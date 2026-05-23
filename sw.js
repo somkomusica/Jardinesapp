@@ -1,7 +1,7 @@
-// Service Worker: Siempre busca la versión más reciente
 const CACHE_NAME = 'jardin-live';
 
 self.addEventListener('install', () => self.skipWaiting());
+
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then(names => Promise.all(
@@ -10,7 +10,6 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Network First: siempre intenta traer lo más nuevo
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(

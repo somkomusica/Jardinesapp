@@ -15,7 +15,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js"></script>
@@ -447,6 +446,321 @@ hr.sep { border: none; border-top: 0.5px dashed var(--border); margin: 14px 0; }
 .spacer { flex: 1; }
 audio { filter: grayscale(1); width: 100%; height: 32px; }
 @media (prefers-color-scheme: dark) { audio { filter: grayscale(1) invert(0.9); } }
+
+/* MODAL */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: none; align-items: center; justify-content: center;
+  z-index: 2000; padding: 20px; backdrop-filter: blur(3px);
+}
+.modal-backdrop.open { display: flex; }
+.modal-card {
+  background: var(--bg); border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius); padding: 22px 22px 18px;
+  max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+.modal-card h3 { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-weight: 400; margin-bottom: 16px; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-secondary); display: block; margin-bottom: 6px; }
+.radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.radio-group button {
+  background: transparent; border: 0.5px solid var(--border-strong); border-radius: 6px;
+  padding: 9px 12px; font-family: var(--font); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-secondary); cursor: pointer; flex: 1; min-width: 70px;
+}
+.radio-group button:hover { color: var(--text); }
+.radio-group button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; padding-top: 14px; border-top: 0.5px solid var(--border); }
+
+/* Jardín sort */
+.jardin-sort { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 10px 0 14px; }
+.jardin-sort .lab { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint); margin-right: 4px; }
+.jardin-sort button { background: transparent; border: 0.5px solid var(--border); font-family: var(--font); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 5px 10px; border-radius: 14px; color: var(--text-secondary); cursor: pointer; }
+.jardin-sort button:hover { color: var(--text); }
+.jardin-sort button.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+/* Plant detail — expanded editor (same capacity as flor) */
+.plant-detail .pd-section { margin-top: 14px; padding-top: 12px; border-top: 0.5px dashed var(--border); }
+.plant-detail .pd-section:first-of-type { border-top: none; padding-top: 0; margin-top: 10px; }
+.plant-detail .pd-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.plant-detail .pd-grid-3 { display: grid; grid-template-columns: 100px 1fr 1fr; gap: 8px; }
+@media (max-width: 580px) { .plant-detail .pd-grid-2, .plant-detail .pd-grid-3 { grid-template-columns: 1fr; } }
+.plant-detail .pd-slot { margin-top: 10px; }
+.plant-detail .pd-slot .pd-img { width: 100%; max-height: 40vh; object-fit: contain; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--bg-soft); }
+.plant-detail .pd-slot audio { width: 100%; }
+.plant-detail .pd-slot .pd-empty { padding: 12px; border: 0.5px dashed var(--border); border-radius: 6px; text-align: center; display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+
+/* Flor card — visually attractive (Flores = baúl final) */
+.flor-row { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; transition: all .15s; }
+.flor-row:hover { border-color: var(--gold); }
+.flor-row.open { border-color: var(--gold-light); }
+.flor-head { display: grid; grid-template-columns: auto 80px 1fr auto; gap: 12px; align-items: center; cursor: pointer; }
+.flor-cover { aspect-ratio: 1; border-radius: 5px; overflow: hidden; background: linear-gradient(135deg, var(--gold-soft), var(--bg-soft)); display: flex; align-items: center; justify-content: center; border: 0.5px solid var(--border); }
+.flor-cover img { width: 100%; height: 100%; object-fit: cover; }
+.flor-cover .ti { font-size: 28px; color: var(--gold); opacity: 0.45; }
+.flor-row .flor-title { font-weight: 500; font-size: 14px; transition: color .15s; }
+.flor-row.open .flor-title { color: var(--gold); font-weight: 600; font-size: 16px; }
+.flor-row .flor-preview { font-size: 11px; color: var(--text-faint); margin-top: 4px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-style: italic; line-height: 1.45; }
+.flor-row .flor-stage-pills { display: flex; gap: 3px; margin-top: 6px; }
+.flor-row .flor-stage-pills .sp { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.flor-row .flor-stage-pills .sp.done { background: var(--gold); }
+.flor-row .flor-meta { font-size: 9px; letter-spacing: 0.14em; color: var(--text-secondary); text-transform: uppercase; display: flex; flex-direction: column; gap: 3px; align-items: flex-end; }
+.flor-row .flor-meta .pct { color: var(--gold); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; }
+@media (max-width: 580px) {
+  .flor-head { grid-template-columns: auto 60px 1fr; }
+  .flor-row .flor-meta { display: none; }
+}
+
+/* Flores toolbar */
+.flor-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 14px 0; }
+.flor-filter-pills { display: flex; gap: 4px; }
+.flor-filter-pills button { background: transparent; border: 0.5px solid var(--border); font-family: var(--font); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 5px 10px; border-radius: 14px; color: var(--text-secondary); cursor: pointer; }
+.flor-filter-pills button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+/* RIEGO — Modo fullscreen (focus inmersivo) */
+.riego-fullscreen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 999;
+  display: none;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 28px;
+  text-align: center;
+  padding: 40px 20px;
+  animation: rf-fade 0.35s ease-out;
+}
+.riego-fullscreen.open { display: flex; }
+@keyframes rf-fade { from { opacity: 0; } to { opacity: 1; } }
+.riego-fullscreen .rf-target {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 400;
+  max-width: 80vw;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.riego-fullscreen .rf-timer {
+  font-size: 84px;
+  font-weight: 200;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text);
+}
+@media (max-width: 580px) {
+  .riego-fullscreen .rf-timer { font-size: 64px; }
+}
+.riego-fullscreen .rf-mantra {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 300;
+  font-style: italic;
+  max-width: 420px;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+}
+.riego-fullscreen .rf-mantra::before { content: '"'; opacity: 0.5; }
+.riego-fullscreen .rf-mantra::after  { content: '"'; opacity: 0.5; }
+.riego-fullscreen .rf-mantra.empty { display: none; }
+.riego-duration-picker {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+}
+.riego-duration-picker button {
+  padding: 12px 22px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .15s;
+}
+.riego-duration-picker button:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.riego-duration-picker .rf-pick-lab {
+  width: 100%; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-faint); margin-bottom: 6px; flex-basis: 100%;
+}
+.riego-fullscreen .rf-stop {
+  margin-top: 8px;
+  padding: 10px 22px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  font-family: var(--font); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-secondary);
+  cursor: pointer; transition: all .15s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.riego-fullscreen .rf-stop:hover { color: var(--text); border-color: var(--text); }
+.riego-fullscreen .rf-stop .ti { font-size: 13px; }
+.riego-fullscreen .rf-elapsed {
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* BÚSQUEDA GLOBAL */
+.global-search-wrap { position: relative; margin-top: 12px; }
+.global-search {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-card); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 8px 12px;
+  backdrop-filter: blur(8px);
+  transition: border-color .15s;
+}
+.global-search:focus-within { border-color: var(--gold); }
+.global-search > .ti-search { color: var(--text-faint); font-size: 14px; flex-shrink: 0; }
+.global-search input {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-family: var(--font); font-size: 12px; color: var(--text);
+  padding: 0; min-width: 0;
+}
+.global-search input::placeholder { color: var(--text-faint); font-style: italic; letter-spacing: 0.02em; }
+.global-search #gsClear {
+  background: none; border: none; color: var(--text-faint);
+  cursor: pointer; padding: 2px 4px; display: flex; align-items: center;
+}
+.global-search #gsClear:hover { color: var(--gold); }
+.global-search #gsClear .ti { font-size: 13px; }
+
+.search-results {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--bg); border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  max-height: 60vh; overflow-y: auto;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+}
+.search-results.open { display: block; }
+.search-results .sr-group { border-bottom: 0.5px dashed var(--border); padding-bottom: 6px; }
+.search-results .sr-group:last-child { border-bottom: none; }
+.search-results .sr-group-head {
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); padding: 9px 14px 6px;
+  font-weight: 500;
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--bg-soft);
+  border-bottom: 0.5px solid var(--border);
+}
+.search-results .sr-group-head .ti { font-size: 11px; margin-right: 4px; }
+.search-results .sr-group-head .count { color: var(--text-faint); font-weight: 400; letter-spacing: 0.1em; }
+.search-results .sr-item {
+  padding: 9px 14px; cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: background .12s, border-color .12s;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.search-results .sr-item:hover,
+.search-results .sr-item.active {
+  background: var(--gold-soft);
+  border-left-color: var(--gold);
+}
+.search-results .sr-item .sr-body { flex: 1; min-width: 0; }
+.search-results .sr-item .sr-title {
+  font-size: 12px; font-weight: 500; color: var(--text);
+  margin-bottom: 3px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.search-results .sr-item .sr-preview {
+  font-size: 10px; color: var(--text-secondary);
+  overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  line-height: 1.45;
+}
+.search-results .sr-item .sr-meta {
+  font-size: 9px; letter-spacing: 0.14em; color: var(--text-faint);
+  text-transform: uppercase; white-space: nowrap; padding-top: 2px;
+  flex-shrink: 0;
+}
+.search-results .sr-item mark {
+  background: var(--gold-soft); color: var(--gold);
+  font-weight: 600; padding: 0 2px; border-radius: 2px;
+}
+.search-results .sr-empty {
+  padding: 18px 14px; text-align: center;
+  color: var(--text-faint); font-style: italic; font-size: 11px;
+}
+.search-results .sr-hint {
+  padding: 6px 14px; font-size: 9px; color: var(--text-faint);
+  text-align: center; letter-spacing: 0.18em; text-transform: uppercase;
+  border-top: 0.5px dashed var(--border);
+  background: var(--bg-soft);
+}
+
+/* pulse al navegar a un resultado */
+@keyframes search-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(184,134,11,0); background-color: transparent; }
+  15%  { box-shadow: 0 0 0 3px rgba(184,134,11,0.45); background-color: var(--gold-soft); }
+  100% { box-shadow: 0 0 0 0 rgba(184,134,11,0); background-color: transparent; }
+}
+.search-pulse { animation: search-pulse 1.8s ease-out 1; border-radius: var(--radius); }
+
+/* DRAG & DROP */
+.dnd-dragging {
+  opacity: 0.7;
+  box-shadow: 0 4px 16px rgba(184,134,11,0.2);
+  cursor: grabbing !important;
+  transition: none !important;
+  background: var(--bg);
+  border-radius: var(--radius);
+}
+.dnd-placeholder {
+  height: 2px;
+  background: var(--gold);
+  border-radius: 1px;
+  margin: 0;
+  pointer-events: none;
+  animation: dnd-ph-pulse 1s ease-in-out infinite;
+}
+@keyframes dnd-ph-pulse {
+  0%, 100% { opacity: 0.55; box-shadow: 0 0 0 0 rgba(184,134,11,0); }
+  50%      { opacity: 1; box-shadow: 0 0 4px rgba(184,134,11,0.5); }
+}
+.dnd-grip {
+  background: transparent; border: none;
+  cursor: grab;
+  padding: 6px 4px;
+  display: inline-flex; align-items: center;
+  color: var(--text-faint);
+  font-family: var(--font);
+  touch-action: manipulation;
+  flex-shrink: 0;
+  transition: color .12s, opacity .15s;
+}
+.dnd-grip:hover { color: var(--gold); }
+.dnd-grip:active { cursor: grabbing; }
+.dnd-grip .ti { font-size: 14px; }
+
+/* Grips dentro de heads colapsables — visibles en hover */
+.collapsible-head .dnd-grip,
+.flor-head .dnd-grip { opacity: 0; }
+.collapsible:hover > .collapsible-head .dnd-grip,
+.flor-row:hover .flor-head .dnd-grip,
+.collapsible.open > .collapsible-head .dnd-grip,
+.flor-row.open .flor-head .dnd-grip { opacity: 1; }
+@media (hover: none) {
+  .collapsible-head .dnd-grip,
+  .flor-head .dnd-grip { opacity: 0.45; }
+}
+
+/* Misiones — tareas mínimas con grip */
+.mission-tasks { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.mission-task { display: flex; align-items: center; gap: 4px; }
+.mission-task .dnd-grip { opacity: 0.45; }
+.mission-task:hover .dnd-grip { opacity: 1; }
+.mission-task input.flat { flex: 1; margin: 0; }
 </style>
 </head>
 <body>
@@ -465,16 +779,20 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <div class="brand">Jar<span class="acc">dín</span></div>
     <div class="date-display" id="dateDisplay">—</div>
   </div>
+  <div class="global-search-wrap" id="globalSearchWrap">
+    <div class="global-search">
+      <i class="ti ti-search"></i>
+      <input type="text" id="globalSearchInput" placeholder="buscar en todo · semillas, flores, diario..." autocomplete="off" spellcheck="false">
+      <button id="gsClear" style="display:none;" title="limpiar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
 </header>
 
 <nav class="tabs" id="tabs"></nav>
 
 <!-- HOY -->
 <section class="tab" id="tab-hoy">
-  <div data-widget="frase" class="card frase-compact">
-    <div class="label">Frase del día</div>
-    <input type="text" class="mantra-input" id="mantraInput" maxlength="120" placeholder="una verdad para hoy...">
-  </div>
   <div data-widget="voces" class="card dark voces-compact">
     <div class="v-text">
       <div class="v-quote" id="quoteText">—</div>
@@ -516,6 +834,11 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <h2 class="section-title"><i class="ti ti-book"></i> Bitácora del día</h2>
 
     <div class="bita-section">
+      <h3><i class="ti ti-quote"></i> Frase del día</h3>
+      <input type="text" class="mantra-input" id="mantraInput" maxlength="120" placeholder="una verdad para hoy..." style="font-size:16px;text-align:left;">
+    </div>
+
+    <div class="bita-section">
       <h3><i class="ti ti-checks"></i> Rituales</h3>
       <div id="habitsTracking"></div>
     </div>
@@ -535,9 +858,20 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <input type="text" class="flat" id="mission-p2" placeholder="prioridad 2..." style="margin-top:4px;">
       <hr class="sep">
       <div class="label gray"><span class="num">3</span>Tareas mínimas</div>
-      <input type="text" class="flat" id="mission-t1" placeholder="tarea 1...">
-      <input type="text" class="flat" id="mission-t2" placeholder="tarea 2..." style="margin-top:4px;">
-      <input type="text" class="flat" id="mission-t3" placeholder="tarea 3..." style="margin-top:4px;">
+      <div class="mission-tasks" id="missionTasks">
+        <div class="mission-task" data-mtask="t1">
+          <button class="dnd-grip" type="button" aria-label="reordenar tarea"><i class="ti ti-grip-vertical"></i></button>
+          <input type="text" class="flat" id="mission-t1" placeholder="tarea 1...">
+        </div>
+        <div class="mission-task" data-mtask="t2">
+          <button class="dnd-grip" type="button" aria-label="reordenar tarea"><i class="ti ti-grip-vertical"></i></button>
+          <input type="text" class="flat" id="mission-t2" placeholder="tarea 2...">
+        </div>
+        <div class="mission-task" data-mtask="t3">
+          <button class="dnd-grip" type="button" aria-label="reordenar tarea"><i class="ti ti-grip-vertical"></i></button>
+          <input type="text" class="flat" id="mission-t3" placeholder="tarea 3...">
+        </div>
+      </div>
     </div>
 
     <div class="bita-section">
@@ -576,7 +910,8 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 <!-- JARDÍN -->
 <section class="tab" id="tab-jardin">
   <div class="card">
-    <h2 class="section-title"><i class="ti ti-plant-2"></i> Jardín — seguimiento del proyecto</h2>
+    <h2 class="section-title"><i class="ti ti-plant-2"></i> Jardín — proyectos en crecimiento</h2>
+    <p class="tab-hint">plantas (ideas en progreso) · al completar todas las etapas, florecen y pasan a Flores</p>
     <div class="project-bar">
       <select id="jardinProjectSel"></select>
       <button class="btn ghost tiny" id="jardinProjectNew"><i class="ti ti-plus"></i> Nuevo</button>
@@ -584,13 +919,19 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     </div>
     <div id="jardinProjectHeader"></div>
 
-    <h3 class="sub-title"><i class="ti ti-flower"></i> Producción</h3>
+    <h3 class="sub-title"><i class="ti ti-plant"></i> Plantas en crecimiento</h3>
     <div class="tab-hint" id="jardinProgress" style="margin-bottom:4px;">—</div>
+    <div class="jardin-sort">
+      <span class="lab">Orden:</span>
+      <button data-sort="progress">Progreso</button>
+      <button data-sort="az">A-Z</button>
+      <button data-sort="priority">Prioridad</button>
+    </div>
     <div class="garden-svg" id="gardenSvg"></div>
     <div id="plantDetail"></div>
 
     <h3 class="sub-title"><i class="ti ti-messages"></i> Seguimiento</h3>
-    <p class="tab-hint">notas y comentarios cronológicos</p>
+    <p class="tab-hint">notas y comentarios cronológicos del proyecto</p>
     <div class="tracking-add">
       <input type="text" id="trackingNew" placeholder="nueva nota de seguimiento...">
       <button class="btn gold tiny" id="trackingAdd"><i class="ti ti-plus"></i></button>
@@ -608,11 +949,17 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 <!-- FLORES -->
 <section class="tab" id="tab-flores">
   <div class="card">
-    <h2 class="section-title"><i class="ti ti-flower"></i> Flores — archivo</h2>
-    <p class="tab-hint">información finalizada por canción</p>
-    <div style="display:flex;gap:8px;margin:14px 0;flex-wrap:wrap;">
-      <select id="florProjectFilter" style="max-width:240px;"></select>
-      <input type="text" id="florSearch" placeholder="buscar letra o título...">
+    <h2 class="section-title"><i class="ti ti-flower"></i> Flores — baúl final</h2>
+    <p class="tab-hint">ideas completadas · archivo del proceso y archivos finales</p>
+    <div class="flor-toolbar">
+      <select id="florProjectFilter" style="max-width:200px;flex:1;"></select>
+      <div class="flor-filter-pills">
+        <button data-flor-filter="complete">Cosechadas</button>
+        <button data-flor-filter="all">Todas</button>
+      </div>
+    </div>
+    <div class="flor-toolbar">
+      <input type="text" id="florSearch" placeholder="buscar letra o título..." style="flex:1;">
       <button class="btn gold" id="florNew"><i class="ti ti-plus"></i> Nueva flor</button>
     </div>
     <div id="florList"></div>
@@ -827,6 +1174,51 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 
 <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
 
+<!-- MODO RIEGO — Fullscreen focus -->
+<div class="riego-fullscreen" id="riegoFullscreen">
+  <div class="rf-target" id="rfTarget">—</div>
+  <div id="rfTimerWrap">
+    <div class="rf-timer" id="rfTimer" style="display:none;">25:00</div>
+    <div class="riego-duration-picker" id="rfPicker">
+      <div class="rf-pick-lab">Elegí duración</div>
+      <button data-dur="25">25 min</button>
+      <button data-dur="35">35 min</button>
+      <button data-dur="45">45 min</button>
+    </div>
+  </div>
+  <div class="rf-mantra" id="rfMantra"></div>
+  <div class="rf-elapsed" id="rfElapsed" style="display:none;">—</div>
+  <button class="rf-stop" id="rfStop"><i class="ti ti-x"></i> Parar</button>
+</div>
+
+<!-- MODAL: Nuevo proyecto -->
+<div class="modal-backdrop" id="newProjModal">
+  <div class="modal-card">
+    <h3><i class="ti ti-plant-2" style="margin-right:6px;"></i>Nuevo proyecto</h3>
+    <div class="modal-field">
+      <label>Nombre</label>
+      <input type="text" id="newProjName" placeholder="(en blanco para nombrarlo después)" autocomplete="off">
+    </div>
+    <div class="modal-field">
+      <label>Categoría</label>
+      <div class="radio-group" id="newProjTypeGroup">
+        <button data-type="Single">Single</button>
+        <button data-type="EP">EP</button>
+        <button data-type="Álbum">Álbum</button>
+        <button data-type="Otro">Otro</button>
+      </div>
+    </div>
+    <div class="modal-field" id="newProjCustomWrap" style="display:none;">
+      <label>Especificar categoría</label>
+      <input type="text" id="newProjCustom" placeholder="ej: Demo, Colaboración, Sesión...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost tiny" id="newProjCancel">Cancelar</button>
+      <button class="btn gold tiny" id="newProjCreate"><i class="ti ti-check"></i> Crear</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ========================= DEFAULTS =========================
 const DEFAULT_QUOTES = [
@@ -888,17 +1280,18 @@ const TABS_META = {
 };
 
 const HOY_WIDGETS_META = {
-  frase:    {name:"Frase del día",    desc:"Una verdad para hoy"},
   voces:    {name:"Voces",            desc:"Banco de citas rotatorias"},
   stats:    {name:"Stats",            desc:"Racha y % de álbum"},
   riego:    {name:"Riego",            desc:"Pomodoro 25min"},
-  bitacora: {name:"Bitácora del día", desc:"Rituales, intención, misiones, reflexión"},
+  bitacora: {name:"Bitácora del día", desc:"Frase, rituales, intención, misiones, reflexión"},
 };
+
+const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 
 const DEFAULT_CONFIG = {
   tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','ajustes'],
   tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, ajustes:true},
-  hoyWidgets: {frase:true, voces:true, stats:true, riego:true, bitacora:true},
+  hoyWidgets: {voces:true, stats:true, riego:true, bitacora:true},
   theme: 'auto',
 };
 
@@ -921,6 +1314,8 @@ const defaults = {
   brand: {logoData:'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit:'', gallery:''},
   expandedProject: false,
   openSemillas: {},
+  jardinSort: 'progress', // 'progress' | 'az' | 'priority'
+  floresFilter: 'complete', // 'complete' | 'all'
 };
 
 // ========================= UTILS =========================
@@ -964,8 +1359,8 @@ function migrate(state) {
     delete state.config.tabVisible.inspiracion;
   }
   DEFAULT_CONFIG.tabOrder.forEach(t => { if (!state.config.tabOrder.includes(t)) state.config.tabOrder.push(t); });
-  // Drop legacy widget keys (habits, intention, missions are now inside bitacora)
-  ['habits','intention','missions'].forEach(k => { if (k in state.config.hoyWidgets) delete state.config.hoyWidgets[k]; });
+  // Drop legacy widget keys (habits, intention, missions, frase are now inside bitacora)
+  ['habits','intention','missions','frase'].forEach(k => { if (k in state.config.hoyWidgets) delete state.config.hoyWidgets[k]; });
   Object.keys(DEFAULT_CONFIG.hoyWidgets).forEach(k => { if (!(k in state.config.hoyWidgets)) state.config.hoyWidgets[k] = true; });
 
   // Brand profile
@@ -1014,6 +1409,14 @@ function migrate(state) {
     if (!('socialContent' in f)) f.socialContent = '';
     if (!('description' in f)) f.description = '';
     if (!('projectId' in f)) f.projectId = 1;
+    if (!('photoData' in f)) f.photoData = null;
+    if (!('audioData' in f)) f.audioData = null;
+    if (!('audioSec' in f)) f.audioSec = 0;
+    if (!('priority' in f)) f.priority = 0;
+  });
+  // Project types — ensure valid
+  (state.projects||[]).forEach(p => {
+    if (!p.type) p.type = 'Álbum';
   });
 
   // Semillas: migrate from inspiraciones / refs / old semillas (with .stage)
@@ -1494,9 +1897,18 @@ function renderJardinProjectHeader() {
         <div class="col-meta">${flores.length} flores · <span style="color:var(--gold);">${pct}%</span></div>
       </div>
       <div class="collapsible-body" style="padding:14px 16px;background:var(--bg-card);border:0.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);">
-        <div class="project-meta"><input type="text" class="project-name-input" value="${escapeHTML(p.name)}" data-pfield="name"></div>
-        <div class="row-flex" style="gap:10px;">
-          <div style="flex:0 0 160px;"><div class="lab" style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Tipo</div><input type="text" class="project-type-input" value="${escapeHTML(p.type)}" data-pfield="type" placeholder="Álbum, EP, Single..."></div>
+        <div class="project-meta"><input type="text" class="project-name-input" value="${escapeHTML(p.name)}" data-pfield="name" placeholder="nombre del proyecto..."></div>
+        <div class="row-flex" style="gap:10px;flex-wrap:wrap;">
+          <div style="flex:0 0 220px;"><div class="lab" style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Categoría</div>
+            <select data-pfield="type" style="font-size:11px;">
+              <option ${p.type==='Single'?'selected':''}>Single</option>
+              <option ${p.type==='EP'?'selected':''}>EP</option>
+              <option ${p.type==='Álbum'?'selected':''}>Álbum</option>
+              ${!['Single','EP','Álbum'].includes(p.type)?`<option selected>${escapeHTML(p.type)}</option>`:''}
+              <option value="__custom">Otro (editar abajo)</option>
+            </select>
+          </div>
+          <div style="flex:1;min-width:140px;"><div class="lab" style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Personalizar categoría</div><input type="text" value="${!['Single','EP','Álbum'].includes(p.type)?escapeHTML(p.type):''}" data-pfield="typeCustom" placeholder="ej: Demo, Sesión..." style="font-size:11px;"></div>
         </div>
         <div class="stat-bar" style="margin-top:10px;"><div class="stat-bar-fill" style="width:${pct}%"></div></div>
         <div class="project-fields" style="margin-top:14px;">
@@ -1518,12 +1930,30 @@ function renderJardinProjectHeader() {
   `;
   $('#projToggle').addEventListener('click', () => { S.expandedProject = !S.expandedProject; save(); renderJardinProjectHeader(); });
   el.querySelectorAll('[data-pfield]').forEach(inp => {
-    inp.addEventListener('input', e => {
+    const evt = inp.tagName === 'SELECT' ? 'change' : 'input';
+    inp.addEventListener(evt, e => {
       const pp = activeProject();
-      pp[inp.dataset.pfield] = e.target.value;
-      save();
-      if (inp.dataset.pfield === 'name' || inp.dataset.pfield === 'type') {
-        renderJardinProjectSelector(); renderFlorProjectFilter(); populateRiegoTargets();
+      const field = inp.dataset.pfield;
+      if (field === 'typeCustom') {
+        const v = e.target.value.trim();
+        if (v) { pp.type = v; }
+        save(); renderJardinProjectSelector(); renderFlorProjectFilter(); populateRiegoTargets();
+      } else if (field === 'type') {
+        const v = e.target.value;
+        if (v === '__custom') {
+          // wait for typeCustom input — focus it
+          const custom = el.querySelector('[data-pfield="typeCustom"]');
+          if (custom) { custom.focus(); }
+          return;
+        }
+        pp.type = v;
+        save(); renderJardinProjectSelector(); renderFlorProjectFilter(); populateRiegoTargets();
+      } else {
+        pp[field] = e.target.value;
+        save();
+        if (field === 'name') {
+          renderJardinProjectSelector(); renderFlorProjectFilter(); populateRiegoTargets();
+        }
       }
     });
   });
@@ -1533,15 +1963,38 @@ function renderJardinProjectHeader() {
 
 function renderGarden() {
   const p = activeProject();
-  const flores = floresInProject(p.id);
-  const total = flores.length*4;
-  const done = flores.reduce((a,f) => a+STAGES.filter(s=>f[s]).length, 0);
+  const allFlores = floresInProject(p.id);
+  // Plants in Jardín = items NOT fully complete (still growing)
+  const plantas = allFlores.filter(f => !STAGES.every(s => f[s]));
+  // Sort
+  const sort = S.jardinSort || 'progress';
+  if (sort === 'progress') {
+    plantas.sort((a,b) => {
+      const da = STAGES.filter(s => a[s]).length;
+      const db = STAGES.filter(s => b[s]).length;
+      return db - da; // most progress first
+    });
+  } else if (sort === 'az') {
+    plantas.sort((a,b) => (a.title||'').localeCompare(b.title||''));
+  } else if (sort === 'priority') {
+    plantas.sort((a,b) => (b.priority||0) - (a.priority||0));
+  }
+  // Sort menu active state
+  $$('.jardin-sort button').forEach(b => b.classList.toggle('active', b.dataset.sort === sort));
+
+  const total = allFlores.length*4;
+  const done = allFlores.reduce((a,f) => a+STAGES.filter(s=>f[s]).length, 0);
   const pct = total ? Math.round((done/total)*100) : 0;
-  $('#jardinProgress').textContent = `${done}/${total} stages · ${pct}% · click una planta para tracking rápido`;
+  const completedCount = allFlores.filter(f => STAGES.every(s => f[s])).length;
+  $('#jardinProgress').textContent = `${plantas.length} en crecimiento · ${completedCount} cosechadas · ${pct}% global`;
 
   const el = $('#gardenSvg');
-  if (!flores.length) { el.innerHTML = '<div class="empty">sin flores en este proyecto</div>'; $('#plantDetail').innerHTML = ''; return; }
-  el.innerHTML = flores.map(f => {
+  if (!plantas.length) {
+    el.innerHTML = '<div class="empty">sin plantas en crecimiento · siembra una semilla desde el Semillero</div>';
+    $('#plantDetail').innerHTML = '';
+    return;
+  }
+  el.innerHTML = plantas.map(f => {
     const ds = STAGES.filter(s => f[s]).length;
     const p = Math.round((ds/4)*100);
     return `<div class="plant ${p===100?'complete':''}${selectedPlantId===f.id?' active':''}" data-flor="${f.id}" title="${escapeHTML(f.title)} — ${p}%">${plantSVG(p)}<div class="name">${escapeHTML(f.title)}</div></div>`;
@@ -1554,6 +2007,14 @@ function renderGarden() {
   renderPlantDetail();
 }
 
+// Sort menu — bound once
+document.addEventListener('click', e => {
+  const b = e.target.closest('.jardin-sort button');
+  if (!b) return;
+  S.jardinSort = b.dataset.sort;
+  save(); renderGarden();
+});
+
 function renderPlantDetail() {
   const el = $('#plantDetail');
   if (!selectedPlantId) { el.innerHTML = ''; return; }
@@ -1564,34 +2025,142 @@ function renderPlantDetail() {
   el.innerHTML = `
     <div class="plant-detail">
       <div class="head">
-        <div class="title">${escapeHTML(f.title)}</div>
-        <div class="pct">${ds}/4 stages · ${pct}%</div>
+        <input type="text" class="title" data-pf="title" value="${escapeHTML(f.title||'')}" style="border:none;font-weight:500;font-size:14px;color:var(--gold);background:transparent;padding:0;flex:1;">
+        <div class="pct">${ds}/4 · ${pct}%</div>
       </div>
       <div class="stages">
         ${STAGES.map(s => `<div class="stage ${f[s]?'done':''}" data-pstage="${s}">${STAGE_LABELS[s]}</div>`).join('')}
       </div>
       <div class="flor-progress-bar" style="margin:8px 0;"><div style="width:${pct}%"></div></div>
-      <label>Notas de producción</label>
-      <textarea data-pnotes rows="2" placeholder="falta grabar quenas, fix hi hats...">${escapeHTML(f.notes||'')}</textarea>
-      <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:10px;">
+
+      <div class="pd-section">
+        <div class="pd-grid-3">
+          <div><label>Tonalidad</label><input type="text" data-pf="key" value="${escapeHTML(f.key||'')}" placeholder="Am, G..."></div>
+          <div><label>Progresión</label><input type="text" data-pf="chords" value="${escapeHTML(f.chords||'')}" placeholder="Am - F - C - G"></div>
+          <div><label>Prioridad</label><select data-pf="priority"><option value="0" ${(f.priority||0)===0?'selected':''}>—</option><option value="1" ${f.priority===1?'selected':''}>baja</option><option value="2" ${f.priority===2?'selected':''}>media</option><option value="3" ${f.priority===3?'selected':''}>alta</option></select></div>
+        </div>
+      </div>
+
+      <div class="pd-section">
+        <label>Letra con acordes</label>
+        <textarea data-pf="lyrics" rows="6" placeholder="la letra... [Am] [F] sobre las sílabas">${escapeHTML(f.lyrics||'')}</textarea>
+      </div>
+
+      <div class="pd-section">
+        <label>Descripción</label>
+        <textarea data-pf="description" rows="2" placeholder="qué cuenta esta canción, su origen...">${escapeHTML(f.description||'')}</textarea>
+      </div>
+
+      <div class="pd-section">
+        <label>Notas de producción</label>
+        <textarea data-pf="notes" rows="2" placeholder="falta grabar quenas, fix hi hats...">${escapeHTML(f.notes||'')}</textarea>
+      </div>
+
+      <div class="pd-section">
+        <label>Contenido redes sociales</label>
+        <textarea data-pf="socialContent" rows="2" placeholder="copy para teaser, caption para reel...">${escapeHTML(f.socialContent||'')}</textarea>
+      </div>
+
+      <div class="pd-section">
+        <label><i class="ti ti-photo"></i> Foto / portada</label>
+        ${f.photoData ? `
+          <img class="pd-img" src="${f.photoData}" alt="">
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+            <button class="btn ghost tiny" data-pact="photoUp"><i class="ti ti-refresh"></i> Cambiar</button>
+            <button class="btn ghost tiny" data-pact="photoCam"><i class="ti ti-camera"></i> Capturar</button>
+            <button class="btn ghost tiny danger" data-pact="photoRm"><i class="ti ti-x"></i> Quitar</button>
+          </div>
+        ` : `
+          <div class="pd-empty">
+            <button class="btn ghost tiny" data-pact="photoUp"><i class="ti ti-photo-plus"></i> Subir foto</button>
+            <button class="btn ghost tiny" data-pact="photoCam"><i class="ti ti-camera"></i> Capturar</button>
+          </div>
+        `}
+      </div>
+
+      <div class="pd-section">
+        <label><i class="ti ti-microphone"></i> Audio de referencia</label>
+        ${f.audioData ? `
+          <audio controls src="${f.audioData}"></audio>
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+            <span class="muted small">${f.audioSec||0}s</span>
+            <button class="btn ghost tiny" data-pact="audioRec" id="pdRec-${f.id}"><i class="ti ti-refresh"></i> Re-grabar</button>
+            <button class="btn ghost tiny" data-pact="audioDl"><i class="ti ti-download"></i></button>
+            <button class="btn ghost tiny danger" data-pact="audioRm"><i class="ti ti-x"></i> Quitar</button>
+            <span class="voice-status" id="pdStatus-${f.id}"></span>
+            <span class="voice-time" id="pdTime-${f.id}"></span>
+          </div>
+        ` : `
+          <div class="pd-empty">
+            <button class="btn ghost tiny" data-pact="audioRec" id="pdRec-${f.id}"><i class="ti ti-microphone"></i> Grabar audio</button>
+            <span class="voice-status" id="pdStatus-${f.id}"></span>
+            <span class="voice-time" id="pdTime-${f.id}"></span>
+          </div>
+        `}
+      </div>
+
+      <div class="pd-section">
+        <label>Links</label>
+        <div class="kvlist" data-list="pdLinks-${f.id}">${renderKvList(f.links||[])}</div>
+        <button class="btn ghost tiny" data-additem="pdLinks-${f.id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar link</button>
+      </div>
+
+      <div class="pd-section">
+        <label>Archivos</label>
+        <div class="kvlist" data-list="pdFiles-${f.id}">${renderKvList(f.files||[])}</div>
+        <button class="btn ghost tiny" data-additem="pdFiles-${f.id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar archivo</button>
+      </div>
+
+      <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:14px;padding-top:12px;border-top:0.5px solid var(--border);flex-wrap:wrap;">
+        <button class="btn ghost tiny danger" id="plantDel"><i class="ti ti-trash"></i> Eliminar</button>
         <button class="btn ghost tiny" id="plantClose"><i class="ti ti-x"></i> Cerrar</button>
-        <button class="btn gold tiny" id="plantOpenFlor"><i class="ti ti-external-link"></i> Ver en Flores</button>
       </div>
     </div>
   `;
+  // Stage clicks
   el.querySelectorAll('[data-pstage]').forEach(b => b.addEventListener('click', () => {
     const stage = b.dataset.pstage;
     const wasComplete = STAGES.every(s => f[s]);
     f[stage] = !f[stage];
     const nowComplete = STAGES.every(s => f[s]);
     save(); renderGarden(); renderAlbumStat(); renderJardinProjectHeader();
-    if (!wasComplete && nowComplete) { toast(`Cosecha — ${f.title} floreció`, '✦'); if (navigator.vibrate) navigator.vibrate([60,40,60,40,100]); }
+    if (!wasComplete && nowComplete) {
+      toast(`Cosecha — ${f.title} floreció · ahora en Flores`, '✦');
+      if (navigator.vibrate) navigator.vibrate([60,40,60,40,100]);
+      // After cosecha, the plant disappears from Jardín
+      selectedPlantId = null;
+      renderGarden();
+      renderFlores();
+    }
   }));
-  el.querySelector('[data-pnotes]').addEventListener('input', e => { f.notes = e.target.value; save(); });
+  // Field bindings
+  el.querySelectorAll('[data-pf]').forEach(inp => inp.addEventListener('input', e => {
+    const field = inp.dataset.pf;
+    if (field === 'priority') f[field] = +e.target.value;
+    else f[field] = e.target.value;
+    save();
+    if (field === 'title' || field === 'priority') renderGarden();
+  }));
+  // Action bindings
+  el.querySelectorAll('[data-pact]').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.pact;
+    if (a === 'photoUp') { photoContext = {type:'planta', id:f.id}; $('#photoInput').click(); }
+    if (a === 'photoCam') { photoContext = {type:'planta', id:f.id}; $('#photoCamera').click(); }
+    if (a === 'photoRm') { f.photoData = null; save(); renderPlantDetail(); }
+    if (a === 'audioRec') toggleRecording({type:'planta', id:f.id, statusId:'pdStatus-'+f.id, timeId:'pdTime-'+f.id, btnId:'pdRec-'+f.id});
+    if (a === 'audioRm') { f.audioData = null; f.audioSec = 0; save(); renderPlantDetail(); }
+    if (a === 'audioDl') { const aEl = document.createElement('a'); aEl.href = f.audioData; aEl.download = (f.title||'audio').replace(/[^\w\-]/g,'_')+'.webm'; aEl.click(); }
+  }));
+  // KV lists
+  bindKvList(el, `pdLinks-${f.id}`, () => f.links, renderPlantDetail);
+  bindKvList(el, `pdFiles-${f.id}`, () => f.files, renderPlantDetail);
+  // Close / delete
   $('#plantClose').addEventListener('click', () => { selectedPlantId = null; renderGarden(); });
-  $('#plantOpenFlor').addEventListener('click', () => {
-    openFlorId = f.id;
-    switchTab('flores');
+  $('#plantDel').addEventListener('click', () => {
+    if (!confirm(`Eliminar la planta "${f.title}"?`)) return;
+    S.flores = S.flores.filter(x => x.id !== f.id);
+    selectedPlantId = null;
+    save(); renderGarden(); renderAlbumStat(); renderJardinProjectHeader();
   });
 }
 
@@ -1630,13 +2199,44 @@ function addTrackingNote() {
 }
 
 $('#jardinProjectSel').addEventListener('change', e => { S.activeProjectId = +e.target.value; selectedPlantId = null; save(); renderJardin(); renderAlbumStat(); });
-$('#jardinProjectNew').addEventListener('click', () => {
-  const name = prompt('Nombre del proyecto:', 'Nuevo proyecto'); if (!name) return;
-  const type = prompt('Tipo (Álbum / EP / Single):', 'Álbum') || 'Álbum';
+
+// New project modal
+let newProjType = 'Álbum';
+function openNewProjectModal() {
+  $('#newProjName').value = '';
+  $('#newProjCustom').value = '';
+  newProjType = 'Álbum';
+  $('#newProjCustomWrap').style.display = 'none';
+  $$('#newProjTypeGroup button').forEach(b => b.classList.toggle('active', b.dataset.type === 'Álbum'));
+  $('#newProjModal').classList.add('open');
+  setTimeout(() => $('#newProjName').focus(), 60);
+}
+function closeNewProjectModal() { $('#newProjModal').classList.remove('open'); }
+$('#jardinProjectNew').addEventListener('click', openNewProjectModal);
+$('#newProjCancel').addEventListener('click', closeNewProjectModal);
+$('#newProjModal').addEventListener('click', e => { if (e.target.id === 'newProjModal') closeNewProjectModal(); });
+$$('#newProjTypeGroup button').forEach(b => b.addEventListener('click', () => {
+  newProjType = b.dataset.type;
+  $$('#newProjTypeGroup button').forEach(x => x.classList.toggle('active', x.dataset.type === newProjType));
+  $('#newProjCustomWrap').style.display = newProjType === 'Otro' ? 'block' : 'none';
+  if (newProjType === 'Otro') setTimeout(() => $('#newProjCustom').focus(), 60);
+}));
+$('#newProjName').addEventListener('keydown', e => { if (e.key === 'Enter') createNewProject(); });
+$('#newProjCustom').addEventListener('keydown', e => { if (e.key === 'Enter') createNewProject(); });
+$('#newProjCreate').addEventListener('click', createNewProject);
+function createNewProject() {
+  const name = $('#newProjName').value.trim() || 'Proyecto sin nombre';
+  let type = newProjType;
+  if (type === 'Otro') {
+    const c = $('#newProjCustom').value.trim();
+    type = c || 'Otro';
+  }
   const np = {id: uid(), name, type, description:'', socialContent:'', links:[], files:[], trackingLog:[]};
   S.projects.push(np); S.activeProjectId = np.id;
-  save(); renderJardin(); renderAlbumStat(); renderFlorProjectFilter(); populateRiegoTargets();
-});
+  save(); closeNewProjectModal();
+  renderJardin(); renderAlbumStat(); renderFlorProjectFilter(); populateRiegoTargets();
+  toast(`Proyecto creado · ${name}`, '✦');
+}
 $('#jardinProjectDel').addEventListener('click', () => {
   if (S.projects.length <= 1) { toast('Necesitas al menos un proyecto'); return; }
   const p = activeProject();
@@ -1649,33 +2249,135 @@ $('#jardinProjectDel').addEventListener('click', () => {
 });
 
 // ========================= RIEGO =========================
-let riegoInterval=null, riegoRemaining=25*60, riegoActive=false, riegoTargetId='';
+let riegoInterval=null, riegoRemaining=25*60, riegoActive=false, riegoTargetId='', riegoTargetLabel='', riegoDurationMin=25;
 function fmtTime(s) { const m=Math.floor(s/60), r=s%60; return String(m).padStart(2,'0')+':'+String(r).padStart(2,'0'); }
-function renderRiegoTime() { $('#riegoTime').textContent = fmtTime(riegoRemaining); }
+function renderRiegoTime() {
+  $('#riegoTime').textContent = fmtTime(riegoRemaining);
+  const rft = $('#rfTimer'); if (rft) rft.textContent = fmtTime(riegoRemaining);
+}
 function populateRiegoTargets() {
   const sel = $('#riegoTarget');
   let opts = '<option value="">— elige qué regar —</option>';
   S.flores.forEach(f => opts += `<option value="flor-${f.id}">${escapeHTML(f.title)}</option>`);
   sel.innerHTML = opts;
 }
-$('#riegoStart').addEventListener('click', () => {
-  if (riegoActive) return;
-  riegoTargetId = $('#riegoTarget').value;
-  if (!riegoTargetId) { toast('Elige qué regar'); return; }
+
+// Modo Riego — fullscreen focus
+function openRiegoFullscreen() {
+  const fs = $('#riegoFullscreen');
+  $('#rfTarget').textContent = riegoTargetLabel || '—';
+  const m = (S.mantra||'').trim();
+  const mantraEl = $('#rfMantra');
+  mantraEl.textContent = m;
+  mantraEl.classList.toggle('empty', !m);
+  // Show picker, hide timer
+  $('#rfPicker').style.display = 'flex';
+  $('#rfTimer').style.display = 'none';
+  $('#rfElapsed').style.display = 'none';
+  fs.classList.add('open');
+  $('#riegoState').textContent = 'modo riego · elige duración';
+}
+function closeRiegoFullscreen() {
+  $('#riegoFullscreen').classList.remove('open');
+}
+function startRiegoTimer(minutes) {
+  riegoDurationMin = minutes;
+  riegoRemaining = minutes * 60;
   riegoActive = true;
-  $('#riegoState').textContent = 'regando · ' + $('#riegoTarget').selectedOptions[0].text;
+  renderRiegoTime();
+  $('#rfPicker').style.display = 'none';
+  $('#rfTimer').style.display = 'block';
+  $('#rfElapsed').style.display = 'block';
+  $('#rfElapsed').textContent = `0 / ${minutes} min`;
+  $('#riegoState').textContent = 'regando · ' + riegoTargetLabel;
+  if (riegoInterval) clearInterval(riegoInterval);
   riegoInterval = setInterval(() => {
     riegoRemaining--;
+    const elapsed = (minutes*60) - riegoRemaining;
+    const elapsedMin = Math.floor(elapsed/60);
+    $('#rfElapsed').textContent = `${elapsedMin} / ${minutes} min`;
     if (riegoRemaining <= 0) {
-      clearInterval(riegoInterval); riegoActive=false; riegoRemaining=25*60; renderRiegoTime();
-      $('#riegoState').textContent = 'sesión completa';
-      S.riegoSessions.push({target:riegoTargetId, date:todayStr(), at:Date.now()}); save();
-      toast('Riego completado · 25 min','✦');
-      if (navigator.vibrate) navigator.vibrate([200,100,200]);
+      finishRiegoSession(true);
     } else renderRiegoTime();
   }, 1000);
+}
+function stopRiegoSession(manual=true) {
+  if (riegoInterval) clearInterval(riegoInterval);
+  riegoActive = false;
+  // If they manually stopped mid-session, still record what they did (if >= 60s)
+  if (manual && riegoTargetId) {
+    const minutesDone = riegoDurationMin - Math.ceil(riegoRemaining/60);
+    if (minutesDone >= 1) {
+      S.riegoSessions.push({target:riegoTargetId, label:riegoTargetLabel, date:todayStr(), at:Date.now(), minutes:minutesDone, planned:riegoDurationMin, completed:false});
+      save();
+    }
+  }
+  riegoRemaining = 25*60; renderRiegoTime();
+  $('#riegoState').textContent = 'en pausa';
+  closeRiegoFullscreen();
+}
+function finishRiegoSession(completed) {
+  if (riegoInterval) clearInterval(riegoInterval);
+  riegoActive = false;
+  const planned = riegoDurationMin;
+  S.riegoSessions.push({target:riegoTargetId, label:riegoTargetLabel, date:todayStr(), at:Date.now(), minutes:planned, planned, completed:true});
+  save();
+  riegoRemaining = 25*60; renderRiegoTime();
+  $('#riegoState').textContent = 'sesión completa';
+  playRiegoEndChime();
+  toast(`Riego completado · ${planned} min`,'✦');
+  if (navigator.vibrate) navigator.vibrate([200,100,200,100,200]);
+  closeRiegoFullscreen();
+}
+function playRiegoEndChime() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    // Two sutil bell-like tones
+    const tones = [{f:660, t:0.0, d:0.35}, {f:880, t:0.18, d:0.5}];
+    tones.forEach(({f,t,d}) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      gain.gain.setValueAtTime(0, ctx.currentTime + t);
+      gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + d);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + d + 0.05);
+    });
+    setTimeout(() => ctx.close && ctx.close(), 1500);
+  } catch (e) { /* silencioso si no hay audio */ }
+}
+
+$('#riegoStart').addEventListener('click', () => {
+  if (riegoActive) { openRiegoFullscreen(); return; }
+  riegoTargetId = $('#riegoTarget').value;
+  if (!riegoTargetId) { toast('Elige qué regar'); return; }
+  riegoTargetLabel = $('#riegoTarget').selectedOptions[0].text;
+  openRiegoFullscreen();
 });
-$('#riegoStop').addEventListener('click', () => { clearInterval(riegoInterval); riegoActive=false; riegoRemaining=25*60; renderRiegoTime(); $('#riegoState').textContent='en pausa'; });
+$('#riegoStop').addEventListener('click', () => {
+  if (riegoActive) stopRiegoSession(true);
+  else { clearInterval(riegoInterval); riegoRemaining=25*60; renderRiegoTime(); $('#riegoState').textContent='en pausa'; closeRiegoFullscreen(); }
+});
+
+// Fullscreen picker buttons
+$$('#rfPicker button[data-dur]').forEach(b => b.addEventListener('click', () => {
+  const dur = +b.dataset.dur;
+  if (!dur) return;
+  startRiegoTimer(dur);
+}));
+// Fullscreen stop button
+$('#rfStop').addEventListener('click', () => stopRiegoSession(true));
+// Escape key cierra el modo riego (pero no detiene si está corriendo — solo oculta)
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('#riegoFullscreen').classList.contains('open')) {
+    if (!riegoActive) closeRiegoFullscreen(); // si todavía no eligió duración, solo cerrar
+  }
+});
 
 // ========================= FLORES (flat archive) =========================
 let openFlorId = null;
@@ -1692,52 +2394,108 @@ function renderFlorProjectFilter() {
 
 function renderFlores() {
   renderFlorProjectFilter();
+  // Update filter pills
+  $$('.flor-filter-pills button').forEach(b => b.classList.toggle('active', b.dataset.florFilter === (S.floresFilter||'complete')));
+
   const list = $('#florList');
   const term = florSearchTerm.toLowerCase();
   let flores = S.flores.slice();
+  // Filter: completed only by default (Flores = baúl final)
+  if ((S.floresFilter||'complete') === 'complete') {
+    flores = flores.filter(f => STAGES.every(s => f[s]));
+  }
   if (florProjectFilter !== 'all') flores = flores.filter(f => f.projectId === +florProjectFilter);
   if (term) flores = flores.filter(f => f.title.toLowerCase().includes(term) || (f.lyrics||'').toLowerCase().includes(term));
-  if (!flores.length) { list.innerHTML = '<div class="empty">sin flores</div>'; return; }
+  if (!flores.length) {
+    list.innerHTML = (S.floresFilter||'complete') === 'complete'
+      ? '<div class="empty">aún sin flores cosechadas · completá todas las etapas de una planta en Jardín para cosecharla</div>'
+      : '<div class="empty">sin flores</div>';
+    return;
+  }
   list.innerHTML = flores.map(f => {
     const open = openFlorId === f.id;
     const ds = STAGES.filter(s => f[s]).length;
     const pct = Math.round((ds/4)*100);
-    const preview = (f.lyrics||'').slice(0,70).replace(/\n/g,' ');
+    const preview = (f.lyrics||f.description||'').slice(0,90).replace(/\n/g,' ');
     const projName = (S.projects.find(p => p.id === f.projectId)||{}).name || '—';
+    const isComplete = ds === 4;
     return `
     <div class="flor-row ${open?'open':''}" data-flor="${f.id}">
       <div class="flor-head" data-toggle="${f.id}">
-        <div>
+        <button class="dnd-grip" type="button" aria-label="reordenar" title="mantener para reordenar"><i class="ti ti-grip-vertical"></i></button>
+        <div class="flor-cover">
+          ${f.photoData ? `<img src="${f.photoData}" alt="">` : `<i class="ti ti-${isComplete?'flower':'plant-2'}"></i>`}
+        </div>
+        <div style="min-width:0;">
           <div class="flor-title">${escapeHTML(f.title)}</div>
           <div class="flor-preview">${escapeHTML(preview || 'sin letra todavía')}</div>
+          <div class="flor-stage-pills">
+            ${STAGES.map(s => `<div class="sp ${f[s]?'done':''}" title="${STAGE_LABELS[s]}"></div>`).join('')}
+          </div>
         </div>
         <div class="flor-meta">
+          <span class="pct">${pct}%</span>
           <span>${escapeHTML(projName)}</span>
           <span>${escapeHTML(f.key||'—')}</span>
-          <span>${ds}/4</span>
-          <span class="gold">${pct}%</span>
         </div>
       </div>
-      <div class="flor-progress-bar"><div style="width:${pct}%"></div></div>
-      <div class="flor-body ${open?'open':''}">
+      <div class="flor-body ${open?'open':''}" style="margin-top:14px;padding-top:14px;border-top:0.5px dashed var(--border);">
         <div class="stages">
           ${STAGES.map(s => `<div class="stage ${f[s]?'done':''}" data-stage="${s}">${STAGE_LABELS[s]}</div>`).join('')}
         </div>
+        <div class="flor-progress-bar"><div style="width:${pct}%"></div></div>
         <div class="row cols-3">
           <div><label>Tonalidad</label><input type="text" data-ff="key" value="${escapeHTML(f.key||'')}" placeholder="Am, G..."></div>
           <div><label>Progresión</label><input type="text" data-ff="chords" value="${escapeHTML(f.chords||'')}" placeholder="Am - F - C - G"></div>
           <div><label>Proyecto</label><select data-ff="projectId">${S.projects.map(p => `<option value="${p.id}" ${p.id===f.projectId?'selected':''}>${escapeHTML(p.name)}</option>`).join('')}</select></div>
         </div>
         <div><label>Letra con acordes</label><textarea data-ff="lyrics" rows="10" placeholder="la letra... pon acordes entre [Am] [F] sobre las sílabas">${escapeHTML(f.lyrics||'')}</textarea></div>
-        <div style="margin-top:10px;"><label>Notas de interpretación / producción</label><textarea data-ff="notes" rows="3">${escapeHTML(f.notes||'')}</textarea></div>
         <div style="margin-top:10px;"><label>Descripción</label><textarea data-ff="description" rows="2" placeholder="qué cuenta esta canción, su origen...">${escapeHTML(f.description||'')}</textarea></div>
+        <div style="margin-top:10px;"><label>Notas de interpretación / producción</label><textarea data-ff="notes" rows="3">${escapeHTML(f.notes||'')}</textarea></div>
         <div style="margin-top:10px;"><label>Contenido redes sociales</label><textarea data-ff="socialContent" rows="3" placeholder="copy para teaser, caption para reel...">${escapeHTML(f.socialContent||'')}</textarea></div>
-        <div style="margin-top:10px;">
+
+        <div style="margin-top:14px;"><label><i class="ti ti-photo"></i> Foto / portada</label>
+          ${f.photoData ? `
+            <img class="pd-img" src="${f.photoData}" alt="" style="width:100%;max-height:40vh;object-fit:contain;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg-soft);">
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+              <button class="btn ghost tiny" data-fact="photoUp" data-id="${f.id}"><i class="ti ti-refresh"></i> Cambiar</button>
+              <button class="btn ghost tiny" data-fact="photoCam" data-id="${f.id}"><i class="ti ti-camera"></i> Capturar</button>
+              <button class="btn ghost tiny danger" data-fact="photoRm" data-id="${f.id}"><i class="ti ti-x"></i> Quitar</button>
+            </div>
+          ` : `
+            <div class="pd-empty" style="padding:12px;border:0.5px dashed var(--border);border-radius:6px;text-align:center;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn ghost tiny" data-fact="photoUp" data-id="${f.id}"><i class="ti ti-photo-plus"></i> Subir foto</button>
+              <button class="btn ghost tiny" data-fact="photoCam" data-id="${f.id}"><i class="ti ti-camera"></i> Capturar</button>
+            </div>
+          `}
+        </div>
+
+        <div style="margin-top:14px;"><label><i class="ti ti-microphone"></i> Audio</label>
+          ${f.audioData ? `
+            <audio controls src="${f.audioData}"></audio>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+              <span class="muted small">${f.audioSec||0}s</span>
+              <button class="btn ghost tiny" data-fact="audioRec" data-id="${f.id}" id="fdRec-${f.id}"><i class="ti ti-refresh"></i> Re-grabar</button>
+              <button class="btn ghost tiny" data-fact="audioDl" data-id="${f.id}"><i class="ti ti-download"></i></button>
+              <button class="btn ghost tiny danger" data-fact="audioRm" data-id="${f.id}"><i class="ti ti-x"></i> Quitar</button>
+              <span class="voice-status" id="fdStatus-${f.id}"></span>
+              <span class="voice-time" id="fdTime-${f.id}"></span>
+            </div>
+          ` : `
+            <div class="pd-empty" style="padding:12px;border:0.5px dashed var(--border);border-radius:6px;text-align:center;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn ghost tiny" data-fact="audioRec" data-id="${f.id}" id="fdRec-${f.id}"><i class="ti ti-microphone"></i> Grabar audio</button>
+              <span class="voice-status" id="fdStatus-${f.id}"></span>
+              <span class="voice-time" id="fdTime-${f.id}"></span>
+            </div>
+          `}
+        </div>
+
+        <div style="margin-top:14px;">
           <label>Links</label>
           <div class="kvlist" data-list="florLinks-${f.id}">${renderKvList(f.links||[])}</div>
           <button class="btn ghost tiny" data-additem="florLinks-${f.id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar link</button>
         </div>
-        <div style="margin-top:10px;">
+        <div style="margin-top:14px;">
           <label>Archivos</label>
           <div class="kvlist" data-list="florFiles-${f.id}">${renderKvList(f.files||[])}</div>
           <button class="btn ghost tiny" data-additem="florFiles-${f.id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar archivo</button>
@@ -1749,7 +2507,8 @@ function renderFlores() {
     </div>`;
   }).join('');
 
-  list.querySelectorAll('[data-toggle]').forEach(el => el.addEventListener('click', () => {
+  list.querySelectorAll('[data-toggle]').forEach(el => el.addEventListener('click', (e) => {
+    if (e.target.closest('.dnd-grip')) return; // no toggle si tocaron el grip
     const id = +el.dataset.toggle; openFlorId = openFlorId === id ? null : id; renderFlores();
   }));
   list.querySelectorAll('.stage').forEach(el => el.addEventListener('click', () => {
@@ -1759,7 +2518,7 @@ function renderFlores() {
     const wasComplete = STAGES.every(s => f[s]);
     f[stage] = !f[stage];
     const nowComplete = STAGES.every(s => f[s]);
-    save(); renderFlores(); renderAlbumStat();
+    save(); renderFlores(); renderAlbumStat(); renderGarden();
     if (!wasComplete && nowComplete) { toast(`Cosecha — ${f.title} floreció`,'✦'); if (navigator.vibrate) navigator.vibrate([60,40,60,40,100]); }
   }));
   list.querySelectorAll('[data-ff]').forEach(inp => inp.addEventListener('input', e => {
@@ -1770,6 +2529,18 @@ function renderFlores() {
     save();
     if (field === 'projectId') renderFlores();
   }));
+  // Photo/audio actions
+  list.querySelectorAll('[data-fact]').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.fact;
+    const id = +b.dataset.id;
+    const f = S.flores.find(x => x.id === id); if (!f) return;
+    if (a === 'photoUp') { photoContext = {type:'flor', id}; $('#photoInput').click(); }
+    if (a === 'photoCam') { photoContext = {type:'flor', id}; $('#photoCamera').click(); }
+    if (a === 'photoRm') { f.photoData = null; save(); renderFlores(); }
+    if (a === 'audioRec') toggleRecording({type:'flor', id, statusId:'fdStatus-'+id, timeId:'fdTime-'+id, btnId:'fdRec-'+id});
+    if (a === 'audioRm') { f.audioData = null; f.audioSec = 0; save(); renderFlores(); }
+    if (a === 'audioDl') { const aEl = document.createElement('a'); aEl.href = f.audioData; aEl.download = (f.title||'audio').replace(/[^\w\-]/g,'_')+'.webm'; aEl.click(); }
+  }));
   S.flores.forEach(f => {
     bindKvList(list, `florLinks-${f.id}`, () => f.links, renderFlores);
     bindKvList(list, `florFiles-${f.id}`, () => f.files, renderFlores);
@@ -1778,16 +2549,32 @@ function renderFlores() {
     if (!confirm('Eliminar esta flor?')) return;
     const id = +b.dataset.delflor;
     S.flores = S.flores.filter(x => x.id !== id); openFlorId = null;
-    save(); renderFlores(); renderAlbumStat();
+    save(); renderFlores(); renderAlbumStat(); renderGarden();
   }));
+  // Drag & drop para reordenar flores
+  makeDraggable(list, {
+    itemSelector: '[data-flor]',
+    handleSelector: '.dnd-grip',
+    getId: el => el.dataset.flor,
+    onReorder: (newOrderIds) => {
+      reorderListByVisible(S.flores, newOrderIds);
+      save();
+      toast('Flores reordenadas', '↕');
+    },
+  });
 }
 $('#florSearch').addEventListener('input', e => { florSearchTerm = e.target.value; renderFlores(); });
 $('#florProjectFilter').addEventListener('change', e => { florProjectFilter = e.target.value; renderFlores(); });
+$$('.flor-filter-pills button').forEach(b => b.addEventListener('click', () => {
+  S.floresFilter = b.dataset.florFilter;
+  save(); renderFlores();
+}));
 $('#florNew').addEventListener('click', () => {
   const id = uid();
   const projId = florProjectFilter !== 'all' ? +florProjectFilter : S.activeProjectId;
-  S.flores.unshift({id, title:'Nueva flor', projectId:projId, key:'', chords:'', lyrics:'', notes:'', socialContent:'', description:'', links:[], files:[], loop:false, arrangement:false, recording:false, mix:false});
-  openFlorId = id; save(); renderFlores();
+  // Creating a flor here means an archive entry — mark complete by default
+  S.flores.unshift({id, title:'Nueva flor', projectId:projId, key:'', chords:'', lyrics:'', notes:'', socialContent:'', description:'', links:[], files:[], photoData:null, audioData:null, audioSec:0, priority:0, loop:true, arrangement:true, recording:true, mix:true});
+  openFlorId = id; save(); renderFlores(); renderGarden();
 });
 
 // ========================= SEMILLERO =========================
@@ -1853,7 +2640,7 @@ function renderSemList() {
     const term = semSearchTerm.toLowerCase();
     items = items.filter(i => (i.title||'').toLowerCase().includes(term) || (i.text||'').toLowerCase().includes(term));
   }
-  items.sort((a,b) => (b.createdAt||b.id||0) - (a.createdAt||a.id||0));
+  // Orden manual (array order); items nuevos van arriba con unshift
   if (!items.length) { list.innerHTML = '<div class="empty">sin semillas</div>'; return; }
   list.innerHTML = items.map(i => {
     const isOpen = !!S.openSemillas[i.id];
@@ -1866,6 +2653,7 @@ function renderSemList() {
     return `
       <div class="collapsible ${isOpen?'open':''}" data-sem-item="${i.id}">
         <div class="collapsible-head" data-sem-toggle="${i.id}">
+          <button class="dnd-grip" type="button" aria-label="reordenar" title="mantener para reordenar"><i class="ti ti-grip-vertical"></i></button>
           <button class="toggle-icon" title="${isOpen?'minimizar':'expandir'}"><i class="ti ti-${isOpen?'minus':'plus'}"></i></button>
           ${i.photoData?`<img class="col-thumb" src="${i.photoData}" alt="">`:''}
           <div class="col-title">${escapeHTML(i.title||'sin título')}</div>
@@ -1878,7 +2666,8 @@ function renderSemList() {
         <div class="collapsible-body" id="semBody-${i.id}"></div>
       </div>`;
   }).join('');
-  list.querySelectorAll('[data-sem-toggle]').forEach(h => h.addEventListener('click', () => {
+  list.querySelectorAll('[data-sem-toggle]').forEach(h => h.addEventListener('click', (e) => {
+    if (e.target.closest('.dnd-grip')) return; // no toggle si tocaron el grip
     const id = +h.dataset.semToggle;
     if (S.openSemillas[id]) delete S.openSemillas[id];
     else { S.openSemillas[id] = true; semDetailOpen = id; }
@@ -1890,6 +2679,17 @@ function renderSemList() {
     const id = +idStr;
     const bodyEl = $('#semBody-'+id);
     if (bodyEl) renderSemBodyInline(id, bodyEl);
+  });
+  // Drag & drop para reordenar semillas
+  makeDraggable(list, {
+    itemSelector: '[data-sem-item]',
+    handleSelector: '.dnd-grip',
+    getId: el => el.dataset.semItem,
+    onReorder: (newOrderIds) => {
+      reorderListByVisible(S.semillas, newOrderIds);
+      save();
+      toast('Semillas reordenadas', '↕');
+    },
   });
 }
 
@@ -1959,7 +2759,7 @@ function renderSemBodyInline(id, container) {
 
     <div class="actions" style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap;">
       <button class="btn ghost tiny danger" data-act="del"><i class="ti ti-trash"></i> Eliminar</button>
-      <button class="btn gold tiny" data-act="sembrar"><i class="ti ti-flower"></i> Sembrar como flor</button>
+      <button class="btn gold tiny" data-act="sembrar"><i class="ti ti-plant"></i> Sembrar como planta</button>
     </div>
   `;
   // Bind text/title/link/group
@@ -2073,7 +2873,7 @@ function renderSemDetail() {
       <div class="actions">
         <button class="btn ghost tiny" id="semDClose"><i class="ti ti-x"></i> Cerrar</button>
         <button class="btn ghost tiny danger" id="semDDel"><i class="ti ti-trash"></i> Eliminar</button>
-        <button class="btn gold tiny" id="semDSembrar"><i class="ti ti-flower"></i> Sembrar como flor</button>
+        <button class="btn gold tiny" id="semDSembrar"><i class="ti ti-plant"></i> Sembrar como planta</button>
       </div>
     </div>
   `;
@@ -2082,7 +2882,7 @@ function renderSemDetail() {
   $('#semDTitle').addEventListener('input', e => { s.title = e.target.value; save(); });
   $('#semDText').addEventListener('input', e => { s.text = e.target.value; save(); });
   $('#semDLink').addEventListener('input', e => { s.link = e.target.value; save(); });
-  $('#semDGroup').addEventListener('change', e => { s.groupId = e.target.value?+e.target.value:null; save(); renderSemGrid(); });
+  $('#semDGroup').addEventListener('change', e => { s.groupId = e.target.value?+e.target.value:null; save(); renderSemList(); });
   $('#semDLinkOpen')?.addEventListener('click', () => { if (s.link) window.open(s.link, '_blank'); });
 
   // Photo controls
@@ -2112,10 +2912,10 @@ function renderSemDetail() {
 function sembrarSemilla(semId) {
   const s = S.semillas.find(x => x.id === semId); if (!s) return;
   const p = activeProject();
-  if (!confirm(`Sembrar "${s.title}" como nueva flor en "${p.name}"?`)) return;
-  const newFlor = {
+  if (!confirm(`Sembrar "${s.title}" como nueva planta en "${p.name}"?`)) return;
+  const newPlanta = {
     id: uid(),
-    title: s.title || 'flor sembrada',
+    title: s.title || 'planta sembrada',
     projectId: S.activeProjectId,
     key:'', chords:'',
     lyrics: s.text || '',
@@ -2124,13 +2924,18 @@ function sembrarSemilla(semId) {
     description: s.text || '',
     links: s.link ? [{name:'fuente', url:s.link}] : [],
     files: [],
+    photoData: s.photoData || null,
+    audioData: s.audioData || null,
+    audioSec: s.audioSec || 0,
+    priority: 0,
     loop:false, arrangement:false, recording:false, mix:false,
   };
-  S.flores.unshift(newFlor); openFlorId = newFlor.id;
+  S.flores.unshift(newPlanta); selectedPlantId = newPlanta.id;
   save();
-  toast(`Sembrado · ${newFlor.title}`,'✦');
+  toast(`Sembrada · ${newPlanta.title}`,'✦');
   if (navigator.vibrate) navigator.vibrate([60,40,100]);
-  switchTab('flores');
+  switchTab('jardin');
+  setTimeout(() => renderJardin(), 100);
 }
 
 // SEMILLA FORM (new entry) — 4 slots, all optional
@@ -2242,7 +3047,7 @@ $('#groupNew').addEventListener('click', () => {
   const name = prompt('Nombre del grupo:'); if (!name) return;
   S.semillaGroups.push({id: uid(), name: name.trim()}); save(); renderSemillero();
 });
-$('#semSearch').addEventListener('input', e => { semSearchTerm = e.target.value; renderSemGrid(); });
+$('#semSearch').addEventListener('input', e => { semSearchTerm = e.target.value; renderSemList(); });
 
 // ========================= PHOTO CAPTURE (context-aware) =========================
 let photoContext = null; // {type:'form'} | {type:'semilla', id}
@@ -2262,6 +3067,12 @@ async function handlePhotoFile(file) {
         }
         save(); renderSemList();
       }
+    } else if (photoContext?.type === 'planta') {
+      const f = S.flores.find(x => x.id === photoContext.id);
+      if (f) { f.photoData = dataUrl; save(); renderPlantDetail(); renderGarden(); renderFlores(); }
+    } else if (photoContext?.type === 'flor') {
+      const f = S.flores.find(x => x.id === photoContext.id);
+      if (f) { f.photoData = dataUrl; save(); renderFlores(); renderGarden(); }
     } else {
       // Direct add from outside form/detail — create a new semilla with photo
       const title = prompt('Título para la foto:', `foto ${todayStr()}`) || `foto ${todayStr()}`;
@@ -2324,6 +3135,20 @@ async function toggleRecording(context) {
           }
           toast('Audio guardado','✦');
           renderSemList();
+        }
+      } else if (recordingContext.type === 'planta') {
+        const f = S.flores.find(x => x.id === recordingContext.id);
+        if (f) {
+          f.audioData = dataUrl; f.audioSec = seconds; save();
+          toast('Audio guardado','✦');
+          renderPlantDetail();
+        }
+      } else if (recordingContext.type === 'flor') {
+        const f = S.flores.find(x => x.id === recordingContext.id);
+        if (f) {
+          f.audioData = dataUrl; f.audioSec = seconds; save();
+          toast('Audio guardado','✦');
+          renderFlores();
         }
       }
     };
@@ -2610,6 +3435,486 @@ $('#importFile').addEventListener('change', e => {
   reader.readAsText(f);
 });
 
+// ========================= DRAG & DROP =========================
+// Sistema genérico de reorden táctil + mouse.
+// Mobile: long-press 300ms sobre el item (excepto inputs) → drag.
+// Desktop: mousedown en .dnd-grip → drag inmediato.
+function makeDraggable(container, opts) {
+  if (!container) return;
+  const {itemSelector, handleSelector, getId, onReorder, longPressMs = 300} = opts;
+  if (container._dndAttached) return; // evitar doble-bind
+  container._dndAttached = true;
+
+  let dragState = null;
+  let lpTimer = null;
+  let lpStart = null;
+
+  const getCoords = e => {
+    const t = e.touches?.[0] || e.changedTouches?.[0] || e;
+    return {x: t.clientX, y: t.clientY};
+  };
+  const items = () => Array.from(container.querySelectorAll(itemSelector));
+
+  function startDrag(item, coords) {
+    const rect = item.getBoundingClientRect();
+    const ph = document.createElement('div');
+    ph.className = 'dnd-placeholder';
+    dragState = { item, startY: coords.y, placeholder: ph, rect };
+    item.parentNode.insertBefore(ph, item);
+    item.style.position = 'fixed';
+    item.style.left = rect.left + 'px';
+    item.style.top  = rect.top  + 'px';
+    item.style.width = rect.width + 'px';
+    item.style.zIndex = '1000';
+    item.style.pointerEvents = 'none';
+    item.classList.add('dnd-dragging');
+    if (navigator.vibrate) navigator.vibrate(15);
+  }
+
+  function onMove(e) {
+    if (!dragState) return;
+    if (e.cancelable) e.preventDefault();
+    const {y} = getCoords(e);
+    const dy = y - dragState.startY;
+    dragState.item.style.transform = `translateY(${dy}px) scale(1.02)`;
+    const peers = items().filter(it => it !== dragState.item);
+    let target = null;
+    for (const it of peers) {
+      const r = it.getBoundingClientRect();
+      if (y < r.top + r.height / 2) { target = it; break; }
+    }
+    const ph = dragState.placeholder;
+    if (target) {
+      if (ph.nextSibling !== target) target.parentNode.insertBefore(ph, target);
+    } else {
+      const last = peers[peers.length - 1];
+      if (last && last.nextSibling !== ph) last.parentNode.appendChild(ph);
+    }
+  }
+
+  function onEnd() {
+    cleanupTimer();
+    if (!dragState) { cleanupDoc(); return; }
+    const {item, placeholder} = dragState;
+    item.style.position = '';
+    item.style.left = ''; item.style.top = ''; item.style.width = '';
+    item.style.transform = ''; item.style.zIndex = '';
+    item.style.pointerEvents = '';
+    item.classList.remove('dnd-dragging');
+    if (placeholder?.parentNode) {
+      placeholder.parentNode.insertBefore(item, placeholder);
+      placeholder.parentNode.removeChild(placeholder);
+    }
+    const newOrder = items().map(it => getId(it));
+    dragState = null;
+    cleanupDoc();
+    if (typeof onReorder === 'function') onReorder(newOrder);
+  }
+
+  function cleanupTimer() { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } lpStart = null; }
+  function cleanupDoc() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+    document.removeEventListener('touchcancel', onEnd);
+  }
+
+  // TOUCH — long-press inicia
+  container.addEventListener('touchstart', e => {
+    const target = e.target;
+    if (target.closest('input, textarea, select, audio')) return;
+    const item = target.closest(itemSelector);
+    if (!item || !container.contains(item)) return;
+    const coords = getCoords(e);
+    lpStart = {x: coords.x, y: coords.y, item};
+    lpTimer = setTimeout(() => {
+      startDrag(item, coords);
+      document.addEventListener('touchmove', onMove, {passive: false});
+      document.addEventListener('touchend', onEnd);
+      document.addEventListener('touchcancel', onEnd);
+      lpTimer = null;
+    }, longPressMs);
+  }, {passive: true});
+  container.addEventListener('touchmove', e => {
+    if (lpTimer && lpStart) {
+      const {x, y} = getCoords(e);
+      if (Math.abs(x - lpStart.x) > 8 || Math.abs(y - lpStart.y) > 8) cleanupTimer();
+    }
+  }, {passive: true});
+  container.addEventListener('touchend', () => cleanupTimer(), {passive: true});
+  container.addEventListener('touchcancel', () => cleanupTimer(), {passive: true});
+
+  // MOUSE — drag desde el grip
+  if (handleSelector) {
+    container.addEventListener('mousedown', e => {
+      const handle = e.target.closest(handleSelector);
+      if (!handle || !container.contains(handle)) return;
+      const item = handle.closest(itemSelector);
+      if (!item) return;
+      e.preventDefault(); e.stopPropagation();
+      startDrag(item, {x: e.clientX, y: e.clientY});
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onEnd);
+    });
+    // Bloquear el click sintético después del drag desde el grip
+    container.addEventListener('click', e => {
+      if (e.target.closest(handleSelector)) e.stopPropagation();
+    }, true);
+  }
+}
+
+// Reorden de tareas mínimas (misiones)
+function reorderMissionTasks(newOrder) {
+  // newOrder = ['mission-t2', 'mission-t1', 'mission-t3'] en orden DOM actual
+  const values = newOrder.map(id => $('#'+id)?.value || '');
+  // Restablecer DOM a orden canónico t1, t2, t3
+  const cont = $('#missionTasks');
+  const rows = {
+    t1: cont.querySelector('[data-mtask="t1"]'),
+    t2: cont.querySelector('[data-mtask="t2"]'),
+    t3: cont.querySelector('[data-mtask="t3"]'),
+  };
+  cont.appendChild(rows.t1); cont.appendChild(rows.t2); cont.appendChild(rows.t3);
+  // Aplicar valores a los slots t1, t2, t3
+  ['mission-t1','mission-t2','mission-t3'].forEach((slot, i) => {
+    S[slot] = values[i] || '';
+    const inp = $('#'+slot);
+    if (inp) inp.value = S[slot];
+  });
+  save();
+  toast('Tareas reordenadas', '↕');
+}
+
+// Reorden genérico para semillas / flores en el array S correspondiente
+function reorderListByVisible(arr, newVisibleIds) {
+  // arr: e.g., S.semillas o S.flores  (mutado in-place)
+  // newVisibleIds: array de IDs (numéricos) en el orden visible nuevo
+  const visibleIdSet = new Set(newVisibleIds.map(Number));
+  const idMap = {};
+  const visiblePositions = [];
+  arr.forEach((it, idx) => {
+    idMap[it.id] = it;
+    if (visibleIdSet.has(it.id)) visiblePositions.push(idx);
+  });
+  visiblePositions.forEach((pos, i) => {
+    const it = idMap[+newVisibleIds[i]];
+    if (it) arr[pos] = it;
+  });
+}
+
+// Wire misiones (HTML estático, se hace una vez)
+function bindMisionesDnd() {
+  makeDraggable($('#missionTasks'), {
+    itemSelector: '.mission-task',
+    handleSelector: '.dnd-grip',
+    getId: el => el.querySelector('input')?.id || el.dataset.mtask,
+    onReorder: reorderMissionTasks,
+  });
+}
+
+// ========================= BÚSQUEDA GLOBAL =========================
+let searchActiveIndex = -1;
+let searchResultsCache = [];
+
+function _escRe(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function _hl(text, term) {
+  const safe = escapeHTML(String(text||''));
+  if (!term) return safe;
+  try {
+    const re = new RegExp('(' + _escRe(term) + ')', 'gi');
+    return safe.replace(re, '<mark>$1</mark>');
+  } catch (e) { return safe; }
+}
+function _snippet(text, term, len=90) {
+  const s = String(text||'').replace(/\s+/g,' ').trim();
+  if (!s) return '';
+  const idx = s.toLowerCase().indexOf(term.toLowerCase());
+  if (idx < 0) return s.slice(0, len) + (s.length>len?'…':'');
+  const start = Math.max(0, idx - 24);
+  const end = Math.min(s.length, idx + term.length + len - 24);
+  return (start>0?'…':'') + s.slice(start, end) + (end<s.length?'…':'');
+}
+
+function gatherSearchHits(term) {
+  const t = term.toLowerCase();
+  const groups = [];
+  const match = v => typeof v === 'string' && v.toLowerCase().includes(t);
+
+  // Semillero
+  const semHits = (S.semillas||[]).filter(s => match(s.title) || match(s.text) || match(s.link)).slice(0, 8)
+    .map(s => ({ icon: s.photoData ? 'ti-photo' : (s.audioData?'ti-microphone':(s.link?'ti-link':'ti-align-left')),
+      title: s.title || 'sin título',
+      preview: _snippet(s.text || s.link || '', term),
+      meta: s.date || '',
+      payload: { type: 'semilla', id: s.id } }));
+  if (semHits.length) groups.push({ label: 'Semillero', icon: 'ti-seedling', items: semHits });
+
+  // Flores / plantas
+  const florHits = (S.flores||[]).filter(f =>
+    match(f.title) || match(f.lyrics) || match(f.notes) || match(f.description) ||
+    match(f.socialContent) || match(f.chords) || match(f.key)
+  );
+  const plantas = [];
+  const flores = [];
+  florHits.forEach(f => {
+    const isComplete = STAGES.every(s => f[s]);
+    const proj = S.projects.find(p => p.id === f.projectId);
+    const hit = {
+      icon: isComplete ? 'ti-flower' : 'ti-plant-2',
+      title: f.title || 'sin título',
+      preview: _snippet(f.lyrics || f.description || f.notes || f.socialContent || '', term),
+      meta: proj ? proj.name : '',
+      payload: { type: isComplete ? 'flor' : 'planta', id: f.id, projectId: f.projectId }
+    };
+    (isComplete ? flores : plantas).push(hit);
+  });
+  if (plantas.length) groups.push({ label: 'Jardín · plantas', icon: 'ti-plant-2', items: plantas.slice(0, 6) });
+  if (flores.length) groups.push({ label: 'Flores · cosechadas', icon: 'ti-flower', items: flores.slice(0, 6) });
+
+  // Proyectos + tracking
+  const jardinJunior = [];
+  (S.projects||[]).forEach(p => {
+    if (match(p.name) || match(p.description) || match(p.socialContent)) {
+      jardinJunior.push({
+        icon: 'ti-folder',
+        title: p.name, preview: _snippet(p.description || p.socialContent || '', term),
+        meta: p.type || '',
+        payload: { type: 'project', id: p.id }
+      });
+    }
+    (p.trackingLog||[]).forEach(tn => {
+      if (match(tn.text)) {
+        jardinJunior.push({
+          icon: 'ti-message',
+          title: `${p.name} · seguimiento`,
+          preview: _snippet(tn.text, term),
+          meta: tn.date || '',
+          payload: { type: 'tracking', projectId: p.id }
+        });
+      }
+    });
+  });
+  if (jardinJunior.length) groups.push({ label: 'Jardín · proyectos', icon: 'ti-folder', items: jardinJunior.slice(0, 6) });
+
+  // Diario / bitácora (combinado, deduplicado por fecha)
+  const seenDiarioDates = new Set();
+  const diarioItems = [];
+  (S.bitacora||[]).forEach(b => {
+    if (match(b.florecio) || match(b.regue) || match(b.pode)) {
+      const content = [b.florecio, b.regue, b.pode].filter(Boolean).join(' · ');
+      diarioItems.push({
+        icon: 'ti-notebook',
+        title: b.date || '—',
+        preview: _snippet(content, term),
+        meta: 'bitácora',
+        payload: { type: 'diario', date: b.date }
+      });
+      seenDiarioDates.add(b.date);
+    }
+  });
+  (S.dailyLog||[]).forEach(d => {
+    if (seenDiarioDates.has(d.date)) return;
+    const text = [
+      d.intention, d.frase, d.voice,
+      d.bitacora?.florecio, d.bitacora?.regue, d.bitacora?.pode,
+      d.missions?.deep, d.missions?.p1, d.missions?.p2, d.missions?.t1, d.missions?.t2, d.missions?.t3,
+    ].filter(Boolean).join(' · ');
+    if (text.toLowerCase().includes(t)) {
+      diarioItems.push({
+        icon: 'ti-camera',
+        title: d.date || '—',
+        preview: _snippet(text, term),
+        meta: 'snapshot',
+        payload: { type: 'diario', date: d.date }
+      });
+    }
+  });
+  if (diarioItems.length) groups.push({ label: 'Diario / bitácora', icon: 'ti-notebook', items: diarioItems.slice(0, 8) });
+
+  // Servicios
+  const servHits = (S.services||[]).filter(s => match(s.client) || match(s.project)).slice(0, 5)
+    .map(s => ({ icon: 'ti-briefcase', title: s.client || '—',
+      preview: `${s.project||''} · $${s.amount||0}`, meta: s.status || s.date || '',
+      payload: { type: 'service', id: s.id } }));
+  if (servHits.length) groups.push({ label: 'Servicios', icon: 'ti-briefcase', items: servHits });
+
+  // Gastos
+  const expHits = (S.expenses||[]).filter(e => match(e.desc) || match(e.cat)).slice(0, 5)
+    .map(e => ({ icon: 'ti-receipt', title: e.desc || '—',
+      preview: `${e.cat||''} · $${e.amount||0}`, meta: e.date || '',
+      payload: { type: 'expense', id: e.id } }));
+  if (expHits.length) groups.push({ label: 'Gastos', icon: 'ti-receipt', items: expHits });
+
+  // Marca
+  const marcaHits = [];
+  const b = S.brand || {};
+  if (match(b.bio)) marcaHits.push({ icon: 'ti-user', title: 'Bio', preview: _snippet(b.bio, term), meta: '', payload: { type: 'brand' } });
+  ['spotify','instagram','youtube'].forEach(k => {
+    const sum = b.social?.[k]?.summary;
+    if (match(sum)) marcaHits.push({ icon: `ti-brand-${k}`, title: k, preview: _snippet(sum, term), meta: 'social', payload: { type: 'brand' } });
+  });
+  (b.photos||[]).forEach(p => {
+    if (match(p.caption)) marcaHits.push({ icon: 'ti-photo', title: 'Foto', preview: _snippet(p.caption, term), meta: 'galería', payload: { type: 'brand' } });
+  });
+  if (marcaHits.length) groups.push({ label: 'Marca', icon: 'ti-user', items: marcaHits.slice(0, 5) });
+
+  return groups;
+}
+
+function renderSearchResults(term) {
+  const el = $('#searchResults');
+  searchResultsCache = []; searchActiveIndex = -1;
+  if (!term || term.length < 2) { el.classList.remove('open'); el.innerHTML = ''; return; }
+  const groups = gatherSearchHits(term);
+  if (!groups.length) {
+    el.innerHTML = `<div class="sr-empty">sin resultados para "${escapeHTML(term)}"</div>`;
+    el.classList.add('open');
+    return;
+  }
+  let html = '';
+  groups.forEach(g => {
+    html += `<div class="sr-group"><div class="sr-group-head"><span><i class="ti ${g.icon}"></i> ${escapeHTML(g.label)}</span><span class="count">${g.items.length}</span></div>`;
+    g.items.forEach(it => {
+      const idx = searchResultsCache.length;
+      searchResultsCache.push(it);
+      html += `<div class="sr-item" data-sridx="${idx}">
+        <div class="sr-body">
+          <div class="sr-title">${_hl(it.title, term)}</div>
+          ${it.preview?`<div class="sr-preview">${_hl(it.preview, term)}</div>`:''}
+        </div>
+        ${it.meta?`<div class="sr-meta">${escapeHTML(it.meta)}</div>`:''}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  html += `<div class="sr-hint">↑↓ navegar · enter abrir · esc cerrar</div>`;
+  el.innerHTML = html;
+  el.classList.add('open');
+  el.querySelectorAll('[data-sridx]').forEach(node => node.addEventListener('click', () => {
+    const idx = +node.dataset.sridx;
+    if (searchResultsCache[idx]) navigateToSearchResult(searchResultsCache[idx]);
+  }));
+}
+
+function _pulseEl(sel, delay=180) {
+  setTimeout(() => {
+    const el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+    if (!el) return;
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    el.classList.add('search-pulse');
+    setTimeout(() => el.classList.remove('search-pulse'), 1900);
+  }, delay);
+}
+
+function navigateToSearchResult(item) {
+  closeSearchResults();
+  $('#globalSearchInput').value = '';
+  $('#gsClear').style.display = 'none';
+  const p = item.payload;
+  if (p.type === 'semilla') {
+    switchTab('semillero');
+    S.openSemillas[p.id] = true; save();
+    renderSemillero();
+    _pulseEl(`[data-sem-item="${p.id}"]`);
+  } else if (p.type === 'planta') {
+    if (p.projectId) S.activeProjectId = p.projectId;
+    switchTab('jardin');
+    selectedPlantId = p.id; save();
+    renderJardin();
+    _pulseEl(`#gardenSvg [data-flor="${p.id}"]`);
+  } else if (p.type === 'flor') {
+    switchTab('flores');
+    openFlorId = p.id;
+    S.floresFilter = 'all'; save();
+    renderFlores();
+    _pulseEl(`[data-flor="${p.id}"]`);
+  } else if (p.type === 'project') {
+    S.activeProjectId = p.id; S.expandedProject = true; save();
+    switchTab('jardin');
+    renderJardin();
+    _pulseEl('#jardinProjectHeader');
+  } else if (p.type === 'tracking') {
+    S.activeProjectId = p.projectId; save();
+    switchTab('jardin');
+    renderJardin();
+    _pulseEl('#trackingList');
+  } else if (p.type === 'diario') {
+    switchTab('diario');
+    setTimeout(() => {
+      const days = document.querySelectorAll('.diario-day');
+      let target = null;
+      days.forEach(d => { if (d.textContent.includes(p.date)) target = d; });
+      if (target) _pulseEl(target, 0);
+    }, 180);
+  } else if (p.type === 'service') {
+    switchTab('servicios');
+    _pulseEl('#servList');
+  } else if (p.type === 'expense') {
+    switchTab('servicios');
+    _pulseEl('#expList');
+  } else if (p.type === 'brand') {
+    switchTab('marca');
+    _pulseEl('.brand-profile');
+  }
+}
+
+function closeSearchResults() {
+  const el = $('#searchResults');
+  if (el) { el.classList.remove('open'); el.innerHTML = ''; }
+  searchResultsCache = []; searchActiveIndex = -1;
+}
+
+function highlightActiveSearch() {
+  const items = $('#searchResults').querySelectorAll('[data-sridx]');
+  items.forEach(it => it.classList.remove('active'));
+  if (searchActiveIndex >= 0 && items[searchActiveIndex]) {
+    items[searchActiveIndex].classList.add('active');
+    items[searchActiveIndex].scrollIntoView({block:'nearest'});
+  }
+}
+
+// Debounce input
+let _searchDebounce = null;
+$('#globalSearchInput').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  $('#gsClear').style.display = v ? 'flex' : 'none';
+  clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(() => renderSearchResults(v), 90);
+});
+$('#globalSearchInput').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeSearchResults(); e.target.blur(); return; }
+  if (!searchResultsCache.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    searchActiveIndex = (searchActiveIndex + 1) % searchResultsCache.length;
+    highlightActiveSearch();
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    searchActiveIndex = (searchActiveIndex - 1 + searchResultsCache.length) % searchResultsCache.length;
+    highlightActiveSearch();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const item = searchResultsCache[searchActiveIndex >= 0 ? searchActiveIndex : 0];
+    if (item) navigateToSearchResult(item);
+  }
+});
+$('#globalSearchInput').addEventListener('focus', () => {
+  const v = $('#globalSearchInput').value.trim();
+  if (v.length >= 2) renderSearchResults(v);
+});
+$('#gsClear').addEventListener('click', () => {
+  $('#globalSearchInput').value = '';
+  closeSearchResults();
+  $('#gsClear').style.display = 'none';
+  $('#globalSearchInput').focus();
+});
+// Click fuera cierra
+document.addEventListener('click', e => {
+  const wrap = $('#globalSearchWrap');
+  if (wrap && !wrap.contains(e.target)) closeSearchResults();
+});
+
 // ========================= INIT =========================
 function init() {
   applyTheme(); renderTabs();
@@ -2628,6 +3933,7 @@ function init() {
   renderLinks(); renderServices(); renderExpenses(); renderWallet();
   renderSemillero();
   bindBrand(); renderBrand();
+  bindMisionesDnd();
 }
 init();
 setInterval(() => {
