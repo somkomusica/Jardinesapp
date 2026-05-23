@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#7A8B6E">
+<meta name="theme-color" content="#B8860B">
 <meta name="description" content="Jardín — Tu sistema de organización artística">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Jardín">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FAF8F3' width='192' height='192'/><text x='96' y='130' font-size='110' text-anchor='middle' fill='%237A8B6E'>🌾</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FAF8F3' width='192' height='192'/><text x='96' y='130' font-size='110' text-anchor='middle' fill='%237A8B6E'>🌾</text></svg>">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KPHJlY3QgZmlsbD0iI0ZBRjhGMyIgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0MCIvPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5NiwgOTYpIiBzdHJva2U9IiNCODg2MEIiIHN0cm9rZS13aWR0aD0iNC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBmaWxsPSJub25lIj4KPHBhdGggZD0iTSAtMjIgLTIyIEwgMCAwIEwgMjIgLTIyIiBzdHJva2Utd2lkdGg9IjUiLz4KPHBhdGggZD0iTSAtMjIgMjIgTCAwIDAgTCAyMiAyMiIgc3Ryb2tlLXdpZHRoPSI1Ii8+CjxwYXRoIGQ9Ik0gMCAtMjIgTCAwIC00NSIvPgo8cGF0aCBkPSJNIDAgMjIgTCAwIDQ1Ii8+CjxwYXRoIGQ9Ik0gLTEwIC00NSBMIC0xMCAtNjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gMTAgLTQ1IEwgMTAgLTYyIiBzdHJva2Utd2lkdGg9IjMuNSIvPgo8cGF0aCBkPSJNIC0xMCAtNjIgTCAwIC01MiBMIDEwIC02MiIgc3Ryb2tlLXdpZHRoPSIzLjUiLz4KPHBhdGggZD0iTSAtMTAgNDUgTCAtMTAgNjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gMTAgNDUgTCAxMCA2MiIgc3Ryb2tlLXdpZHRoPSIzLjUiLz4KPHBhdGggZD0iTSAtMTAgNjIgTCAwIDUyIEwgMTAgNjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gMjIgLTIyIEwgNDUgLTIyIi8+CjxwYXRoIGQ9Ik0gMjIgMjIgTCA0NSAyMiIvPgo8cGF0aCBkPSJNIC0yMiAtMjIgTCAtNDUgLTIyIi8+CjxwYXRoIGQ9Ik0gLTIyIDIyIEwgLTQ1IDIyIi8+CjxwYXRoIGQ9Ik0gNDUgLTIyIEwgNjIgLTIyIiBzdHJva2Utd2lkdGg9IjMuNSIvPgo8cGF0aCBkPSJNIDQ1IDIyIEwgNjIgMjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gNjIgLTIyIEwgNTIgLTEwIEwgNjIgLTIiIHN0cm9rZS13aWR0aD0iMy41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0gNjIgMiBMIDUyIDEwIEwgNjIgMjIiIHN0cm9rZS13aWR0aD0iMy41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0gLTQ1IC0yMiBMIC02MiAtMjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gLTQ1IDIyIEwgLTYyIDIyIiBzdHJva2Utd2lkdGg9IjMuNSIvPgo8cGF0aCBkPSJNIC02MiAtMjIgTCAtNTIgLTEwIEwgLTYyIC0yIiBzdHJva2Utd2lkdGg9IjMuNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNIC02MiAyIEwgLTUyIDEwIEwgLTYyIDIyIiBzdHJva2Utd2lkdGg9IjMuNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cG9seWdvbiBwb2ludHM9IjAsLTc4IDQsLTc0IDAsLTcwIC00LC03NCIgZmlsbD0iIzdBOEI2RSIgc3Ryb2tlPSJub25lIi8+Cjxwb2x5Z29uIHBvaW50cz0iMCw3OCA0LDc0IDAsNzAgLTQsNzQiIGZpbGw9IiM3QThCNkUiIHN0cm9rZT0ibm9uZSIvPgo8cG9seWdvbiBwb2ludHM9Ii03OCwwIC03NCw0IC03MCwwIC03NCwtNCIgZmlsbD0iIzdBOEI2RSIgc3Ryb2tlPSJub25lIi8+Cjxwb2x5Z29uIHBvaW50cz0iNzgsMCA3NCw0IDcwLDAgNzQsLTQiIGZpbGw9IiM3QThCNkUiIHN0cm9rZT0ibm9uZSIvPgo8L2c+Cjwvc3ZnPg==">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KPHJlY3QgZmlsbD0iI0ZBRjhGMyIgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0MCIvPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5NiwgOTYpIiBzdHJva2U9IiNCODg2MEIiIHN0cm9rZS13aWR0aD0iNC41IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIiBzdHJva2UtbGluZWpvaW49Im1pdGVyIiBmaWxsPSJub25lIj4KPHBhdGggZD0iTSAtMjIgLTIyIEwgMCAwIEwgMjIgLTIyIiBzdHJva2Utd2lkdGg9IjUiLz4KPHBhdGggZD0iTSAtMjIgMjIgTCAwIDAgTCAyMiAyMiIgc3Ryb2tlLXdpZHRoPSI1Ii8+CjxwYXRoIGQ9Ik0gMCAtMjIgTCAwIC00NSIvPgo8cGF0aCBkPSJNIDAgMjIgTCAwIDQ1Ii8+CjxwYXRoIGQ9Ik0gLTEwIC00NSBMIC0xMCAtNjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gMTAgLTQ1IEwgMTAgLTYyIiBzdHJva2Utd2lkdGg9IjMuNSIvPgo8cGF0aCBkPSJNIC0xMCAtNjIgTCAwIC01MiBMIDEwIC02MiIgc3Ryb2tlLXdpZHRoPSIzLjUiLz4KPHBhdGggZD0iTSAtMTAgNDUgTCAtMTAgNjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gMTAgNDUgTCAxMCA2MiIgc3Ryb2tlLXdpZHRoPSIzLjUiLz4KPHBhdGggZD0iTSAtMTAgNjIgTCAwIDUyIEwgMTAgNjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gMjIgLTIyIEwgNDUgLTIyIi8+CjxwYXRoIGQ9Ik0gMjIgMjIgTCA0NSAyMiIvPgo8cGF0aCBkPSJNIC0yMiAtMjIgTCAtNDUgLTIyIi8+CjxwYXRoIGQ9Ik0gLTIyIDIyIEwgLTQ1IDIyIi8+CjxwYXRoIGQ9Ik0gNDUgLTIyIEwgNjIgLTIyIiBzdHJva2Utd2lkdGg9IjMuNSIvPgo8cGF0aCBkPSJNIDQ1IDIyIEwgNjIgMjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gNjIgLTIyIEwgNTIgLTEwIEwgNjIgLTIiIHN0cm9rZS13aWR0aD0iMy41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0gNjIgMiBMIDUyIDEwIEwgNjIgMjIiIHN0cm9rZS13aWR0aD0iMy41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0gLTQ1IC0yMiBMIC02MiAtMjIiIHN0cm9rZS13aWR0aD0iMy41Ii8+CjxwYXRoIGQ9Ik0gLTQ1IDIyIEwgLTYyIDIyIiBzdHJva2Utd2lkdGg9IjMuNSIvPgo8cGF0aCBkPSJNIC02MiAtMjIgTCAtNTIgLTEwIEwgLTYyIC0yIiBzdHJva2Utd2lkdGg9IjMuNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNIC02MiAyIEwgLTUyIDEwIEwgLTYyIDIyIiBzdHJva2Utd2lkdGg9IjMuNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cG9seWdvbiBwb2ludHM9IjAsLTc4IDQsLTc0IDAsLTcwIC00LC03NCIgZmlsbD0iIzdBOEI2RSIgc3Ryb2tlPSJub25lIi8+Cjxwb2x5Z29uIHBvaW50cz0iMCw3OCA0LDc0IDAsNzAgLTQsNzQiIGZpbGw9IiM3QThCNkUiIHN0cm9rZT0ibm9uZSIvPgo8cG9seWdvbiBwb2ludHM9Ii03OCwwIC03NCw0IC03MCwwIC03NCwtNCIgZmlsbD0iIzdBOEI2RSIgc3Ryb2tlPSJub25lIi8+Cjxwb2x5Z29uIHBvaW50cz0iNzgsMCA3NCw0IDcwLDAgNzQsLTQiIGZpbGw9IiM3QThCNkUiIHN0cm9rZT0ibm9uZSIvPgo8L2c+Cjwvc3ZnPg==">
 <title>Jardín — Somko</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js"></script>
@@ -69,9 +69,114 @@ header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 22p
 .brand-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .brand { font-weight: 500; font-size: 15px; letter-spacing: 0.18em; text-transform: uppercase; }
 .brand .acc { color: var(--gold); }
-.season { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); }
-.greet { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-secondary); }
-.greet b { color: var(--text); font-weight: 500; }
+.date-display { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); text-align: right; }
+
+/* Smaller tab hints */
+.tab-hint { font-size: 10px; color: var(--text-faint); margin-bottom: 10px; line-height: 1.4; font-style: italic; }
+
+/* Collapsible rows (semillas, flores, projects) */
+.collapsible {
+  border-bottom: 0.5px solid var(--border);
+}
+.collapsible:last-child { border-bottom: none; }
+.collapsible-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; cursor: pointer; user-select: none;
+  transition: color .15s;
+}
+.collapsible-head:hover .toggle-icon { color: var(--gold); }
+.collapsible-head .toggle-icon {
+  width: 18px; height: 18px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text-secondary);
+  border: 0.5px solid var(--border-strong); border-radius: 4px;
+  transition: all .15s;
+}
+.collapsible.open .toggle-icon { background: var(--gold); color: #fff; border-color: var(--gold); }
+.collapsible-head .col-title {
+  flex: 1; font-weight: 500; font-size: 13px;
+  transition: color .15s;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.collapsible.open .col-title { color: var(--gold); font-weight: 600; }
+.collapsible-head .col-meta {
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-secondary); display: flex; gap: 8px; align-items: center;
+  flex-wrap: nowrap; white-space: nowrap;
+}
+.collapsible-head .col-thumb {
+  width: 28px; height: 28px; object-fit: cover; border-radius: 4px;
+  border: 0.5px solid var(--border); flex-shrink: 0;
+}
+.collapsible-body { display: none; padding: 6px 0 14px; padding-left: 28px; }
+.collapsible.open .collapsible-body { display: block; }
+@media (max-width: 580px) { .collapsible-body { padding-left: 6px; } }
+
+/* Compact Frase + Voces */
+.frase-compact { padding: 14px 16px !important; }
+.frase-compact .label { font-size: 9px; margin-bottom: 4px; }
+.frase-compact .mantra-input { font-size: 16px; }
+.voces-compact { padding: 12px 16px !important; display: flex; align-items: center; gap: 12px; }
+.voces-compact .v-text { flex: 1; min-width: 0; }
+.voces-compact .v-quote { font-size: 12px; line-height: 1.4; font-weight: 300; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.voces-compact .v-author { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-light); margin-top: 4px; }
+.voces-compact .v-acts { display: flex; gap: 4px; flex-shrink: 0; }
+.voces-compact .v-acts button { background: transparent; border: 0.5px solid rgba(240,237,230,0.18); color: rgba(240,237,230,0.7); padding: 5px; border-radius: 4px; cursor: pointer; }
+.voces-compact .v-acts button:hover { color: #fff; border-color: rgba(240,237,230,0.4); }
+
+/* Per-habit tracking */
+.habit-track {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 0.5px dashed var(--border);
+}
+.habit-track:last-child { border-bottom: none; }
+.habit-track .hab-check {
+  width: 18px; height: 18px; border: 0.5px solid var(--border-strong);
+  border-radius: 4px; cursor: pointer; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: transparent; flex-shrink: 0; padding: 0;
+}
+.habit-track .hab-check.done { background: var(--gold); border-color: var(--gold); color: #fff; }
+.habit-track .hab-check.done::after { content: '\2713'; }
+.habit-track .hab-name { flex: 1; font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.habit-track .hab-name .opt { font-size: 9px; color: var(--text-faint); margin-left: 4px; }
+.habit-track .hab-streak { font-size: 10px; letter-spacing: 0.1em; color: var(--text-secondary); white-space: nowrap; }
+.habit-track .hab-grid { display: grid; grid-template-columns: repeat(21, 1fr); gap: 2px; flex: 0 0 105px; }
+.habit-track .hab-cell { width: 100%; aspect-ratio: 1; max-width: 5px; border-radius: 1px; background: var(--border); }
+.habit-track .hab-cell.done { background: var(--gold); }
+.habit-track .hab-cell.today { box-shadow: 0 0 0 1px var(--text); }
+@media (max-width: 580px) {
+  .habit-track .hab-grid { display: none; }
+}
+
+.bita-section { margin-top: 16px; }
+.bita-section:first-child { margin-top: 0; }
+.bita-section h3 { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; font-weight: 400; display: flex; align-items: center; gap: 6px; }
+.bita-section h3 .ti { color: var(--gold); }
+
+/* Marca profile */
+.brand-profile { display: grid; gap: 20px; }
+.brand-logo-area { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.brand-logo-display {
+  width: 96px; height: 96px;
+  border: 0.5px dashed var(--border-strong); border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; background: var(--bg-soft); flex-shrink: 0;
+}
+.brand-logo-display img { width: 100%; height: 100%; object-fit: contain; }
+.brand-logo-display .placeholder { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); text-align: center; padding: 8px; }
+.brand-logo-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.brand-photo-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.brand-photo { aspect-ratio: 1; border-radius: 4px; background: var(--bg-soft); border: 0.5px solid var(--border); position: relative; overflow: hidden; cursor: pointer; }
+.brand-photo img { width: 100%; height: 100%; object-fit: cover; }
+.brand-photo .ph-cap { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.55); color: #fff; font-size: 9px; padding: 3px 6px; letter-spacing: 0.06em; }
+.brand-photo .ph-del { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.55); color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 10px; }
+.brand-photo-upload { aspect-ratio: 1; border-radius: 4px; border: 0.5px dashed var(--border-strong); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-faint); flex-direction: column; gap: 4px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+.brand-photo-upload:hover { border-color: var(--gold); color: var(--gold); }
+.brand-social-card { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+.brand-social-card .bs-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.brand-social-card .bs-head .ti { font-size: 18px; color: var(--gold); }
+.brand-social-card .bs-name { font-weight: 500; flex: 1; font-size: 13px; letter-spacing: 0.04em; }
 
 nav.tabs { display: flex; gap: 2px; overflow-x: auto; border-bottom: 0.5px solid var(--border); margin-bottom: 22px; scrollbar-width: none; }
 nav.tabs::-webkit-scrollbar { display: none; }
@@ -235,8 +340,9 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 
 /* FLORES */
 .flor-row { border-bottom: 0.5px solid var(--border); padding: 12px 0; }
+.flor-row.open .flor-title { color: var(--gold); font-weight: 600; }
 .flor-head { display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 12px; }
-.flor-title { font-weight: 500; }
+.flor-title { font-weight: 500; transition: color .15s; }
 .flor-preview { font-size: 11px; color: var(--text-faint); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; }
 .flor-meta { font-size: 10px; letter-spacing: 0.14em; color: var(--text-secondary); text-transform: uppercase; display: flex; gap: 8px; align-items: center; }
 .flor-body { display: none; padding: 14px 0 8px; border-top: 0.5px dashed var(--border); margin-top: 12px; }
@@ -357,31 +463,27 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 <header class="top">
   <div class="brand-row">
     <div class="brand">Jar<span class="acc">dín</span></div>
-    <div class="season" id="seasonLbl">—</div>
+    <div class="date-display" id="dateDisplay">—</div>
   </div>
-  <div class="greet" id="greetLbl">—</div>
 </header>
 
 <nav class="tabs" id="tabs"></nav>
 
 <!-- HOY -->
 <section class="tab" id="tab-hoy">
-  <div data-widget="habits" class="habit-bar">
-    <span class="label">Rituales</span>
-    <div id="habitChips" style="display:flex;flex-wrap:wrap;gap:6px;flex:1;"></div>
+  <div data-widget="frase" class="card frase-compact">
+    <div class="label">Frase del día</div>
+    <input type="text" class="mantra-input" id="mantraInput" maxlength="120" placeholder="una verdad para hoy...">
   </div>
-  <div data-widget="frase" class="card mantra-card">
-    <div class="label" style="text-align:center;">Frase del día</div>
-    <input type="text" class="mantra-input" id="mantraInput" maxlength="120" placeholder="una frase, una verdad para hoy...">
-  </div>
-  <div data-widget="voces" class="card dark quote-card">
-    <div class="label">Voces</div>
-    <div class="quote-text" id="quoteText">—</div>
-    <div class="quote-author" id="quoteAuthor">—</div>
-    <div class="quote-actions">
-      <button id="quoteRotate"><i class="ti ti-refresh"></i> Otra</button>
-      <button id="quoteAdd"><i class="ti ti-plus"></i> Agregar</button>
-      <button id="quoteDel"><i class="ti ti-trash"></i> Quitar</button>
+  <div data-widget="voces" class="card dark voces-compact">
+    <div class="v-text">
+      <div class="v-quote" id="quoteText">—</div>
+      <div class="v-author" id="quoteAuthor">—</div>
+    </div>
+    <div class="v-acts">
+      <button id="quoteRotate" title="otra"><i class="ti ti-refresh"></i></button>
+      <button id="quoteAdd" title="agregar"><i class="ti ti-plus"></i></button>
+      <button id="quoteDel" title="quitar"><i class="ti ti-x"></i></button>
     </div>
   </div>
   <div id="quoteAddForm" style="display:none;margin-bottom:14px;"><input type="text" id="quoteAddInput" placeholder="frase — autor"></div>
@@ -397,26 +499,8 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <div class="stat-bar"><div class="stat-bar-fill" id="albumBar" style="width:0%"></div></div>
     </div>
   </div>
-  <div data-widget="intention" class="card">
-    <div class="label">Intención del día</div>
-    <input type="text" class="flat" id="intention" placeholder="una palabra, una verdad para hoy...">
-  </div>
-  <div data-widget="missions" class="card">
-    <h2 class="section-title">Misiones del día</h2>
-    <div class="label"><span class="num">1</span>Enfoque profundo</div>
-    <input type="text" class="flat" id="mission-deep" placeholder="la única cosa que importa hoy...">
-    <hr class="sep">
-    <div class="label gold"><span class="num">2</span>Prioridades</div>
-    <input type="text" class="flat" id="mission-p1" placeholder="prioridad 1...">
-    <input type="text" class="flat" id="mission-p2" placeholder="prioridad 2..." style="margin-top:4px;">
-    <hr class="sep">
-    <div class="label gray"><span class="num">3</span>Tareas mínimas</div>
-    <input type="text" class="flat" id="mission-t1" placeholder="tarea 1...">
-    <input type="text" class="flat" id="mission-t2" placeholder="tarea 2..." style="margin-top:4px;">
-    <input type="text" class="flat" id="mission-t3" placeholder="tarea 3..." style="margin-top:4px;">
-  </div>
   <div data-widget="riego" class="card">
-    <h2 class="section-title"><i class="ti ti-droplet"></i> Riego — sesión de enfoque</h2>
+    <h2 class="section-title"><i class="ti ti-droplet"></i> Riego</h2>
     <div class="riego">
       <div><div class="riego-time" id="riegoTime">25:00</div><div class="riego-state" id="riegoState">en pausa</div></div>
       <div class="riego-ctrl">
@@ -430,13 +514,43 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
   </div>
   <div data-widget="bitacora" class="card">
     <h2 class="section-title"><i class="ti ti-book"></i> Bitácora del día</h2>
-    <div class="bitacora-prompts">
-      <div class="bitacora-prompt"><label>Qué floreció hoy</label><textarea id="bita-florecio" rows="2" placeholder="el momento que sí..."></textarea></div>
-      <div class="bitacora-prompt"><label>Qué regué</label><textarea id="bita-regue" rows="2" placeholder="dónde puse atención..."></textarea></div>
-      <div class="bitacora-prompt"><label>Qué podé</label><textarea id="bita-pode" rows="2" placeholder="qué solté, qué dejé ir..."></textarea></div>
+
+    <div class="bita-section">
+      <h3><i class="ti ti-checks"></i> Rituales</h3>
+      <div id="habitsTracking"></div>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-      <button class="btn gold tiny" id="bitaSave"><i class="ti ti-bookmark"></i> Guardar entrada</button>
+
+    <div class="bita-section">
+      <h3><i class="ti ti-target"></i> Intención</h3>
+      <input type="text" class="flat" id="intention" placeholder="una palabra, una verdad para hoy...">
+    </div>
+
+    <div class="bita-section">
+      <h3><i class="ti ti-flag"></i> Misiones</h3>
+      <div class="label"><span class="num">1</span>Enfoque profundo</div>
+      <input type="text" class="flat" id="mission-deep" placeholder="la única cosa que importa hoy...">
+      <hr class="sep">
+      <div class="label gold"><span class="num">2</span>Prioridades</div>
+      <input type="text" class="flat" id="mission-p1" placeholder="prioridad 1...">
+      <input type="text" class="flat" id="mission-p2" placeholder="prioridad 2..." style="margin-top:4px;">
+      <hr class="sep">
+      <div class="label gray"><span class="num">3</span>Tareas mínimas</div>
+      <input type="text" class="flat" id="mission-t1" placeholder="tarea 1...">
+      <input type="text" class="flat" id="mission-t2" placeholder="tarea 2..." style="margin-top:4px;">
+      <input type="text" class="flat" id="mission-t3" placeholder="tarea 3..." style="margin-top:4px;">
+    </div>
+
+    <div class="bita-section">
+      <h3><i class="ti ti-leaf"></i> Reflexión</h3>
+      <div class="bitacora-prompts">
+        <div class="bitacora-prompt"><label>Qué floreció hoy</label><textarea id="bita-florecio" rows="2" placeholder="el momento que sí..."></textarea></div>
+        <div class="bitacora-prompt"><label>Qué regué</label><textarea id="bita-regue" rows="2" placeholder="dónde puse atención..."></textarea></div>
+        <div class="bitacora-prompt"><label>Qué podé</label><textarea id="bita-pode" rows="2" placeholder="qué solté, qué dejé ir..."></textarea></div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+      <button class="btn gold tiny" id="bitaSave"><i class="ti ti-bookmark"></i> Guardar entrada del día</button>
     </div>
     <div class="bitacora-history" id="bitaHistory"></div>
   </div>
@@ -446,7 +560,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 <section class="tab" id="tab-semillero">
   <div class="card">
     <h2 class="section-title"><i class="ti ti-seedling"></i> Semillero</h2>
-    <p class="muted small">Captura rápida — cada semilla tiene espacio para texto, foto, audio y link. Puedes agregar más en cualquier momento. Pulsa <b>Sembrar</b> para llevarla al jardín como flor.</p>
+    <p class="tab-hint">captura rápida · texto · foto · audio · link · agregalos en cualquier momento · sembrá para crear flor</p>
     <div class="sem-toolbar" style="margin-top:14px;">
       <button class="btn gold" id="semNew"><i class="ti ti-plus"></i> Nueva semilla</button>
       <button class="btn ghost" id="groupNew"><i class="ti ti-folder-plus"></i> Nuevo grupo</button>
@@ -455,8 +569,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     </div>
     <div class="sem-filter" id="semFilter"></div>
     <div id="semFormWrap"></div>
-    <div id="semDetailWrap"></div>
-    <div class="sem-grid" id="semGrid"></div>
+    <div id="semList"></div>
   </div>
 </section>
 
@@ -472,12 +585,12 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <div id="jardinProjectHeader"></div>
 
     <h3 class="sub-title"><i class="ti ti-flower"></i> Producción</h3>
-    <div class="row-flex small muted" id="jardinProgress" style="margin-bottom:4px;">—</div>
+    <div class="tab-hint" id="jardinProgress" style="margin-bottom:4px;">—</div>
     <div class="garden-svg" id="gardenSvg"></div>
     <div id="plantDetail"></div>
 
-    <h3 class="sub-title"><i class="ti ti-messages"></i> Seguimiento del proyecto</h3>
-    <p class="muted small">Notas, comentarios y observaciones cronológicas.</p>
+    <h3 class="sub-title"><i class="ti ti-messages"></i> Seguimiento</h3>
+    <p class="tab-hint">notas y comentarios cronológicos</p>
     <div class="tracking-add">
       <input type="text" id="trackingNew" placeholder="nueva nota de seguimiento...">
       <button class="btn gold tiny" id="trackingAdd"><i class="ti ti-plus"></i></button>
@@ -487,7 +600,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 
   <div class="card">
     <h2 class="section-title"><i class="ti ti-calendar"></i> Constancia — 60 días</h2>
-    <p class="muted small">Color dorado por día de rituales cumplidos.</p>
+    <p class="tab-hint">dorado = día de rituales cumplidos</p>
     <div class="heatmap" id="heatmap"></div>
   </div>
 </section>
@@ -495,8 +608,8 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 <!-- FLORES -->
 <section class="tab" id="tab-flores">
   <div class="card">
-    <h2 class="section-title"><i class="ti ti-flower"></i> Flores — archivo organizado</h2>
-    <p class="muted small">Información finalizada por canción: letra, acordes, descripciones, redes, archivos y links.</p>
+    <h2 class="section-title"><i class="ti ti-flower"></i> Flores — archivo</h2>
+    <p class="tab-hint">información finalizada por canción</p>
     <div style="display:flex;gap:8px;margin:14px 0;flex-wrap:wrap;">
       <select id="florProjectFilter" style="max-width:240px;"></select>
       <input type="text" id="florSearch" placeholder="buscar letra o título...">
@@ -509,8 +622,8 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 <!-- DIARIO -->
 <section class="tab" id="tab-diario">
   <div class="card">
-    <h2 class="section-title"><i class="ti ti-notebook"></i> Diario — registro del jardín</h2>
-    <p class="muted small">Se guarda automáticamente al cambiar de día.</p>
+    <h2 class="section-title"><i class="ti ti-notebook"></i> Diario</h2>
+    <p class="tab-hint">se guarda automáticamente al cambiar de día</p>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin:14px 0;flex-wrap:wrap;">
       <button class="btn ghost tiny" id="diarioFilterAll"><i class="ti ti-list"></i> Todos</button>
       <button class="btn ghost tiny" id="diarioFilterMonth"><i class="ti ti-calendar"></i> Este mes</button>
@@ -523,38 +636,107 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 <!-- MARCA -->
 <section class="tab" id="tab-marca">
   <div class="card">
-    <h2 class="section-title"><i class="ti ti-stack"></i> Marca Somko</h2>
-    <div class="lib-row">
-      <div class="lib-name">Logo</div>
-      <input type="url" id="lib-logo" placeholder="pega el enlace de Drive...">
-      <div class="lib-actions">
-        <button class="btn ghost tiny" data-copy="lib-logo"><i class="ti ti-copy"></i></button>
-        <button class="btn ghost tiny" data-open="lib-logo"><i class="ti ti-external-link"></i></button>
+    <h2 class="section-title"><i class="ti ti-user"></i> Perfil de Marca</h2>
+    <p class="tab-hint">tu identidad visible · logo, fotos y resúmenes para cada plataforma</p>
+
+    <div class="brand-profile">
+      <div class="brand-logo-area">
+        <div class="brand-logo-display" id="brandLogoDisplay"></div>
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:6px;">Logo</div>
+          <div class="brand-logo-actions">
+            <button class="btn ghost tiny" id="brandLogoUpload"><i class="ti ti-upload"></i> Upload your logo</button>
+            <button class="btn ghost tiny" id="brandLogoDownload" hidden><i class="ti ti-download"></i> Descargar</button>
+            <button class="btn ghost tiny danger" id="brandLogoRemove" hidden><i class="ti ti-x"></i> Quitar</button>
+          </div>
+          <input type="file" id="brandLogoInput" accept="image/*" hidden>
+        </div>
+      </div>
+
+      <div>
+        <div class="label">Bio</div>
+        <textarea id="brandBio" rows="3" placeholder="quién eres en una frase, tu identidad artística..."></textarea>
+      </div>
+
+      <div>
+        <h3 class="sub-title"><i class="ti ti-photo"></i> Galería de fotos</h3>
+        <p class="tab-hint">fotos de prensa, portadas, momentos · click para ver / poner caption</p>
+        <div class="brand-photo-gallery" id="brandGallery"></div>
+        <input type="file" id="brandPhotoInput" accept="image/*" hidden>
+        <input type="file" id="brandPhotoCamera" accept="image/*" capture="environment" hidden>
+      </div>
+
+      <div>
+        <h3 class="sub-title"><i class="ti ti-brand-spotify"></i> Spotify</h3>
+        <div class="brand-social-card">
+          <div class="bs-head"><i class="ti ti-brand-spotify"></i><span class="bs-name">Spotify</span>
+            <button class="btn ghost tiny" id="brandSpOpen" title="abrir"><i class="ti ti-external-link"></i></button>
+          </div>
+          <input type="url" id="brandSpUrl" placeholder="https://open.spotify.com/artist/...">
+          <textarea id="brandSpSummary" rows="3" placeholder="mini resumen · descripción de artista, monthly listeners, tracks destacados..." style="margin-top:6px;"></textarea>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="sub-title"><i class="ti ti-brand-instagram"></i> Instagram</h3>
+        <div class="brand-social-card">
+          <div class="bs-head"><i class="ti ti-brand-instagram"></i><span class="bs-name">Instagram</span>
+            <button class="btn ghost tiny" id="brandIgOpen" title="abrir"><i class="ti ti-external-link"></i></button>
+          </div>
+          <input type="url" id="brandIgUrl" placeholder="https://instagram.com/...">
+          <textarea id="brandIgSummary" rows="3" placeholder="mini resumen · tono, frecuencia de posts, qué compartes..." style="margin-top:6px;"></textarea>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="sub-title"><i class="ti ti-brand-youtube"></i> YouTube</h3>
+        <div class="brand-social-card">
+          <div class="bs-head"><i class="ti ti-brand-youtube"></i><span class="bs-name">YouTube</span>
+            <button class="btn ghost tiny" id="brandYtOpen" title="abrir"><i class="ti ti-external-link"></i></button>
+          </div>
+          <input type="url" id="brandYtUrl" placeholder="https://youtube.com/@...">
+          <textarea id="brandYtSummary" rows="3" placeholder="mini resumen · tipo de contenido, suscriptores..." style="margin-top:6px;"></textarea>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="sub-title"><i class="ti ti-files"></i> Otros recursos</h3>
+        <div class="lib-row">
+          <div class="lib-name">Press Kit</div>
+          <input type="url" id="lib-presskit" placeholder="link al press kit (Drive/Dropbox)...">
+          <div class="lib-actions">
+            <button class="btn ghost tiny" data-copy="lib-presskit"><i class="ti ti-copy"></i></button>
+            <button class="btn ghost tiny" data-open="lib-presskit"><i class="ti ti-external-link"></i></button>
+          </div>
+        </div>
+        <div class="lib-row">
+          <div class="lib-name">Logo (link)</div>
+          <input type="url" id="lib-logo" placeholder="link a logo en alta...">
+          <div class="lib-actions">
+            <button class="btn ghost tiny" data-copy="lib-logo"><i class="ti ti-copy"></i></button>
+            <button class="btn ghost tiny" data-open="lib-logo"><i class="ti ti-external-link"></i></button>
+          </div>
+        </div>
+        <div class="lib-row">
+          <div class="lib-name">Fotos (Drive)</div>
+          <input type="url" id="lib-fotos" placeholder="link a carpeta de fotos...">
+          <div class="lib-actions">
+            <button class="btn ghost tiny" data-copy="lib-fotos"><i class="ti ti-copy"></i></button>
+            <button class="btn ghost tiny" data-open="lib-fotos"><i class="ti ti-external-link"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="sub-title"><i class="ti ti-link"></i> Links extra</h3>
+        <div class="add-row">
+          <input type="text" id="linkName" placeholder="nombre (Bandcamp, SoundCloud...)">
+          <input type="url" id="linkUrl" placeholder="https://">
+          <button class="btn gold" id="linkAdd"><i class="ti ti-plus"></i></button>
+        </div>
+        <div id="linkList" style="margin-top:10px;"></div>
       </div>
     </div>
-    <div class="lib-row">
-      <div class="lib-name">Fotos</div>
-      <input type="url" id="lib-fotos" placeholder="pega el enlace de Drive...">
-      <div class="lib-actions">
-        <button class="btn ghost tiny" data-copy="lib-fotos"><i class="ti ti-copy"></i></button>
-        <button class="btn ghost tiny" data-open="lib-fotos"><i class="ti ti-external-link"></i></button>
-      </div>
-    </div>
-    <div class="lib-row">
-      <div class="lib-name">Press Kit</div>
-      <input type="url" id="lib-presskit" placeholder="pega el enlace de Drive...">
-      <div class="lib-actions">
-        <button class="btn ghost tiny" data-copy="lib-presskit"><i class="ti ti-copy"></i></button>
-        <button class="btn ghost tiny" data-open="lib-presskit"><i class="ti ti-external-link"></i></button>
-      </div>
-    </div>
-    <h3 class="sub-title"><i class="ti ti-link"></i> Links</h3>
-    <div class="add-row">
-      <input type="text" id="linkName" placeholder="nombre (Spotify, Bandcamp, IG...)">
-      <input type="url" id="linkUrl" placeholder="https://">
-      <button class="btn gold" id="linkAdd"><i class="ti ti-plus"></i></button>
-    </div>
-    <div id="linkList" style="margin-top:10px;"></div>
   </div>
 </section>
 
@@ -592,7 +774,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 <section class="tab" id="tab-ajustes">
   <div class="card">
     <h2 class="section-title"><i class="ti ti-settings"></i> Ajustes</h2>
-    <p class="muted small">Moldea tu jardín. Reordena las secciones, oculta lo que no usas, cambia el tema.</p>
+    <p class="tab-hint">reordena, oculta, cambia tema</p>
     <div class="config-section" style="margin-top:18px;">
       <h3>Apariencia</h3>
       <div class="config-item">
@@ -706,20 +888,17 @@ const TABS_META = {
 };
 
 const HOY_WIDGETS_META = {
-  habits:    {name:"Rituales",          desc:"Chips de hábitos diarios"},
-  frase:     {name:"Frase del día",     desc:"Tu frase personal"},
-  voces:     {name:"Voces",             desc:"Banco de citas rotatorias"},
-  stats:     {name:"Stats",             desc:"Racha y % de álbum"},
-  intention: {name:"Intención",         desc:"Una verdad para hoy"},
-  missions:  {name:"Misiones (1·2·3)",  desc:"Enfoque, prioridades, tareas"},
-  riego:     {name:"Riego (pomodoro)",  desc:"Sesión de enfoque de 25min"},
-  bitacora:  {name:"Bitácora",          desc:"Floreció / regué / podé"},
+  frase:    {name:"Frase del día",    desc:"Una verdad para hoy"},
+  voces:    {name:"Voces",            desc:"Banco de citas rotatorias"},
+  stats:    {name:"Stats",            desc:"Racha y % de álbum"},
+  riego:    {name:"Riego",            desc:"Pomodoro 25min"},
+  bitacora: {name:"Bitácora del día", desc:"Rituales, intención, misiones, reflexión"},
 };
 
 const DEFAULT_CONFIG = {
   tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','ajustes'],
   tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, ajustes:true},
-  hoyWidgets: {habits:true, frase:true, voces:true, stats:true, intention:true, missions:true, riego:true, bitacora:true},
+  hoyWidgets: {frase:true, voces:true, stats:true, riego:true, bitacora:true},
   theme: 'auto',
 };
 
@@ -739,6 +918,9 @@ const defaults = {
   bitacora: [], bita_florecio:'', bita_regue:'', bita_pode:'', bitaDate:'',
   dailyLog: [], riegoSessions: [],
   activeProjectId: 1,
+  brand: {logoData:'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit:'', gallery:''},
+  expandedProject: false,
+  openSemillas: {},
 };
 
 // ========================= UTILS =========================
@@ -782,6 +964,15 @@ function migrate(state) {
     delete state.config.tabVisible.inspiracion;
   }
   DEFAULT_CONFIG.tabOrder.forEach(t => { if (!state.config.tabOrder.includes(t)) state.config.tabOrder.push(t); });
+  // Drop legacy widget keys (habits, intention, missions are now inside bitacora)
+  ['habits','intention','missions'].forEach(k => { if (k in state.config.hoyWidgets) delete state.config.hoyWidgets[k]; });
+  Object.keys(DEFAULT_CONFIG.hoyWidgets).forEach(k => { if (!(k in state.config.hoyWidgets)) state.config.hoyWidgets[k] = true; });
+
+  // Brand profile
+  if (!state.brand) state.brand = {logoData: state['lib-logo']||'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit: state['lib-presskit']||'', gallery: state['lib-fotos']||''};
+  if (!state.brand.social) state.brand.social = {spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}};
+  ['spotify','instagram','youtube'].forEach(k => { if (!state.brand.social[k]) state.brand.social[k] = {url:'', summary:''}; });
+  if (!Array.isArray(state.brand.photos)) state.brand.photos = [];
 
   // Projects
   if (!Array.isArray(state.projects) || !state.projects.length) state.projects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
@@ -892,9 +1083,10 @@ function dailyCheck() {
       const reqIds = HABITS_CONFIG.filter(h=>h.required).map(h=>h.id);
       const doneReq = reqIds.filter(id => S.habits[id]).length;
       const ratio = doneReq/reqIds.length;
+      const snap = {...S.habits};
       S.habitHistory = (S.habitHistory||[]).filter(e => e.date !== S.habitDate);
-      S.habitHistory.push({date:S.habitDate, ratio});
-      if (S.habitHistory.length > 90) S.habitHistory = S.habitHistory.slice(-90);
+      S.habitHistory.push({date:S.habitDate, habits: snap, ratio});
+      if (S.habitHistory.length > 365) S.habitHistory = S.habitHistory.slice(-365);
       snapshotDay(S.habitDate);
       S.streak = (doneReq === reqIds.length) ? (S.streak||0)+1 : 0;
     }
@@ -915,15 +1107,13 @@ function dailyCheck() {
   save();
 }
 
-// ========================= GREETING =========================
-function setGreeting() {
-  const h = new Date().getHours();
-  let g = h<6?'Madrugada':h<12?'Buen día':h<19?'Buena tarde':'Buena noche';
-  const date = new Date().toLocaleDateString('es-CL', {weekday:'long', day:'numeric', month:'long'});
-  $('#greetLbl').innerHTML = `<b>${g}, Somko</b> · ${date}`;
-  const m = new Date().getMonth()+1;
-  $('#seasonLbl').textContent = (m===12||m<=2)?'Verano':(m<=5)?'Otoño':(m<=8)?'Invierno':'Primavera';
+// ========================= DATE DISPLAY =========================
+function setDateDisplay() {
+  const date = new Date().toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+  $('#dateDisplay').textContent = date;
 }
+// Backwards-compat alias used by interval
+function setGreeting() { setDateDisplay(); }
 
 // ========================= TABS / THEME / WIDGETS =========================
 function applyTheme() {
@@ -951,7 +1141,31 @@ function switchTab(key) {
   if (key === 'flores') renderFlores();
   if (key === 'diario') renderDiario();
   if (key === 'ajustes') renderConfig();
+  if (key === 'marca') renderBrand();
 }
+
+// Mobile swipe to switch tabs
+let touchStartX = null, touchStartY = null;
+document.body.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, {passive: true});
+document.body.addEventListener('touchend', e => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  touchStartX = null;
+  if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6) return;
+  const target = e.target;
+  if (target.closest('textarea, input, audio, select, button')) return;
+  const visible = S.config.tabOrder.filter(t => S.config.tabVisible[t] && TABS_META[t]);
+  const curTab = document.querySelector('section.tab.active')?.id?.replace('tab-','');
+  const idx = visible.indexOf(curTab);
+  if (idx < 0) return;
+  if (dx > 0 && idx > 0) switchTab(visible[idx-1]);
+  else if (dx < 0 && idx < visible.length-1) switchTab(visible[idx+1]);
+}, {passive: true});
 function applyHoyWidgets() {
   Object.entries(S.config.hoyWidgets).forEach(([k,v]) => {
     const el = document.querySelector(`[data-widget="${k}"]`);
@@ -992,24 +1206,62 @@ $('#quoteDel').addEventListener('click', () => {
 function renderMantra() { $('#mantraInput').value = S.mantra||''; }
 $('#mantraInput').addEventListener('input', e => { S.mantra = e.target.value; save(); });
 
-// ========================= HABITS =========================
+// ========================= HABITS (per-habit tracking) =========================
+function getHabitStreak(habitId) {
+  let streak = S.habits[habitId] ? 1 : 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = 1; i < 365; i++) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    const ds = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const entry = (S.habitHistory||[]).find(h => h.date === ds);
+    if (!entry || !entry.habits || !entry.habits[habitId]) break;
+    streak++;
+  }
+  return streak;
+}
+function getHabitTotalDays(habitId) {
+  let total = S.habits[habitId] ? 1 : 0;
+  (S.habitHistory||[]).forEach(h => { if (h.habits && h.habits[habitId]) total++; });
+  return total;
+}
+function getHabitLastN(habitId, n) {
+  const arr = [];
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = n-1; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    const ds = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if (ds === todayStr()) arr.push({date:ds, done: !!S.habits[habitId], today:true});
+    else { const entry = (S.habitHistory||[]).find(h => h.date===ds); arr.push({date:ds, done: !!(entry?.habits?.[habitId]), today:false}); }
+  }
+  return arr;
+}
+
 function renderHabits() {
-  const wrap = $('#habitChips'); wrap.innerHTML = '';
+  const wrap = $('#habitsTracking'); if (!wrap) return;
+  wrap.innerHTML = '';
   HABITS_CONFIG.forEach(h => {
     const done = !!S.habits[h.id];
-    const chip = document.createElement('div');
-    chip.className = 'habit-chip' + (done?' done':'') + (h.required?'':' bonus');
-    chip.innerHTML = `<span class="dot"></span><span>${h.name}</span>`;
-    chip.addEventListener('click', () => {
+    const streak = getHabitStreak(h.id);
+    const total = getHabitTotalDays(h.id);
+    const last21 = getHabitLastN(h.id, 21);
+    const row = document.createElement('div');
+    row.className = 'habit-track';
+    row.innerHTML = `
+      <button class="hab-check ${done?'done':''}" data-hab="${h.id}"></button>
+      <div class="hab-name">${h.name}${h.required?'':'<span class="opt">opt</span>'}</div>
+      <div class="hab-streak">${streak}d · ${total} tot</div>
+      <div class="hab-grid">${last21.map(d => `<div class="hab-cell ${d.done?'done':''}${d.today?' today':''}" title="${d.date}${d.done?' ✓':''}"></div>`).join('')}</div>
+    `;
+    row.querySelector('.hab-check').addEventListener('click', () => {
       S.habits[h.id] = !S.habits[h.id];
-      renderHabits(); renderStreak(); save();
+      renderHabits(); renderStreak(); renderHeatmap(); save();
       if (S.habits[h.id] && navigator.vibrate) navigator.vibrate(10);
       if (S.habits[h.id]) {
         const reqIds = HABITS_CONFIG.filter(x=>x.required).map(x=>x.id);
         if (reqIds.every(id => S.habits[id])) toast('Rituales completos — el jardín respira','✦');
       }
     });
-    wrap.appendChild(chip);
+    wrap.appendChild(row);
   });
 }
 function renderStreak() {
@@ -1044,12 +1296,18 @@ function bindField(id) {
 function bindBita(field, id) { const el=$('#'+id); el.value=S[field]||''; el.addEventListener('input', e => { S[field]=e.target.value; save(); }); }
 bindBita('bita_florecio','bita-florecio'); bindBita('bita_regue','bita-regue'); bindBita('bita_pode','bita-pode');
 $('#bitaSave').addEventListener('click', () => {
-  if (!S.bita_florecio && !S.bita_regue && !S.bita_pode) { toast('Escribe algo primero'); return; }
   const today = todayStr();
-  S.bitacora = S.bitacora.filter(b => b.date !== today);
-  S.bitacora.unshift({date:today, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode});
-  if (S.bitacora.length > 60) S.bitacora = S.bitacora.slice(0,60);
-  save(); renderBitaHistory(); toast('Bitácora guardada','✓');
+  // Save bitacora prompts entry
+  if (S.bita_florecio || S.bita_regue || S.bita_pode) {
+    S.bitacora = S.bitacora.filter(b => b.date !== today);
+    S.bitacora.unshift({date:today, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode});
+    if (S.bitacora.length > 60) S.bitacora = S.bitacora.slice(0,60);
+  }
+  // Always snapshot full day (captures rituales + intención + misiones + reflexión)
+  snapshotDay();
+  save(); renderBitaHistory(); renderDiario();
+  toast('Entrada del día guardada','✦');
+  if (navigator.vibrate) navigator.vibrate(30);
 });
 function renderBitaHistory() {
   const el = $('#bitaHistory');
@@ -1226,32 +1484,39 @@ function renderJardinProjectHeader() {
   const total = flores.length*4;
   const done = flores.reduce((a,f) => a+STAGES.filter(s=>f[s]).length, 0);
   const pct = total ? Math.round((done/total)*100) : 0;
+  const isOpen = !!S.expandedProject;
   const el = $('#jardinProjectHeader');
   el.innerHTML = `
-    <div class="project-meta">
-      <input type="text" class="project-name-input" value="${escapeHTML(p.name)}" data-pfield="name">
-      <span class="project-progress">${flores.length} flores · ${pct}%</span>
-    </div>
-    <div class="row-flex" style="gap:10px;">
-      <div style="flex:0 0 160px;"><div class="lab" style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Tipo</div><input type="text" class="project-type-input" value="${escapeHTML(p.type)}" data-pfield="type" placeholder="Álbum, EP, Single...">
+    <div class="collapsible ${isOpen?'open':''}" style="border-bottom:none;">
+      <div class="collapsible-head" id="projToggle" style="padding:14px 16px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius);">
+        <button class="toggle-icon"><i class="ti ti-${isOpen?'minus':'plus'}"></i></button>
+        <div class="col-title">${escapeHTML(p.name)} · ${escapeHTML(p.type)}</div>
+        <div class="col-meta">${flores.length} flores · <span style="color:var(--gold);">${pct}%</span></div>
       </div>
-    </div>
-    <div class="stat-bar" style="margin-top:10px;"><div class="stat-bar-fill" style="width:${pct}%"></div></div>
-    <div class="project-fields" style="margin-top:14px;">
-      <div><div class="lab">Descripción</div><textarea data-pfield="description" rows="2" placeholder="esencia del proyecto, concepto, historia...">${escapeHTML(p.description||'')}</textarea></div>
-      <div><div class="lab">Contenido para redes sociales</div><textarea data-pfield="socialContent" rows="3" placeholder="copy para Spotify, descripción de Bandcamp, captions...">${escapeHTML(p.socialContent||'')}</textarea></div>
-      <div>
-        <div class="lab">Links</div>
-        <div class="kvlist" data-list="jardinProjectLinks">${renderKvList(p.links||[])}</div>
-        <button class="btn ghost tiny" data-additem="jardinProjectLinks" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar link</button>
-      </div>
-      <div>
-        <div class="lab">Archivos (links a Drive, Dropbox...)</div>
-        <div class="kvlist" data-list="jardinProjectFiles">${renderKvList(p.files||[])}</div>
-        <button class="btn ghost tiny" data-additem="jardinProjectFiles" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar archivo</button>
+      <div class="collapsible-body" style="padding:14px 16px;background:var(--bg-card);border:0.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);">
+        <div class="project-meta"><input type="text" class="project-name-input" value="${escapeHTML(p.name)}" data-pfield="name"></div>
+        <div class="row-flex" style="gap:10px;">
+          <div style="flex:0 0 160px;"><div class="lab" style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px;">Tipo</div><input type="text" class="project-type-input" value="${escapeHTML(p.type)}" data-pfield="type" placeholder="Álbum, EP, Single..."></div>
+        </div>
+        <div class="stat-bar" style="margin-top:10px;"><div class="stat-bar-fill" style="width:${pct}%"></div></div>
+        <div class="project-fields" style="margin-top:14px;">
+          <div><div class="lab">Descripción</div><textarea data-pfield="description" rows="2" placeholder="esencia del proyecto, concepto, historia...">${escapeHTML(p.description||'')}</textarea></div>
+          <div><div class="lab">Contenido para redes sociales</div><textarea data-pfield="socialContent" rows="3" placeholder="copy para Spotify, descripción de Bandcamp, captions...">${escapeHTML(p.socialContent||'')}</textarea></div>
+          <div>
+            <div class="lab">Links</div>
+            <div class="kvlist" data-list="jardinProjectLinks">${renderKvList(p.links||[])}</div>
+            <button class="btn ghost tiny" data-additem="jardinProjectLinks" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar link</button>
+          </div>
+          <div>
+            <div class="lab">Archivos (links a Drive, Dropbox...)</div>
+            <div class="kvlist" data-list="jardinProjectFiles">${renderKvList(p.files||[])}</div>
+            <button class="btn ghost tiny" data-additem="jardinProjectFiles" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar archivo</button>
+          </div>
+        </div>
       </div>
     </div>
   `;
+  $('#projToggle').addEventListener('click', () => { S.expandedProject = !S.expandedProject; save(); renderJardinProjectHeader(); });
   el.querySelectorAll('[data-pfield]').forEach(inp => {
     inp.addEventListener('input', e => {
       const pp = activeProject();
@@ -1440,7 +1705,7 @@ function renderFlores() {
     const preview = (f.lyrics||'').slice(0,70).replace(/\n/g,' ');
     const projName = (S.projects.find(p => p.id === f.projectId)||{}).name || '—';
     return `
-    <div class="flor-row" data-flor="${f.id}">
+    <div class="flor-row ${open?'open':''}" data-flor="${f.id}">
       <div class="flor-head" data-toggle="${f.id}">
         <div>
           <div class="flor-title">${escapeHTML(f.title)}</div>
@@ -1535,8 +1800,7 @@ let semFormDraft = null;
 function renderSemillero() {
   renderSemFilter();
   renderSemForm();
-  renderSemDetail();
-  renderSemGrid();
+  renderSemList();
 }
 
 function renderSemFilter() {
@@ -1582,39 +1846,154 @@ function semMatchesFilter(i) {
   return true;
 }
 
-function renderSemGrid() {
-  const grid = $('#semGrid');
+function renderSemList() {
+  const list = $('#semList');
   let items = (S.semillas||[]).filter(semMatchesFilter);
   if (semSearchTerm) {
     const term = semSearchTerm.toLowerCase();
     items = items.filter(i => (i.title||'').toLowerCase().includes(term) || (i.text||'').toLowerCase().includes(term));
   }
   items.sort((a,b) => (b.createdAt||b.id||0) - (a.createdAt||a.id||0));
-  if (!items.length) { grid.innerHTML = '<div class="empty">sin semillas</div>'; return; }
-  grid.innerHTML = items.map(i => {
+  if (!items.length) { list.innerHTML = '<div class="empty">sin semillas</div>'; return; }
+  list.innerHTML = items.map(i => {
+    const isOpen = !!S.openSemillas[i.id];
     const types = [];
-    if (i.text) types.push(`<span class="t"><i class="ti ti-align-left"></i>texto</span>`);
-    if (i.photoData) types.push(`<span class="t"><i class="ti ti-photo"></i>foto</span>`);
-    if (i.audioData) types.push(`<span class="t"><i class="ti ti-microphone"></i>${i.audioSec||0}s</span>`);
-    if (i.link) types.push(`<span class="t"><i class="ti ti-link"></i>link</span>`);
+    if (i.text) types.push(`<i class="ti ti-align-left" title="texto"></i>`);
+    if (i.photoData) types.push(`<i class="ti ti-photo" title="foto"></i>`);
+    if (i.audioData) types.push(`<i class="ti ti-microphone" title="audio ${i.audioSec||0}s"></i>`);
+    if (i.link) types.push(`<i class="ti ti-link" title="link"></i>`);
     const g = i.groupId ? S.semillaGroups.find(x => x.id === i.groupId) : null;
     return `
-      <div class="sem-card" data-sem="${i.id}">
-        ${i.photoData ? `<img class="sem-thumb" src="${i.photoData}" alt="">` : ''}
-        <div class="sem-title">${escapeHTML(i.title||'sin título')}</div>
-        ${i.text ? `<div class="sem-preview">${escapeHTML(i.text)}</div>` : ''}
-        <div class="sem-types">${types.join('')}</div>
-        <div class="sem-meta">
-          <span>${i.date||''}</span>
-          ${g ? `<span class="sem-group-tag">${escapeHTML(g.name)}</span>` : '<span></span>'}
+      <div class="collapsible ${isOpen?'open':''}" data-sem-item="${i.id}">
+        <div class="collapsible-head" data-sem-toggle="${i.id}">
+          <button class="toggle-icon" title="${isOpen?'minimizar':'expandir'}"><i class="ti ti-${isOpen?'minus':'plus'}"></i></button>
+          ${i.photoData?`<img class="col-thumb" src="${i.photoData}" alt="">`:''}
+          <div class="col-title">${escapeHTML(i.title||'sin título')}</div>
+          <div class="col-meta">
+            ${types.join(' ')}
+            ${g?`<span class="sem-group-tag">${escapeHTML(g.name)}</span>`:''}
+            <span style="opacity:0.6;">${i.date||''}</span>
+          </div>
         </div>
+        <div class="collapsible-body" id="semBody-${i.id}"></div>
       </div>`;
   }).join('');
-  grid.querySelectorAll('[data-sem]').forEach(c => c.addEventListener('click', () => {
-    semDetailOpen = +c.dataset.sem; renderSemillero();
-    setTimeout(() => $('#semDetailWrap')?.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+  list.querySelectorAll('[data-sem-toggle]').forEach(h => h.addEventListener('click', () => {
+    const id = +h.dataset.semToggle;
+    if (S.openSemillas[id]) delete S.openSemillas[id];
+    else { S.openSemillas[id] = true; semDetailOpen = id; }
+    save();
+    renderSemList();
+  }));
+  // Render bodies for open ones
+  Object.keys(S.openSemillas).forEach(idStr => {
+    const id = +idStr;
+    const bodyEl = $('#semBody-'+id);
+    if (bodyEl) renderSemBodyInline(id, bodyEl);
+  });
+}
+
+function renderSemBodyInline(id, container) {
+  const s = S.semillas.find(x => x.id === id); if (!s) return;
+  const groupOpts = ['<option value="">— sin grupo —</option>'].concat(
+    S.semillaGroups.map(g => `<option value="${g.id}" ${g.id===s.groupId?'selected':''}>${escapeHTML(g.name)}</option>`)
+  ).join('');
+  container.innerHTML = `
+    <input type="text" class="sem-title-input" data-sf="title" value="${escapeHTML(s.title||'')}" placeholder="título...">
+
+    <div class="sem-slot">
+      <label class="slot-label"><i class="ti ti-align-left"></i> Texto</label>
+      <textarea data-sf="text" rows="3" placeholder="escribe pensamientos, fragmentos, ideas...">${escapeHTML(s.text||'')}</textarea>
+    </div>
+
+    <div class="sem-slot ${s.photoData?'':'empty'}">
+      <label class="slot-label"><i class="ti ti-photo"></i> Foto</label>
+      ${s.photoData ? `
+        <img class="preview-img" src="${s.photoData}" alt="">
+        <div class="slot-actions">
+          <button class="btn ghost tiny" data-act="photoUp"><i class="ti ti-refresh"></i> Cambiar</button>
+          <button class="btn ghost tiny" data-act="photoCam"><i class="ti ti-camera"></i> Capturar</button>
+          <button class="btn ghost tiny danger" data-act="photoRm"><i class="ti ti-x"></i> Quitar</button>
+        </div>
+      ` : `
+        <div class="slot-empty">
+          <div class="hint">aún sin foto</div>
+          <button class="btn ghost" data-act="photoUp"><i class="ti ti-photo-plus"></i> Subir foto</button>
+          <button class="btn ghost" data-act="photoCam"><i class="ti ti-camera"></i> Capturar</button>
+        </div>
+      `}
+    </div>
+
+    <div class="sem-slot ${s.audioData?'':'empty'}">
+      <label class="slot-label"><i class="ti ti-microphone"></i> Audio</label>
+      ${s.audioData ? `
+        <audio controls src="${s.audioData}"></audio>
+        <div class="slot-actions">
+          <span class="muted small">${s.audioSec||0}s</span>
+          <button class="btn ghost tiny" data-act="audioRec" id="semRec-${id}"><i class="ti ti-refresh"></i> Re-grabar</button>
+          <button class="btn ghost tiny" data-act="audioDl"><i class="ti ti-download"></i></button>
+          <button class="btn ghost tiny danger" data-act="audioRm"><i class="ti ti-x"></i> Quitar</button>
+          <span class="voice-status" id="semStatus-${id}"></span>
+          <span class="voice-time" id="semTime-${id}"></span>
+        </div>
+      ` : `
+        <div class="slot-empty">
+          <div class="hint">aún sin audio</div>
+          <button class="btn ghost" data-act="audioRec" id="semRec-${id}"><i class="ti ti-microphone"></i> Grabar audio</button>
+          <span class="voice-status" id="semStatus-${id}"></span>
+          <span class="voice-time" id="semTime-${id}"></span>
+        </div>
+      `}
+    </div>
+
+    <div class="sem-slot">
+      <label class="slot-label"><i class="ti ti-link"></i> Link</label>
+      <input type="url" data-sf="link" value="${escapeHTML(s.link||'')}" placeholder="https://...">
+      ${s.link?`<div class="slot-actions"><button class="btn ghost tiny" data-act="linkOpen"><i class="ti ti-external-link"></i> Abrir</button></div>`:''}
+    </div>
+
+    <div class="sem-slot">
+      <label class="slot-label"><i class="ti ti-folder"></i> Grupo</label>
+      <select data-sf="groupId">${groupOpts}</select>
+    </div>
+
+    <div class="actions" style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap;">
+      <button class="btn ghost tiny danger" data-act="del"><i class="ti ti-trash"></i> Eliminar</button>
+      <button class="btn gold tiny" data-act="sembrar"><i class="ti ti-flower"></i> Sembrar como flor</button>
+    </div>
+  `;
+  // Bind text/title/link/group
+  container.querySelectorAll('[data-sf]').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const f = inp.dataset.sf;
+      if (f === 'groupId') s[f] = e.target.value?+e.target.value:null;
+      else s[f] = e.target.value;
+      save();
+      if (f === 'title' || f === 'groupId') renderSemList();
+    });
+  });
+  // Bind actions
+  container.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
+    const a = b.dataset.act;
+    if (a === 'photoUp') { photoContext = {type:'semilla', id:s.id}; $('#photoInput').click(); }
+    if (a === 'photoCam') { photoContext = {type:'semilla', id:s.id}; $('#photoCamera').click(); }
+    if (a === 'photoRm') { s.photoData = null; save(); renderSemList(); }
+    if (a === 'audioRec') toggleRecording({type:'semilla', id:s.id, statusId:'semStatus-'+s.id, timeId:'semTime-'+s.id, btnId:'semRec-'+s.id});
+    if (a === 'audioRm') { s.audioData = null; s.audioSec = 0; save(); renderSemList(); }
+    if (a === 'audioDl') { const aEl = document.createElement('a'); aEl.href = s.audioData; aEl.download = (s.title||'voz').replace(/[^\w\-]/g,'_')+'.webm'; aEl.click(); }
+    if (a === 'linkOpen') { if (s.link) window.open(s.link, '_blank'); }
+    if (a === 'sembrar') sembrarSemilla(s.id);
+    if (a === 'del') {
+      if (!confirm('Eliminar esta semilla?')) return;
+      S.semillas = S.semillas.filter(x => x.id !== s.id);
+      delete S.openSemillas[s.id];
+      save(); renderSemList();
+    }
   }));
 }
+
+// Compat shim: old renderSemDetail no longer used but kept as no-op
+function renderSemDetail() { /* legacy */ }
 
 // SEMILLA DETAIL — always shows 4 slots (text/photo/audio/link) — empty or filled
 function renderSemDetail() {
@@ -1709,11 +2088,11 @@ function renderSemDetail() {
   // Photo controls
   $('#semDPhotoUpload')?.addEventListener('click', () => { photoContext={type:'semilla', id:s.id}; $('#photoInput').click(); });
   $('#semDPhotoCamera')?.addEventListener('click', () => { photoContext={type:'semilla', id:s.id}; $('#photoCamera').click(); });
-  $('#semDPhotoRemove')?.addEventListener('click', () => { s.photoData = null; save(); renderSemDetail(); renderSemGrid(); });
+  $('#semDPhotoRemove')?.addEventListener('click', () => { s.photoData = null; save(); renderSemList(); });
 
   // Audio controls
   $('#semDAudioRec')?.addEventListener('click', () => toggleRecording({type:'semilla', id:s.id, statusId:'semDVoiceStatus', timeId:'semDVoiceTime', btnId:'semDAudioRec'}));
-  $('#semDAudioRemove')?.addEventListener('click', () => { s.audioData=null; s.audioSec=0; save(); renderSemDetail(); renderSemGrid(); });
+  $('#semDAudioRemove')?.addEventListener('click', () => { s.audioData=null; s.audioSec=0; save(); renderSemList(); });
   $('#semDAudioDl')?.addEventListener('click', () => {
     const a = document.createElement('a');
     a.href = s.audioData;
@@ -1881,7 +2260,7 @@ async function handlePhotoFile(file) {
           const newT = prompt('Título para la foto:', s.title || `foto ${todayStr()}`);
           if (newT) s.title = newT;
         }
-        save(); renderSemDetail(); renderSemGrid();
+        save(); renderSemList();
       }
     } else {
       // Direct add from outside form/detail — create a new semilla with photo
@@ -1944,7 +2323,7 @@ async function toggleRecording(context) {
             if (newTitle) { s.title = newTitle; save(); }
           }
           toast('Audio guardado','✦');
-          renderSemDetail(); renderSemGrid();
+          renderSemList();
         }
       }
     };
@@ -1971,7 +2350,90 @@ function stopRecording() {
   try { mediaRecorder.stop(); } catch(e){}
 }
 
-// ========================= MARCA =========================
+// ========================= BRAND PROFILE =========================
+function renderBrand() {
+  const b = S.brand;
+  // Logo display
+  const ld = $('#brandLogoDisplay');
+  if (b.logoData) {
+    ld.innerHTML = `<img src="${b.logoData}" alt="logo">`;
+    $('#brandLogoDownload').hidden = false;
+    $('#brandLogoRemove').hidden = false;
+  } else {
+    ld.innerHTML = `<div class="placeholder">Upload your logo</div>`;
+    $('#brandLogoDownload').hidden = true;
+    $('#brandLogoRemove').hidden = true;
+  }
+  // Bind fields
+  $('#brandBio').value = b.bio || '';
+  $('#brandSpUrl').value = b.social.spotify.url || '';
+  $('#brandSpSummary').value = b.social.spotify.summary || '';
+  $('#brandIgUrl').value = b.social.instagram.url || '';
+  $('#brandIgSummary').value = b.social.instagram.summary || '';
+  $('#brandYtUrl').value = b.social.youtube.url || '';
+  $('#brandYtSummary').value = b.social.youtube.summary || '';
+  // Gallery
+  const gal = $('#brandGallery');
+  let html = '';
+  (b.photos||[]).forEach(p => {
+    html += `<div class="brand-photo" data-photo="${p.id}"><img src="${p.dataUrl}" alt=""><button class="ph-del" data-phdel="${p.id}" title="eliminar">×</button>${p.caption?`<div class="ph-cap">${escapeHTML(p.caption)}</div>`:''}</div>`;
+  });
+  html += `<div class="brand-photo-upload" id="brandPhotoUpload"><i class="ti ti-plus" style="font-size:18px;"></i><span>agregar</span></div>`;
+  html += `<div class="brand-photo-upload" id="brandPhotoCapture"><i class="ti ti-camera" style="font-size:18px;"></i><span>capturar</span></div>`;
+  gal.innerHTML = html;
+  gal.querySelectorAll('[data-phdel]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (!confirm('Eliminar foto?')) return;
+    S.brand.photos = S.brand.photos.filter(x => x.id !== +btn.dataset.phdel);
+    save(); renderBrand();
+  }));
+  gal.querySelectorAll('[data-photo]').forEach(el => el.addEventListener('click', () => {
+    const id = +el.dataset.photo;
+    const p = S.brand.photos.find(x => x.id === id); if (!p) return;
+    const cap = prompt('Caption de la foto:', p.caption || '');
+    if (cap !== null) { p.caption = cap; save(); renderBrand(); }
+  }));
+  $('#brandPhotoUpload').addEventListener('click', () => $('#brandPhotoInput').click());
+  $('#brandPhotoCapture').addEventListener('click', () => $('#brandPhotoCamera').click());
+}
+
+// Bind brand inputs (once)
+function bindBrand() {
+  $('#brandBio').addEventListener('input', e => { S.brand.bio = e.target.value; save(); });
+  $('#brandSpUrl').addEventListener('input', e => { S.brand.social.spotify.url = e.target.value; save(); });
+  $('#brandSpSummary').addEventListener('input', e => { S.brand.social.spotify.summary = e.target.value; save(); });
+  $('#brandIgUrl').addEventListener('input', e => { S.brand.social.instagram.url = e.target.value; save(); });
+  $('#brandIgSummary').addEventListener('input', e => { S.brand.social.instagram.summary = e.target.value; save(); });
+  $('#brandYtUrl').addEventListener('input', e => { S.brand.social.youtube.url = e.target.value; save(); });
+  $('#brandYtSummary').addEventListener('input', e => { S.brand.social.youtube.summary = e.target.value; save(); });
+  $('#brandSpOpen').addEventListener('click', () => { if (S.brand.social.spotify.url) window.open(S.brand.social.spotify.url, '_blank'); });
+  $('#brandIgOpen').addEventListener('click', () => { if (S.brand.social.instagram.url) window.open(S.brand.social.instagram.url, '_blank'); });
+  $('#brandYtOpen').addEventListener('click', () => { if (S.brand.social.youtube.url) window.open(S.brand.social.youtube.url, '_blank'); });
+  $('#brandLogoUpload').addEventListener('click', () => $('#brandLogoInput').click());
+  $('#brandLogoRemove').addEventListener('click', () => { if (!confirm('Quitar logo?')) return; S.brand.logoData = ''; save(); renderBrand(); });
+  $('#brandLogoDownload').addEventListener('click', () => {
+    if (!S.brand.logoData) return;
+    const a = document.createElement('a'); a.href = S.brand.logoData; a.download = 'logo.png'; a.click();
+  });
+  $('#brandLogoInput').addEventListener('change', async e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    try { S.brand.logoData = await fileToCompressedDataUrl(f, 800, 0.9); save(); renderBrand(); toast('Logo cargado','✦'); }
+    catch (err) { toast('Error con el logo'); }
+  });
+  const onPhoto = async (f) => {
+    if (!f) return;
+    try {
+      const dataUrl = await fileToCompressedDataUrl(f, 1280, 0.78);
+      const cap = prompt('Caption (opcional):', '') || '';
+      S.brand.photos.push({id: uid(), dataUrl, caption: cap, date: todayStr()});
+      save(); renderBrand(); toast('Foto agregada','✦');
+    } catch (err) { toast('Error con la foto'); }
+  };
+  $('#brandPhotoInput').addEventListener('change', e => { const f = e.target.files[0]; e.target.value=''; onPhoto(f); });
+  $('#brandPhotoCamera').addEventListener('change', e => { const f = e.target.files[0]; e.target.value=''; onPhoto(f); });
+}
+
+// ========================= MARCA (legacy fields kept) =========================
 $$('[data-copy]').forEach(b => b.addEventListener('click', () => {
   const v = $('#'+b.dataset.copy).value;
   if (!v) { toast('Vacío'); return; }
@@ -2154,7 +2616,7 @@ function init() {
   const firstVisible = S.config.tabOrder.find(t => S.config.tabVisible[t]);
   if (firstVisible) switchTab(firstVisible);
   applyHoyWidgets();
-  dailyCheck(); setGreeting();
+  dailyCheck(); setDateDisplay();
   renderQuote(); renderMantra();
   renderHabits(); renderStreak();
   renderAlbumStat();
@@ -2165,6 +2627,7 @@ function init() {
   populateRiegoTargets(); renderRiegoTime();
   renderLinks(); renderServices(); renderExpenses(); renderWallet();
   renderSemillero();
+  bindBrand(); renderBrand();
 }
 init();
 setInterval(() => {
@@ -2230,11 +2693,9 @@ setInterval(() => {
   if (firebaseReady && userId) loadFromFirebase();
 }, 300000);
 
-// ========== SERVICE WORKER ==========
+// ========== SERVICE WORKER (AUTO-UPDATE) ==========
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  });
+  navigator.serviceWorker.register('sw.js');
 }
 </script>
 </body>
