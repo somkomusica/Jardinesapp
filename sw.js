@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jardin-live';
+const CACHE_NAME = 'jardin-v5-storage';
 
 self.addEventListener('install', () => self.skipWaiting());
 
