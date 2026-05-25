@@ -1,11 +1,12 @@
 // Jardín Service Worker — Network First con auto-update
-// Cuando subes nueva versión a GitHub, la app se actualiza sola al abrirla
-
-const CACHE_NAME = 'jardin-v7-girasol';
+const CACHE_NAME = 'jardin-v8-png';
 const ESSENTIAL_FILES = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -33,8 +34,6 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-
-  // No interferir con Firebase, Google APIs, gstatic
   const skipCache =
     url.hostname.includes('firebase') ||
     url.hostname.includes('googleapis.com') ||

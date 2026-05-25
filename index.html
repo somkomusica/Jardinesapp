@@ -5,12 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#D4A017">
 <meta name="description" content="Jardín — Tu sistema de organización artística">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Jardín">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KPHJlY3QgZmlsbD0iIzFhMWExYSIgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0MCIvPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5NiwgOTYpIj4KPGcgZmlsbD0iIzhCNjUwOCIgc3Ryb2tlPSJub25lIj4KPGcgdHJhbnNmb3JtPSJyb3RhdGUoMjIuNSkiPgo8cGF0aCBkPSJNIDAgLTIyIFEgOCAtNDAgMCAtNjAgUSAtOCAtNDAgMCAtMjIgWiIvPgo8cGF0aCBkPSJNIDAgMjIgUSA4IDQwIDAgNjAgUSAtOCA0MCAwIDIyIFoiLz4KPHBhdGggZD0iTSAtMjIgMCBRIC00MCAtOCAtNjAgMCBRIC00MCA4IC0yMiAwIFoiLz4KPHBhdGggZD0iTSAyMiAwIFEgNDAgLTggNjAgMCBRIDQwIDggMjIgMCBaIi8+CjxnIHRyYW5zZm9ybT0icm90YXRlKDQ1KSI+CjxwYXRoIGQ9Ik0gMCAtMjIgUSA4IC00MCAwIC02MCBRIC04IC00MCAwIC0yMiBaIi8+CjxwYXRoIGQ9Ik0gMCAyMiBRIDggNDAgMCA2MCBRIC04IDQwIDAgMjIgWiIvPgo8cGF0aCBkPSJNIC0yMiAwIFEgLTQwIC04IC02MCAwIFEgLTQwIDggLTIyIDAgWiIvPgo8cGF0aCBkPSJNIDIyIDAgUSA0MCAtOCA2MCAwIFEgNDAgOCAyMiAwIFoiLz4KPC9nPgo8L2c+CjwvZz4KPGcgZmlsbD0iI0Q0QTAxNyIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTSAwIC0xOCBRIDkgLTMyIDAgLTUwIFEgLTkgLTMyIDAgLTE4IFoiLz4KPHBhdGggZD0iTSAwIDE4IFEgOSAzMiAwIDUwIFEgLTkgMzIgMCAxOCBaIi8+CjxwYXRoIGQ9Ik0gLTE4IDAgUSAtMzIgLTkgLTUwIDAgUSAtMzIgOSAtMTggMCBaIi8+CjxwYXRoIGQ9Ik0gMTggMCBRIDMyIC05IDUwIDAgUSAzMiA5IDE4IDAgWiIvPgo8ZyB0cmFuc2Zvcm09InJvdGF0ZSg0NSkiPgo8cGF0aCBkPSJNIDAgLTE4IFEgOSAtMzIgMCAtNTAgUSAtOSAtMzIgMCAtMTggWiIvPgo8cGF0aCBkPSJNIDAgMTggUSA5IDMyIDAgNTAgUSAtOSAzMiAwIDE4IFoiLz4KPHBhdGggZD0iTSAtMTggMCBRIC0zMiAtOSAtNTAgMCBRIC0zMiA5IC0xOCAwIFoiLz4KPHBhdGggZD0iTSAxOCAwIFEgMzIgLTkgNTAgMCBRIDMyIDkgMTggMCBaIi8+CjwvZz4KPC9nPgo8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMTciIGZpbGw9IiMzQTJEMjAiLz4KPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjE3IiBmaWxsPSJub25lIiBzdHJva2U9IiNENEEwMTciIHN0cm9rZS13aWR0aD0iMSIvPgo8L2c+Cjwvc3ZnPgo=">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KPHJlY3QgZmlsbD0iIzFhMWExYSIgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0MCIvPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5NiwgOTYpIj4KPGcgZmlsbD0iIzhCNjUwOCIgc3Ryb2tlPSJub25lIj4KPGcgdHJhbnNmb3JtPSJyb3RhdGUoMjIuNSkiPgo8cGF0aCBkPSJNIDAgLTIyIFEgOCAtNDAgMCAtNjAgUSAtOCAtNDAgMCAtMjIgWiIvPgo8cGF0aCBkPSJNIDAgMjIgUSA4IDQwIDAgNjAgUSAtOCA0MCAwIDIyIFoiLz4KPHBhdGggZD0iTSAtMjIgMCBRIC00MCAtOCAtNjAgMCBRIC00MCA4IC0yMiAwIFoiLz4KPHBhdGggZD0iTSAyMiAwIFEgNDAgLTggNjAgMCBRIDQwIDggMjIgMCBaIi8+CjxnIHRyYW5zZm9ybT0icm90YXRlKDQ1KSI+CjxwYXRoIGQ9Ik0gMCAtMjIgUSA4IC00MCAwIC02MCBRIC04IC00MCAwIC0yMiBaIi8+CjxwYXRoIGQ9Ik0gMCAyMiBRIDggNDAgMCA2MCBRIC04IDQwIDAgMjIgWiIvPgo8cGF0aCBkPSJNIC0yMiAwIFEgLTQwIC04IC02MCAwIFEgLTQwIDggLTIyIDAgWiIvPgo8cGF0aCBkPSJNIDIyIDAgUSA0MCAtOCA2MCAwIFEgNDAgOCAyMiAwIFoiLz4KPC9nPgo8L2c+CjwvZz4KPGcgZmlsbD0iI0Q0QTAxNyIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTSAwIC0xOCBRIDkgLTMyIDAgLTUwIFEgLTkgLTMyIDAgLTE4IFoiLz4KPHBhdGggZD0iTSAwIDE4IFEgOSAzMiAwIDUwIFEgLTkgMzIgMCAxOCBaIi8+CjxwYXRoIGQ9Ik0gLTE4IDAgUSAtMzIgLTkgLTUwIDAgUSAtMzIgOSAtMTggMCBaIi8+CjxwYXRoIGQ9Ik0gMTggMCBRIDMyIC05IDUwIDAgUSAzMiA5IDE4IDAgWiIvPgo8ZyB0cmFuc2Zvcm09InJvdGF0ZSg0NSkiPgo8cGF0aCBkPSJNIDAgLTE4IFEgOSAtMzIgMCAtNTAgUSAtOSAtMzIgMCAtMTggWiIvPgo8cGF0aCBkPSJNIDAgMTggUSA5IDMyIDAgNTAgUSAtOSAzMiAwIDE4IFoiLz4KPHBhdGggZD0iTSAtMTggMCBRIC0zMiAtOSAtNTAgMCBRIC0zMiA5IC0xOCAwIFoiLz4KPHBhdGggZD0iTSAxOCAwIFEgMzIgLTkgNTAgMCBRIDMyIDkgMTggMCBaIi8+CjwvZz4KPC9nPgo8Y2lyY2xlIGN4PSIwIiBjeT0iMCIgcj0iMTciIGZpbGw9IiMzQTJEMjAiLz4KPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjE3IiBmaWxsPSJub25lIiBzdHJva2U9IiNENEEwMTciIHN0cm9rZS13aWR0aD0iMSIvPgo8L2c+Cjwvc3ZnPgo=">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <title>Jardín — Somko</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500;600&display=swap" rel="stylesheet">
@@ -5787,25 +5784,19 @@ setInterval(() => {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
-      // Buscar updates cada vez que la app se abre y cada 30 minutos
       reg.update();
       setInterval(() => reg.update(), 30 * 60 * 1000);
-      
-      // Cuando hay una nueva versión esperando, activarla automáticamente
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // Hay una nueva versión instalada — activar y recargar
               newWorker.postMessage({ type: 'SKIP_WAITING' });
             }
           });
         }
       });
     }).catch(err => console.log('SW error:', err));
-    
-    // Recargar la página cuando el SW nuevo toma control
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (refreshing) return;
