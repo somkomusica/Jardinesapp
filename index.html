@@ -5813,6 +5813,7 @@ auth.onAuthStateChanged(user => {
     firebaseReady = true;
     loadFromFirebase();
     listenBotData();
+    listenRemoteState();
     publishOwnerUid();
     // Update footer to reflect sync status
     const ft = document.querySelector('.foot > div > div:first-child');
@@ -6211,6 +6212,9 @@ function _mergeWithLocal(remote, local) {
 
 let _firstFirebaseLoad = true;
 let _forceRemoteLoad = false;
+// Marca de tiempo más alta ya vista (escrita por nosotros o aplicada desde la nube).
+// Evita ecos de nuestras propias escrituras y re-aplicar el mismo cambio en el listener en vivo.
+let _lastSeenUpdate = (JSON.parse(localStorage.getItem('jardin-state') || '{}').lastUpdate) || 0;
 function loadFromFirebase() {
   db.ref('users/' + userId + '/jardin').once('value', snapshot => {
     if (snapshot.exists()) {
@@ -6221,9 +6225,12 @@ function loadFromFirebase() {
         const merged = _mergeWithLocal(remoteData, localData);
         localStorage.setItem('jardin-state', JSON.stringify(merged));
         S = migrate(Object.assign({}, defaults, merged));
+        _lastSeenUpdate = Math.max(_lastSeenUpdate, remoteData.lastUpdate || 0);
         init();
         if (_forceRemoteLoad) toast('Cuenta sincronizada en este dispositivo', '☁');
         else if (!_firstFirebaseLoad) toast('Datos actualizados desde otro dispositivo', '☁');
+      } else {
+        _lastSeenUpdate = Math.max(_lastSeenUpdate, remoteData.lastUpdate || 0);
       }
     }
     _forceRemoteLoad = false;
@@ -6231,13 +6238,37 @@ function loadFromFirebase() {
   });
 }
 
+// ===== Sincronización en vivo: refleja al instante los cambios del bot u otro dispositivo =====
+let _remoteStateRef = null;
+function applyRemoteState(remoteData) {
+  if ((remoteData.lastUpdate || 0) <= _lastSeenUpdate) return; // propio o ya visto
+  const el = document.activeElement;
+  const editing = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+  if (editing) { setTimeout(() => applyRemoteState(remoteData), 4000); return; } // no interrumpir edición
+  const localData = JSON.parse(localStorage.getItem('jardin-state') || '{}');
+  const merged = _mergeWithLocal(remoteData, localData);
+  localStorage.setItem('jardin-state', JSON.stringify(merged));
+  S = migrate(Object.assign({}, defaults, merged));
+  _lastSeenUpdate = remoteData.lastUpdate || _lastSeenUpdate;
+  init();
+  toast('Tu socio actualizó el Jardín', '🌿');
+}
+function listenRemoteState() {
+  if (!db || !userId) return;
+  if (_remoteStateRef) { try { _remoteStateRef.off(); } catch (e) {} }
+  _remoteStateRef = db.ref('users/' + userId + '/jardin');
+  _remoteStateRef.on('value', snap => { if (snap.exists()) applyRemoteState(snap.val()); });
+}
+
 function saveToFirebase() {
   if (!firebaseReady || !userId) return;
+  const ts = Date.now();
+  _lastSeenUpdate = ts; // marca nuestra propia escritura — el listener en vivo la ignora (sin eco)
   // Strip base64 blobs — they're in localStorage; Storage URLs pass through as-is
-  const payload = _stripBlobsForDB(Object.assign({}, S, {lastUpdate: Date.now()}));
+  const payload = _stripBlobsForDB(Object.assign({}, S, {lastUpdate: ts}));
   db.ref('users/' + userId + '/jardin').set(payload)
     .catch(err => console.error('Firebase save error:', err));
-  // Sync mission/habit data to botData path for WhatsApp bot
+  // Sync mission/habit data to botData path for the bot
   if (S.botKey) {
     db.ref('botData/' + S.botKey).update({
       'mission-deep': S['mission-deep'] || '',
@@ -6250,7 +6281,7 @@ function saveToFirebase() {
       habits: S.habits || {},
       habitDate: S.habitDate || '',
       streak: S.streak || 0,
-      lastUpdate: Date.now(),
+      lastUpdate: ts,
     }).catch(err => console.error('Bot sync error:', err));
   }
 }
