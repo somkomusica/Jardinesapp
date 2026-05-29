@@ -12,10 +12,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-storage.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-storage-compat.js"></script>
 <style>
 :root {
   --bg: #FAF8F3; --bg-soft: #F2EFE8;
@@ -411,6 +411,21 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .status-pill { font-size: 9px; padding: 3px 8px; border-radius: 10px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; text-align: center; }
 .status-pill.pendiente { background: var(--border); color: var(--text-secondary); }
 .status-pill.pagado { background: var(--gold-soft); color: var(--gold); }
+.status-pill.tentativo { background: var(--border); color: var(--text-secondary); }
+.status-pill.confirmado { background: var(--gold-soft); color: var(--gold); }
+.status-pill.realizado { background: rgba(80,160,110,0.16); color: #4a9d6a; }
+
+.con-form { display: grid; gap: 8px; margin-bottom: 14px; grid-template-columns: 1fr 1fr 130px 100px 130px; }
+.con-form .con-ideas { grid-column: 1 / -1; resize: vertical; min-height: 44px; }
+@media (max-width: 700px) { .con-form { grid-template-columns: 1fr 1fr; } }
+.con-item { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.con-head { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px; align-items: center; }
+.con-head .con-place { font-size: 13px; font-weight: 600; }
+.con-head .con-place .muted { font-weight: 400; }
+.con-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 4px; font-size: 11px; color: var(--text-secondary); }
+.con-item .con-notes { width: 100%; margin-top: 8px; font-size: 12px; resize: vertical; min-height: 40px; }
+.con-tickets { color: var(--gold); font-size: 11px; text-decoration: none; }
+@media (max-width: 700px) { .con-head { grid-template-columns: 1fr auto; } }
 
 .config-section { margin-bottom: 22px; }
 .config-section h3 { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); font-weight: 400; margin-bottom: 12px; }
@@ -773,6 +788,34 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
   .collapsible-head .dnd-grip,
   .flor-head .dnd-grip { opacity: 0.45; }
 }
+
+/* ---- HOY · widgets modulares (expandir / minimizar / mover) ---- */
+#tab-hoy [data-widget] { display: flex; flex-direction: column; }
+#tab-hoy [data-widget] > .widget-bar,
+#tab-hoy [data-widget] > .widget-body { width: 100%; box-sizing: border-box; }
+.widget-bar { display: flex; align-items: center; justify-content: flex-end; gap: 2px; min-height: 22px; }
+.widget-grip, .widget-collapse {
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text-faint); padding: 3px 4px; border-radius: 4px;
+  display: inline-flex; align-items: center; line-height: 1;
+  font-family: var(--font); touch-action: manipulation;
+  transition: color .12s;
+}
+.widget-grip { cursor: grab; }
+.widget-grip:active { cursor: grabbing; }
+.widget-grip:hover, .widget-collapse:hover { color: var(--gold); }
+.widget-grip .ti, .widget-collapse .ti { font-size: 15px; }
+.widget-collapse .ti { transition: transform .2s; }
+[data-widget].hoy-collapsed .widget-collapse .ti { transform: rotate(-90deg); }
+.widget-name { display: none; flex: 1; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-faint); padding-left: 2px; }
+[data-widget].hoy-collapsed .widget-name { display: inline-block; }
+[data-widget].hoy-collapsed .widget-body { display: none !important; }
+/* contraste sobre tarjetas oscuras (voces) */
+.dark .widget-grip, .dark .widget-collapse, .dark .widget-name { color: rgba(240,237,230,.55); }
+.dark .widget-grip:hover, .dark .widget-collapse:hover { color: #fff; }
+/* re-establecer layouts internos tras envolver en .widget-body */
+.voces-compact .widget-body { display: flex; align-items: center; gap: 12px; }
+[data-widget="stats"] .widget-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 /* Misiones — tareas mínimas con grip */
 .mission-tasks { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
@@ -1342,7 +1385,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     </div>
 
     <div style="display:flex;justify-content:flex-end;margin-top:14px;">
-      <button class="btn gold tiny" id="bitaSave"><i class="ti ti-bookmark"></i> Guardar entrada del día</button>
+      <button class="btn gold tiny" id="bitaSave"><i class="ti ti-moon-stars"></i> Cerrar jornada</button>
     </div>
     <div class="bitacora-history" id="bitaHistory"></div>
   </div>
@@ -1663,6 +1706,29 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
   </div>
 </section>
 
+<!-- CONCIERTOS -->
+<section class="tab" id="tab-conciertos">
+  <div class="card">
+    <h2 class="section-title"><i class="ti ti-microphone-2"></i> Conciertos</h2>
+    <p class="tab-hint">lugar · fecha · fee · estado · tickets · ideas — llevá el viaje de los shows</p>
+    <div class="con-form">
+      <input type="text" id="conPlace" placeholder="lugar / venue">
+      <input type="text" id="conCity" placeholder="ciudad">
+      <input type="date" id="conDate">
+      <input type="number" id="conFee" placeholder="fee $">
+      <select id="conEstado">
+        <option value="tentativo">Tentativo</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="realizado">Realizado</option>
+      </select>
+      <input type="url" id="conTickets" placeholder="link tickets (https://...)" style="grid-column: 1 / -1;">
+      <textarea id="conIdeas" class="con-ideas" placeholder="ideas, set, producción, contactos..."></textarea>
+      <button class="btn gold" id="conAdd" style="grid-column: 1 / -1;"><i class="ti ti-plus"></i> Agregar concierto</button>
+    </div>
+    <div id="conList"></div>
+  </div>
+</section>
+
 <!-- AJUSTES -->
 <section class="tab" id="tab-ajustes">
   <div class="card">
@@ -1688,6 +1754,11 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <div id="configWidgetsList"></div>
     </div>
     <div class="config-section">
+      <h3><i class="ti ti-cloud-lock" style="margin-right:6px;color:var(--gold);"></i>Cuenta y sincronización</h3>
+      <p style="font-size:11px;color:var(--text-secondary);margin-bottom:12px;">Creá una cuenta para sincronizar tus datos entre computadora y celular, y que nunca se pierdan al actualizar la app.</p>
+      <div id="authBox"></div>
+    </div>
+    <div class="config-section">
       <h3>Datos</h3>
       <div class="config-item">
         <div><div class="config-name">Exportar respaldo</div><div class="config-desc">Descarga todo en JSON</div></div>
@@ -1700,6 +1771,33 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <div class="config-item">
         <div><div class="config-name">Reiniciar app</div><div class="config-desc">Borra todos los datos locales</div></div>
         <button class="btn ghost tiny danger" id="resetBtn"><i class="ti ti-refresh"></i> Reiniciar</button>
+      </div>
+    </div>
+    <div class="config-section">
+      <h3><i class="ti ti-brand-whatsapp" style="margin-right:6px;color:#25D366;"></i>Bot WhatsApp</h3>
+      <p style="font-size:11px;color:var(--text-secondary);margin-bottom:12px;">Para conectar el bot, necesitas tu ID de Firebase. Cópialo y pégalo en el archivo <code>.env</code> del bot.</p>
+      <div class="config-item">
+        <div>
+          <div class="config-name">Bot Key</div>
+          <div class="config-desc" id="botUserIdDisplay" style="font-family:var(--font);letter-spacing:0.05em;word-break:break-all;">Cargando...</div>
+        </div>
+        <button class="btn ghost tiny" id="copyBotUserId"><i class="ti ti-copy"></i> Copiar</button>
+      </div>
+      <div class="config-item" style="flex-direction:column;align-items:flex-start;gap:6px;">
+        <div class="config-name">Pegar Bot Key del bot</div>
+        <div style="display:flex;gap:8px;width:100%;">
+          <input type="text" class="flat" id="botKeyInput" placeholder="c854eacb-6ed0-4cdd-..." style="flex:1;font-size:11px;">
+          <button class="btn ghost tiny" id="setBotKeyBtn"><i class="ti ti-check"></i> Aplicar</button>
+        </div>
+      </div>
+      <div class="config-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <div class="config-name">Instrucciones rápidas</div>
+        <ol style="font-size:11px;color:var(--text-secondary);line-height:1.8;padding-left:16px;">
+          <li>Ve a <code>bot/</code> y ejecuta <code>npm install</code></li>
+          <li>Copia <code>.env.example</code> → <code>.env</code> y pega tu ID arriba</li>
+          <li>Descarga la cuenta de servicio desde Firebase Console → Configuración del proyecto → Cuentas de servicio → Generar nueva clave privada → guárdala como <code>bot/serviceAccount.json</code></li>
+          <li>Ejecuta <code>node index.js</code> y escanea el QR con WhatsApp</li>
+        </ol>
       </div>
     </div>
   </div>
@@ -1776,6 +1874,32 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
   </div>
 </div>
 
+<div class="modal-backdrop" id="closeDayModal">
+  <div class="modal-card">
+    <h3><i class="ti ti-moon-stars" style="margin-right:6px;"></i>Sembrar mañana</h3>
+    <p style="font-size:11px;color:var(--text-secondary);margin:-4px 0 14px;">Cerrás el día y dejás listas las misiones de <strong id="closeDayDate">mañana</strong>. Una sola cosa que importa, dos prioridades, tres tareas mínimas.</p>
+    <div class="modal-field">
+      <label><span class="num">1</span> Enfoque profundo</label>
+      <input type="text" id="planDeep" placeholder="la única cosa que importa mañana..." autocomplete="off">
+    </div>
+    <div class="modal-field">
+      <label class="gold"><span class="num">2</span> Prioridades</label>
+      <input type="text" id="planP1" placeholder="prioridad 1..." autocomplete="off">
+      <input type="text" id="planP2" placeholder="prioridad 2..." autocomplete="off" style="margin-top:4px;">
+    </div>
+    <div class="modal-field">
+      <label class="gray"><span class="num">3</span> Tareas mínimas</label>
+      <input type="text" id="planT1" placeholder="tarea 1..." autocomplete="off">
+      <input type="text" id="planT2" placeholder="tarea 2..." autocomplete="off" style="margin-top:4px;">
+      <input type="text" id="planT3" placeholder="tarea 3..." autocomplete="off" style="margin-top:4px;">
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost tiny" id="closeDayCancel">Cancelar</button>
+      <button class="btn gold tiny" id="closeDayConfirm"><i class="ti ti-seeding"></i> Cerrar jornada</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ========================= DEFAULTS =========================
 const DEFAULT_QUOTES = [
@@ -1833,6 +1957,7 @@ const TABS_META = {
   diario:     {label:"Diario",     icon:"ti-notebook"},
   marca:      {label:"Marca",      icon:"ti-stack"},
   servicios:  {label:"Servicios",  icon:"ti-briefcase"},
+  conciertos: {label:"Conciertos", icon:"ti-microphone-2"},
   estadisticas:{label:"Estadísticas", icon:"ti-chart-line"},
   ajustes:    {label:"Ajustes",    icon:"ti-settings"},
 };
@@ -1848,9 +1973,11 @@ const HOY_WIDGETS_META = {
 const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 
 const DEFAULT_CONFIG = {
-  tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','estadisticas','ajustes'],
-  tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, estadisticas:true, ajustes:true},
+  tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','conciertos','estadisticas','ajustes'],
+  tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, conciertos:true, estadisticas:true, ajustes:true},
   hoyWidgets: {voces:true, stats:true, riego:true, bitacora:true, dashboard:true},
+  hoyOrder: ['voces','stats','riego','bitacora','dashboard'],
+  hoyCollapsed: {voces:false, stats:false, riego:false, bitacora:false},
   theme: 'auto',
 };
 
@@ -1866,8 +1993,9 @@ const defaults = {
   'mission-deep':'', 'mission-p1':'', 'mission-p2':'',
   'mission-t1':'', 'mission-t2':'', 'mission-t3':'',
   'lib-logo':'', 'lib-fotos':'', 'lib-presskit':'',
-  links: [], services: [], expenses: [],
+  links: [], services: [], expenses: [], conciertos: [],
   bitacora: [], bita_florecio:'', bita_regue:'', bita_pode:'', bitaDate:'',
+  closedDate: '', nextPlan: null,
   dailyLog: [], riegoSessions: [],
   activeProjectId: 1,
   brand: {logoData:'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit:'', gallery:''},
@@ -1876,10 +2004,12 @@ const defaults = {
   jardinSort: 'progress', // 'progress' | 'az' | 'priority'
   floresFilter: 'complete', // legacy, kept for migration
   florGroupBy: 'none', // 'none' | 'proyecto' | 'estado'
+  botKey: '',
 };
 
 // ========================= UTILS =========================
 const todayStr = () => { const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const tomorrowStr = () => { const d = new Date(); d.setDate(d.getDate()+1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
 function toast(msg, icon='') { const t=$('#toast'); $('#toastIcon').textContent=icon; $('#toastMsg').textContent=msg; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2400); }
@@ -1946,12 +2076,22 @@ function migrate(state) {
     state.config.tabVisible.semillero = state.config.tabVisible.inspiracion;
     delete state.config.tabVisible.inspiracion;
   }
+  // Place Conciertos right after Servicios for existing users (instead of appended last)
+  if (!state.config.tabOrder.includes('conciertos')) {
+    const si = state.config.tabOrder.indexOf('servicios');
+    if (si >= 0) state.config.tabOrder.splice(si+1, 0, 'conciertos');
+  }
   DEFAULT_CONFIG.tabOrder.forEach(t => { if (!state.config.tabOrder.includes(t)) state.config.tabOrder.push(t); });
   // Ensure new tabs are visible by default
   Object.keys(DEFAULT_CONFIG.tabVisible).forEach(t => { if (!(t in state.config.tabVisible)) state.config.tabVisible[t] = true; });
   // Drop legacy widget keys (habits, intention, missions, frase are now inside bitacora)
   ['habits','intention','missions','frase'].forEach(k => { if (k in state.config.hoyWidgets) delete state.config.hoyWidgets[k]; });
   Object.keys(DEFAULT_CONFIG.hoyWidgets).forEach(k => { if (!(k in state.config.hoyWidgets)) state.config.hoyWidgets[k] = true; });
+  // HOY widgets modulares: orden + estado colapsado
+  state.config.hoyOrder = (Array.isArray(state.config.hoyOrder) && state.config.hoyOrder.length) ? state.config.hoyOrder.slice() : DEFAULT_CONFIG.hoyOrder.slice();
+  state.config.hoyOrder = state.config.hoyOrder.filter(k => DEFAULT_CONFIG.hoyOrder.includes(k));
+  DEFAULT_CONFIG.hoyOrder.forEach(k => { if (!state.config.hoyOrder.includes(k)) state.config.hoyOrder.push(k); });
+  state.config.hoyCollapsed = Object.assign({}, DEFAULT_CONFIG.hoyCollapsed, state.config.hoyCollapsed || {});
 
   // Brand profile
   if (!state.brand) state.brand = {logoData: state['lib-logo']||'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit: state['lib-presskit']||'', gallery: state['lib-fotos']||''};
@@ -2061,6 +2201,17 @@ function migrate(state) {
   state.services.forEach(s => { if (!s.date) s.date = todayStr(); });
   state.expenses.forEach(e => { if (!e.date) e.date = todayStr(); });
 
+  // Conciertos
+  if (!Array.isArray(state.conciertos)) state.conciertos = [];
+  state.conciertos.forEach(c => {
+    if (!('ciudad' in c)) c.ciudad = '';
+    if (!('estado' in c)) c.estado = 'tentativo';
+    if (!('tickets' in c)) c.tickets = '';
+    if (!('ideas' in c)) c.ideas = '';
+    if (!('fee' in c)) c.fee = 0;
+    if (!('date' in c)) c.date = '';
+  });
+
   // RiegoSessions
   if (!Array.isArray(state.riegoSessions)) state.riegoSessions = [];
 
@@ -2077,6 +2228,7 @@ function loadState() {
 }
 
 let S = loadState();
+if (!S.botKey) { S.botKey = crypto.randomUUID(); try { localStorage.setItem('jardin-state', JSON.stringify(S)); } catch(e) {} }
 function save() {
   // Commit any pending undo deletion (item already removed from state)
   if (undoState) {
@@ -2150,31 +2302,41 @@ function hideUndoToast() {
 function dailyCheck() {
   const today = todayStr();
   if (S.habitDate !== today) {
-    if (S.habitDate) {
+    // Skip archival if this day was already closed manually (cerrarJornada did it)
+    if (S.habitDate && S.closedDate !== S.habitDate) {
       const reqIds = HABITS_CONFIG.filter(h=>h.required).map(h=>h.id);
       const doneReq = reqIds.filter(id => S.habits[id]).length;
-      const ratio = doneReq/reqIds.length;
+      const ratio = reqIds.length ? doneReq/reqIds.length : 0;
       const snap = {...S.habits};
       S.habitHistory = (S.habitHistory||[]).filter(e => e.date !== S.habitDate);
       S.habitHistory.push({date:S.habitDate, habits: snap, ratio});
       if (S.habitHistory.length > 365) S.habitHistory = S.habitHistory.slice(-365);
       snapshotDay(S.habitDate);
-      S.streak = (doneReq === reqIds.length) ? (S.streak||0)+1 : 0;
+      S.streak = (reqIds.length && doneReq === reqIds.length) ? (S.streak||0)+1 : 0;
     }
     S.habits = {}; S.habitDate = today;
   }
   if (S.quoteDate !== today) {
     S.quoteIndex = Math.floor(Math.random()*S.quotes.length); S.quoteDate = today;
-    S.intention = ''; ['mission-deep','mission-p1','mission-p2','mission-t1','mission-t2','mission-t3'].forEach(k => S[k]='');
+    S.intention = '';
+    // Seed today's missions from the plan made last night when closing the jornada
+    if (S.nextPlan && S.nextPlan.date === today) {
+      S['mission-deep']=S.nextPlan.deep||''; S['mission-p1']=S.nextPlan.p1||''; S['mission-p2']=S.nextPlan.p2||'';
+      S['mission-t1']=S.nextPlan.t1||''; S['mission-t2']=S.nextPlan.t2||''; S['mission-t3']=S.nextPlan.t3||'';
+      S.nextPlan = null;
+    } else {
+      ['mission-deep','mission-p1','mission-p2','mission-t1','mission-t2','mission-t3'].forEach(k => S[k]='');
+    }
   }
   if (S.mantraDate !== today) { S.mantra=''; S.mantraDate=today; }
   if (S.bitaDate !== today) {
-    if (S.bitaDate && (S.bita_florecio || S.bita_regue || S.bita_pode)) {
+    if (S.bitaDate && S.closedDate !== S.bitaDate && (S.bita_florecio || S.bita_regue || S.bita_pode)) {
       S.bitacora.unshift({date:S.bitaDate, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode});
       if (S.bitacora.length > 60) S.bitacora = S.bitacora.slice(0,60);
     }
     S.bita_florecio=''; S.bita_regue=''; S.bita_pode=''; S.bitaDate=today;
   }
+  if (typeof refreshHoyInputs === 'function') refreshHoyInputs();
   save();
 }
 
@@ -2457,22 +2619,83 @@ function bindField(id) {
 // ========================= BITACORA =========================
 function bindBita(field, id) { const el=$('#'+id); el.value=S[field]||''; el.addEventListener('input', e => { S[field]=e.target.value; save(); }); }
 bindBita('bita_florecio','bita-florecio'); bindBita('bita_regue','bita-regue'); bindBita('bita_pode','bita-pode');
-$('#bitaSave').addEventListener('click', () => {
-  const today = todayStr();
-  // Require at least one of the three fields to count as a real entry
+// Re-fill HOY inputs from S after a programmatic state change (close/rollover)
+function refreshHoyInputs() {
+  const set = (sel, val) => { const el = $(sel); if (el) el.value = val || ''; };
+  set('#mantraInput', S.mantra);
+  set('#intention', S.intention);
+  ['deep','p1','p2','t1','t2','t3'].forEach(k => set('#mission-'+k, S['mission-'+k]));
+  set('#bita-florecio', S.bita_florecio);
+  set('#bita-regue', S.bita_regue);
+  set('#bita-pode', S.bita_pode);
+}
+
+// Open the "Sembrar mañana" modal (the close-day flow)
+function openCloseDayModal() {
   if (!S.bita_florecio && !S.bita_regue && !S.bita_pode) {
-    toast('Escribí al menos una respuesta de la reflexión', '!');
+    toast('Escribí al menos una respuesta de la reflexión antes de cerrar', '!');
     return;
   }
-  S.bitacora = S.bitacora.filter(b => b.date !== today);
-  S.bitacora.unshift({date:today, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode});
-  if (S.bitacora.length > 60) S.bitacora = S.bitacora.slice(0,60);
-  // Always snapshot full day (captures rituales + intención + misiones + reflexión)
-  snapshotDay();
-  save(); renderBitaHistory(); renderDiario();
-  applyMissionLock(); // re-evaluate (e.g. if user opens later)
-  toast('Bitácora guardada · mañana se desbloquean las misiones','✦');
+  const tomorrow = tomorrowStr();
+  const pre = (S.nextPlan && S.nextPlan.date === tomorrow) ? S.nextPlan : {};
+  $('#closeDayDate').textContent = fmtDate(tomorrow);
+  $('#planDeep').value = pre.deep || '';
+  $('#planP1').value = pre.p1 || '';
+  $('#planP2').value = pre.p2 || '';
+  $('#planT1').value = pre.t1 || '';
+  $('#planT2').value = pre.t2 || '';
+  $('#planT3').value = pre.t3 || '';
+  $('#closeDayModal').classList.add('open');
+  setTimeout(() => $('#planDeep').focus(), 60);
+}
+function closeCloseDayModal() { $('#closeDayModal').classList.remove('open'); }
+
+// Archive today, reset the slate, and seed tomorrow's missions
+function cerrarJornada(plan) {
+  const today = todayStr();
+  // Archive once per day (avoid double-counting habits/streak if re-closed)
+  if (S.closedDate !== today) {
+    S.bitacora = S.bitacora.filter(b => b.date !== today);
+    if (S.bita_florecio || S.bita_regue || S.bita_pode) {
+      S.bitacora.unshift({date:today, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode});
+      if (S.bitacora.length > 60) S.bitacora = S.bitacora.slice(0,60);
+    }
+    const reqIds = HABITS_CONFIG.filter(h=>h.required).map(h=>h.id);
+    const doneReq = reqIds.filter(id => S.habits[id]).length;
+    const ratio = reqIds.length ? doneReq/reqIds.length : 0;
+    S.habitHistory = (S.habitHistory||[]).filter(e => e.date !== today);
+    S.habitHistory.push({date:today, habits:{...S.habits}, ratio});
+    if (S.habitHistory.length > 365) S.habitHistory = S.habitHistory.slice(-365);
+    S.streak = (reqIds.length && doneReq === reqIds.length) ? (S.streak||0)+1 : 0;
+  }
+  // Snapshot full day (captures rituales + intención + misiones + reflexión)
+  snapshotDay(today);
+  // Seed tomorrow
+  S.nextPlan = {date: tomorrowStr(), deep:plan.deep, p1:plan.p1, p2:plan.p2, t1:plan.t1, t2:plan.t2, t3:plan.t3};
+  S.closedDate = today;
+  // Reset the slate: rituales + bitácora + intención + frase + misiones del día cerrado
+  S.habits = {};
+  S.intention = ''; S.mantra = '';
+  S.bita_florecio = ''; S.bita_regue = ''; S.bita_pode = '';
+  ['mission-deep','mission-p1','mission-p2','mission-t1','mission-t2','mission-t3'].forEach(k => S[k]='');
+  save();
+  refreshHoyInputs();
+  renderHabits(); renderStreak(); renderHeatmap(); renderBitaHistory(); renderDiario();
+  applyMissionLock();
+  closeCloseDayModal();
+  toast('Jornada cerrada · mañana ya está sembrado','✦');
   if (navigator.vibrate) navigator.vibrate(30);
+}
+
+$('#bitaSave').addEventListener('click', openCloseDayModal);
+$('#closeDayCancel').addEventListener('click', closeCloseDayModal);
+$('#closeDayModal').addEventListener('click', e => { if (e.target.id === 'closeDayModal') closeCloseDayModal(); });
+$('#closeDayConfirm').addEventListener('click', () => {
+  cerrarJornada({
+    deep: $('#planDeep').value.trim(),
+    p1: $('#planP1').value.trim(), p2: $('#planP2').value.trim(),
+    t1: $('#planT1').value.trim(), t2: $('#planT2').value.trim(), t3: $('#planT3').value.trim(),
+  });
 });
 function renderBitaHistory() {
   const el = $('#bitaHistory');
@@ -2576,7 +2799,8 @@ function renderHeatmap() {
   (S.habitHistory||[]).forEach(e => map[e.date] = e.ratio);
   const reqIds = HABITS_CONFIG.filter(h=>h.required).map(h=>h.id);
   const doneReq = reqIds.filter(id => S.habits[id]).length;
-  map[todayStr()] = doneReq/reqIds.length;
+  // If today was closed, keep its archived ratio (live S.habits was reset)
+  if (S.closedDate !== todayStr()) map[todayStr()] = reqIds.length ? doneReq/reqIds.length : 0;
   let html = '';
   for (let i=59; i>=0; i--) {
     const d = new Date(today); d.setDate(d.getDate()-i);
@@ -4430,6 +4654,67 @@ $('#expAdd').addEventListener('click', () => {
   $('#expDate').value = todayStr();
   save(); renderExpenses(); renderWallet();
 });
+// ========================= CONCIERTOS =========================
+const ESTADO_NEXT = { tentativo:'confirmado', confirmado:'realizado', realizado:'tentativo' };
+function fmtFee(n) { const v = Number(n)||0; return v ? '$'+v.toLocaleString('es-CL') : '—'; }
+function renderConciertos() {
+  const list = $('#conList'); if (!list) return;
+  if (!S.conciertos.length) { list.innerHTML = '<div class="empty">aún no hay conciertos · sembrá el primero</div>'; return; }
+  const items = S.conciertos.slice().sort((a,b) => {
+    if (!a.date) return 1; if (!b.date) return -1; return a.date.localeCompare(b.date);
+  });
+  list.innerHTML = items.map(c => `
+    <div class="con-item" data-con="${c.id}">
+      <div class="con-head">
+        <div>
+          <div class="con-place">${escapeHTML(c.lugar||'(sin lugar)')}${c.ciudad?` <span class="muted">· ${escapeHTML(c.ciudad)}</span>`:''}</div>
+          <div class="con-meta">
+            <span><i class="ti ti-calendar"></i> ${c.date?fmtDate(c.date):'sin fecha'}</span>
+            <span><i class="ti ti-cash"></i> ${fmtFee(c.fee)}</span>
+            ${c.tickets?`<a class="con-tickets" href="${escapeHTML(c.tickets)}" target="_blank" rel="noopener"><i class="ti ti-ticket"></i> tickets</a>`:''}
+          </div>
+        </div>
+        <span class="status-pill ${c.estado}" data-constatus="${c.id}">${c.estado}</span>
+        <button class="btn ghost tiny danger" data-delcon="${c.id}"><i class="ti ti-trash"></i></button>
+      </div>
+      <textarea class="con-notes flat" data-conideas="${c.id}" placeholder="ideas, set, producción, contactos...">${escapeHTML(c.ideas||'')}</textarea>
+    </div>`).join('');
+  list.querySelectorAll('[data-constatus]').forEach(b => b.addEventListener('click', () => {
+    const c = S.conciertos.find(x => x.id === +b.dataset.constatus); if (!c) return;
+    c.estado = ESTADO_NEXT[c.estado] || 'tentativo'; save(); renderConciertos();
+  }));
+  list.querySelectorAll('[data-conideas]').forEach(t => t.addEventListener('input', e => {
+    const c = S.conciertos.find(x => x.id === +e.target.dataset.conideas); if (!c) return;
+    c.ideas = e.target.value; save();
+  }));
+  list.querySelectorAll('[data-delcon]').forEach(b => b.addEventListener('click', () => {
+    const id = +b.dataset.delcon;
+    const removed = S.conciertos.find(x => x.id === id);
+    const idx = S.conciertos.findIndex(x => x.id === id);
+    if (!removed) return;
+    S.conciertos = S.conciertos.filter(x => x.id !== id);
+    save(); renderConciertos();
+    showUndoToast(`"${removed.lugar||'concierto'}" eliminado`, () => {
+      S.conciertos.splice(idx, 0, removed); save(); renderConciertos();
+    });
+  }));
+}
+$('#conAdd')?.addEventListener('click', () => {
+  const lugar = $('#conPlace').value.trim();
+  const ciudad = $('#conCity').value.trim();
+  const date = $('#conDate').value || '';
+  const fee = parseFloat($('#conFee').value) || 0;
+  const estado = $('#conEstado').value;
+  const tickets = $('#conTickets').value.trim();
+  const ideas = $('#conIdeas').value.trim();
+  if (!lugar && !date) { toast('Agregá al menos un lugar o una fecha','!'); return; }
+  S.conciertos.unshift({id: uid(), lugar, ciudad, date, fee, estado, tickets, ideas, createdAt: Date.now()});
+  ['#conPlace','#conCity','#conDate','#conFee','#conTickets','#conIdeas'].forEach(s => { const el=$(s); if (el) el.value=''; });
+  $('#conEstado').value = 'tentativo';
+  save(); renderConciertos();
+  toast('Concierto agregado','✦');
+});
+
 function inMonthFilter(d) {
   if (!walletMonthFilter) return true;
   return d && d.startsWith(walletMonthFilter);
@@ -4672,6 +4957,7 @@ document.getElementById('walletMonthReset').addEventListener('click', () => {
 
 // ========================= AJUSTES =========================
 function renderConfig() {
+  updateBotUserIdDisplay();
   $$('#themeOptions button').forEach(b => b.classList.toggle('active', b.dataset.theme === S.config.theme));
   const tabsEl = $('#configTabsList');
   tabsEl.innerHTML = S.config.tabOrder.map((key, idx) => {
@@ -4712,6 +4998,7 @@ function renderConfig() {
     S.config.hoyWidgets[k] = !S.config.hoyWidgets[k];
     save(); renderConfig(); applyHoyWidgets();
   }));
+  renderAuth();
 }
 function moveTab(key, dir) {
   const arr = S.config.tabOrder; const i = arr.indexOf(key);
@@ -4741,6 +5028,33 @@ $('#exportBtn').addEventListener('click', doExport);
 $('#exportBtn2').addEventListener('click', doExport);
 $('#importBtn').addEventListener('click', doImport);
 $('#importBtn2').addEventListener('click', doImport);
+
+// Bot WhatsApp — mostrar Firebase User ID
+function updateBotUserIdDisplay() {
+  const el = $('#botUserIdDisplay');
+  const copyBtn = $('#copyBotUserId');
+  if (!el) return;
+  if (S.botKey) {
+    el.textContent = S.botKey;
+    if (copyBtn) copyBtn.style.display = '';
+  } else {
+    el.textContent = 'Generando...';
+    if (copyBtn) copyBtn.style.display = 'none';
+  }
+}
+$('#copyBotUserId')?.addEventListener('click', () => {
+  if (!S.botKey) return;
+  navigator.clipboard.writeText(S.botKey).then(() => toast('Bot Key copiado', '✓'));
+});
+$('#setBotKeyBtn')?.addEventListener('click', () => {
+  const val = $('#botKeyInput')?.value?.trim();
+  if (!val) return;
+  S.botKey = val;
+  try { localStorage.setItem('jardin-state', JSON.stringify(S)); } catch(e) {}
+  updateBotUserIdDisplay();
+  $('#botKeyInput').value = '';
+  toast('Bot Key actualizado', '✓');
+});
 $('#migrateMediaBtn').addEventListener('click', async () => {
   await migrateMediaToStorage();
   await processUploadQueue();
@@ -4766,7 +5080,7 @@ $('#importFile').addEventListener('change', e => {
 // Desktop: mousedown en .dnd-grip → drag inmediato.
 function makeDraggable(container, opts) {
   if (!container) return;
-  const {itemSelector, handleSelector, getId, onReorder, longPressMs = 300} = opts;
+  const {itemSelector, handleSelector, getId, onReorder, longPressMs = 300, lpHandleSelector} = opts;
   if (container._dndAttached) return; // evitar doble-bind
   container._dndAttached = true;
 
@@ -4849,6 +5163,7 @@ function makeDraggable(container, opts) {
   container.addEventListener('touchstart', e => {
     const target = e.target;
     if (target.closest('input, textarea, select, audio')) return;
+    if (lpHandleSelector && !target.closest(lpHandleSelector)) return;
     const item = target.closest(itemSelector);
     if (!item || !container.contains(item)) return;
     const coords = getCoords(e);
@@ -4935,6 +5250,78 @@ function bindMisionesDnd() {
     handleSelector: '.dnd-grip',
     getId: el => el.querySelector('input')?.id || el.dataset.mtask,
     onReorder: reorderMissionTasks,
+  });
+}
+
+// ========================= HOY · WIDGETS MODULARES =========================
+const HOY_NAMES = { voces:'Voces', stats:'Progreso', riego:'Riego', bitacora:'Bitácora', dashboard:'Estadísticas' };
+const HOY_COLLAPSIBLE = { voces:1, stats:1, riego:1, bitacora:1 }; // dashboard usa su propio toggle interno
+
+// Envuelve el contenido de cada widget en .widget-body y le antepone una barra
+// con grip (mover) + nombre (visible al colapsar) + chevron (minimizar). Idempotente.
+function injectHoyControls() {
+  const host = document.getElementById('tab-hoy');
+  if (!host) return;
+  host.querySelectorAll('[data-widget]').forEach(w => {
+    if (w._wrapped) return;
+    const key = w.dataset.widget;
+    const body = document.createElement('div');
+    body.className = 'widget-body';
+    while (w.firstChild) body.appendChild(w.firstChild);
+    const bar = document.createElement('div');
+    bar.className = 'widget-bar';
+    const collapseBtn = HOY_COLLAPSIBLE[key]
+      ? '<button class="widget-collapse" type="button" aria-label="minimizar"><i class="ti ti-chevron-down"></i></button>'
+      : '';
+    bar.innerHTML = '<button class="widget-grip" type="button" aria-label="mover"><i class="ti ti-grip-vertical"></i></button>'
+      + '<span class="widget-name">' + (HOY_NAMES[key] || key) + '</span>'
+      + collapseBtn;
+    w.appendChild(bar);
+    w.appendChild(body);
+    w._wrapped = true;
+    const cb = bar.querySelector('.widget-collapse');
+    if (cb) cb.addEventListener('click', e => {
+      e.stopPropagation();
+      S.config.hoyCollapsed[key] = !S.config.hoyCollapsed[key];
+      save(); applyHoyCollapsed();
+    });
+  });
+}
+
+function applyHoyOrder() {
+  const host = document.getElementById('tab-hoy');
+  if (!host) return;
+  (S.config.hoyOrder || DEFAULT_CONFIG.hoyOrder).forEach(key => {
+    const el = host.querySelector('[data-widget="' + key + '"]');
+    if (el) host.appendChild(el); // re-anexar en orden ⇒ orden final del DOM
+  });
+  // El form de "agregar frase" viaja junto al widget de voces
+  const form = document.getElementById('quoteAddForm');
+  const voces = host.querySelector('[data-widget="voces"]');
+  if (form && voces) voces.after(form);
+}
+
+function applyHoyCollapsed() {
+  const host = document.getElementById('tab-hoy');
+  if (!host) return;
+  Object.entries(S.config.hoyCollapsed || {}).forEach(([key, val]) => {
+    const el = host.querySelector('[data-widget="' + key + '"]');
+    if (el) el.classList.toggle('hoy-collapsed', !!val);
+  });
+}
+
+function bindHoyDnd() {
+  makeDraggable(document.getElementById('tab-hoy'), {
+    itemSelector: '[data-widget]',
+    handleSelector: '.widget-grip',
+    lpHandleSelector: '.widget-bar',
+    getId: el => el.dataset.widget,
+    onReorder: ids => {
+      const order = ids.slice();
+      DEFAULT_CONFIG.hoyOrder.forEach(k => { if (!order.includes(k)) order.push(k); });
+      S.config.hoyOrder = order;
+      save(); applyHoyOrder();
+    },
   });
 }
 
@@ -5253,11 +5640,27 @@ function hasBitacoraSavedFor(date) {
 function isMissionUnlocked() {
   // First-ever day: no prior bitácora, so unlocked
   if (!S.bitacora || S.bitacora.length === 0) return true;
+  // Closed today → locked preview ("mañana se siembra")
+  if (S.closedDate === todayStr()) return false;
+  // Closed yesterday → today's missions are seeded & editable
+  if (S.closedDate === yesterdayStr()) return true;
   // If yesterday is in history → unlocked. Otherwise locked.
   return hasBitacoraSavedFor(yesterdayStr());
 }
 function applyMissionLock() {
   const unlocked = isMissionUnlocked();
+  const closedToday = S.closedDate === todayStr();
+  const overlayHTML = closedToday
+    ? `<div class="mlo-inner">
+        <i class="ti ti-moon-stars"></i>
+        <div class="mlo-title">Jornada cerrada</div>
+        <div class="mlo-msg">Mañana se siembran las misiones que dejaste listas. Descansá.</div>
+      </div>`
+    : `<div class="mlo-inner">
+        <i class="ti ti-lock"></i>
+        <div class="mlo-title">Cerrá el día anterior</div>
+        <div class="mlo-msg">Esta sección se desbloquea cuando completes y guardes la <strong>bitácora del día de ayer</strong>.</div>
+      </div>`;
   document.querySelectorAll('#tab-hoy .bita-section').forEach(sec => {
     const h3 = sec.querySelector('h3');
     if (!h3) return;
@@ -5274,13 +5677,9 @@ function applyMissionLock() {
       if (!overlay) {
         overlay = document.createElement('div');
         overlay.className = 'mission-lock-overlay';
-        overlay.innerHTML = `<div class="mlo-inner">
-          <i class="ti ti-lock"></i>
-          <div class="mlo-title">Cerrá el día anterior</div>
-          <div class="mlo-msg">Esta sección se desbloquea cuando completes y guardes la <strong>bitácora del día de ayer</strong>.</div>
-        </div>`;
         sec.appendChild(overlay);
       }
+      overlay.innerHTML = overlayHTML;
     } else if (overlay) {
       overlay.remove();
     }
@@ -5351,7 +5750,9 @@ function init() {
   applyTheme(); renderTabs();
   const firstVisible = S.config.tabOrder.find(t => S.config.tabVisible[t]);
   if (firstVisible) switchTab(firstVisible);
+  injectHoyControls();
   applyHoyWidgets();
+  applyHoyOrder(); applyHoyCollapsed();
   dailyCheck(); setDateDisplay();
   renderQuote(); renderMantra();
   renderHabits(); renderStreak();
@@ -5363,10 +5764,12 @@ function init() {
   populateRiegoTargets(); renderRiegoTime();
   initDateInputs();
   renderLinks(); renderServices(); renderExpenses(); renderWallet();
+  renderConciertos();
   renderStatsDashboard();
   renderSemillero();
   bindBrand(); renderBrand();
   bindMisionesDnd();
+  bindHoyDnd();
   checkStorageUsage();
   applyMissionLock();
   renderNotifBanner();
@@ -5399,14 +5802,22 @@ auth = firebase.auth();
 db = firebase.database();
 storage = firebase.storage();
 
+let isAnon = true;
+// Mantener la sesión iniciada entre recargas (clave para sync persistente)
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
 auth.onAuthStateChanged(user => {
   if (user) {
     userId = user.uid;
+    isAnon = !!user.isAnonymous;
     firebaseReady = true;
     loadFromFirebase();
-    // Update footer to show cloud sync active
+    listenBotData();
+    publishOwnerUid();
+    // Update footer to reflect sync status
     const ft = document.querySelector('.foot > div > div:first-child');
-    if (ft) ft.textContent = 'Jardín · v5 · local + nube';
+    if (ft) ft.textContent = isAnon ? 'Jardín · v5 · local (sin cuenta)' : 'Jardín · v5 · sincronizado';
+    renderAuth();
     // Auto-migrate any leftover base64 blobs once initial load settles
     setTimeout(() => {
       if (_hasLocalBlobs()) migrateMediaToStorage();
@@ -5416,9 +5827,112 @@ auth.onAuthStateChanged(user => {
     // Retry queue periodically (every 30s) — light operation
     setInterval(() => processUploadQueue(), 30000);
   } else {
+    isAnon = true;
+    renderAuth();
     auth.signInAnonymously().catch(err => console.error('Firebase error:', err));
   }
 });
+
+// ========== AUTH: cuenta y sincronización ==========
+// Publica el uid del dueño en botData para que el bot acceda a users/{uid}/jardin
+function publishOwnerUid() {
+  if (!S.botKey || !db || !userId) return;
+  db.ref('botData/' + S.botKey).update({ ownerUid: userId }).catch(() => {});
+}
+
+function renderAuth() {
+  const box = document.getElementById('authBox');
+  if (!box) return;
+  const u = auth && auth.currentUser;
+  if (u && !u.isAnonymous) {
+    box.innerHTML = `
+      <div class="config-item">
+        <div><div class="config-name"><i class="ti ti-circle-check" style="color:#3a9d5d;"></i> Sincronizado</div>
+        <div class="config-desc" style="word-break:break-all;">${escapeHTML(u.email || '')}</div></div>
+        <button class="btn ghost tiny" id="authSignOutBtn"><i class="ti ti-logout"></i> Cerrar sesión</button>
+      </div>
+      <div class="config-desc" style="margin-top:6px;">Iniciá sesión con este mismo correo en tu otro dispositivo para ver los mismos datos.</div>`;
+    document.getElementById('authSignOutBtn').addEventListener('click', authSignOut);
+    return;
+  }
+  box.innerHTML = `
+    <div class="config-desc" style="margin-bottom:10px;"><i class="ti ti-alert-triangle" style="color:var(--gold);"></i> Modo local sin cuenta — tus datos solo viven en este dispositivo.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <input type="email" class="flat" id="authEmail" placeholder="tu@correo.com" autocomplete="email" style="font-size:12px;">
+      <input type="password" class="flat" id="authPass" placeholder="contraseña (mín. 6)" autocomplete="current-password" style="font-size:12px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn gold tiny" id="authCreateBtn"><i class="ti ti-cloud-upload"></i> Crear cuenta y sincronizar</button>
+        <button class="btn ghost tiny" id="authLoginBtn"><i class="ti ti-login"></i> Ya tengo cuenta</button>
+      </div>
+      <div class="config-desc" id="authMsg" style="min-height:14px;"></div>
+    </div>`;
+  document.getElementById('authCreateBtn').addEventListener('click', authCreate);
+  document.getElementById('authLoginBtn').addEventListener('click', authLogin);
+}
+
+function _authInputs() {
+  const emailEl = document.getElementById('authEmail');
+  const passEl = document.getElementById('authPass');
+  return { email: emailEl ? emailEl.value.trim() : '', pass: passEl ? passEl.value : '' };
+}
+function _authMsg(t, ok) {
+  const m = document.getElementById('authMsg');
+  if (m) { m.textContent = t; m.style.color = ok ? '#3a9d5d' : 'var(--gold)'; }
+}
+
+async function authCreate() {
+  const { email, pass } = _authInputs();
+  if (!email || !pass || pass.length < 6) { _authMsg('Ingresá correo y contraseña de al menos 6 caracteres.'); return; }
+  try {
+    const cred = firebase.auth.EmailAuthProvider.credential(email, pass);
+    if (auth.currentUser && auth.currentUser.isAnonymous) {
+      // Upgrade anónimo → permanente: MISMO uid, conserva todos los datos
+      await auth.currentUser.linkWithCredential(cred);
+    } else {
+      await auth.createUserWithEmailAndPassword(email, pass);
+    }
+    isAnon = false;
+    userId = auth.currentUser.uid;
+    publishOwnerUid();
+    save(); // sube los datos actuales bajo la cuenta ya permanente
+    toast('Cuenta creada · datos sincronizados', '☁');
+    renderAuth();
+    const ft = document.querySelector('.foot > div > div:first-child'); if (ft) ft.textContent = 'Jardín · v5 · sincronizado';
+  } catch (e) {
+    if (e.code === 'auth/email-already-in-use' || e.code === 'auth/credential-already-in-use') {
+      _authMsg('Ese correo ya tiene cuenta. Usá "Ya tengo cuenta" para iniciar sesión.');
+    } else if (e.code === 'auth/invalid-email') {
+      _authMsg('Correo inválido.');
+    } else {
+      _authMsg('No se pudo crear: ' + (e.message || e.code));
+    }
+  }
+}
+
+async function authLogin() {
+  const { email, pass } = _authInputs();
+  if (!email || !pass) { _authMsg('Ingresá correo y contraseña.'); return; }
+  try {
+    _forceRemoteLoad = true; // primera carga en este dispositivo toma la cuenta compartida
+    await auth.signInWithEmailAndPassword(email, pass);
+    isAnon = false;
+    toast('Sesión iniciada', '☁');
+    // onAuthStateChanged cargará los datos remotos
+  } catch (e) {
+    _forceRemoteLoad = false;
+    if (e.code === 'auth/user-not-found') _authMsg('No existe una cuenta con ese correo. Creala primero.');
+    else if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') _authMsg('Contraseña incorrecta.');
+    else if (e.code === 'auth/invalid-email') _authMsg('Correo inválido.');
+    else _authMsg('No se pudo iniciar sesión: ' + (e.message || e.code));
+  }
+}
+
+async function authSignOut() {
+  if (!confirm('¿Cerrar sesión? Volverás a modo local en este dispositivo (tus datos en la nube quedan guardados).')) return;
+  try { await auth.signOut(); } catch (e) {}
+  toast('Sesión cerrada', '✓');
+  // onAuthStateChanged(null) → vuelve a iniciar sesión anónima
+}
 
 const originalSave = window.save;
 window.save = function() {
@@ -5696,20 +6210,23 @@ function _mergeWithLocal(remote, local) {
 }
 
 let _firstFirebaseLoad = true;
+let _forceRemoteLoad = false;
 function loadFromFirebase() {
   db.ref('users/' + userId + '/jardin').once('value', snapshot => {
     if (snapshot.exists()) {
       const remoteData = snapshot.val();
       const localData = JSON.parse(localStorage.getItem('jardin-state') || '{}');
-      if ((remoteData.lastUpdate || 0) > (localData.lastUpdate || 0)) {
+      if (_forceRemoteLoad || (remoteData.lastUpdate || 0) > (localData.lastUpdate || 0)) {
         // Merge: keep local blobs where remote only has __local__ marker
         const merged = _mergeWithLocal(remoteData, localData);
         localStorage.setItem('jardin-state', JSON.stringify(merged));
         S = migrate(Object.assign({}, defaults, merged));
         init();
-        if (!_firstFirebaseLoad) toast('Datos actualizados desde otro dispositivo', '☁');
+        if (_forceRemoteLoad) toast('Cuenta sincronizada en este dispositivo', '☁');
+        else if (!_firstFirebaseLoad) toast('Datos actualizados desde otro dispositivo', '☁');
       }
     }
+    _forceRemoteLoad = false;
     _firstFirebaseLoad = false;
   });
 }
@@ -5720,6 +6237,31 @@ function saveToFirebase() {
   const payload = _stripBlobsForDB(Object.assign({}, S, {lastUpdate: Date.now()}));
   db.ref('users/' + userId + '/jardin').set(payload)
     .catch(err => console.error('Firebase save error:', err));
+  // Sync mission/habit data to botData path for WhatsApp bot
+  if (S.botKey) {
+    db.ref('botData/' + S.botKey).update({
+      'mission-deep': S['mission-deep'] || '',
+      'mission-p1':   S['mission-p1']   || '',
+      'mission-p2':   S['mission-p2']   || '',
+      'mission-t1':   S['mission-t1']   || '',
+      'mission-t2':   S['mission-t2']   || '',
+      'mission-t3':   S['mission-t3']   || '',
+      intention: S.intention || '',
+      habits: S.habits || {},
+      habitDate: S.habitDate || '',
+      streak: S.streak || 0,
+      lastUpdate: Date.now(),
+    }).catch(err => console.error('Bot sync error:', err));
+  }
+}
+
+function listenBotData() {
+  if (!S.botKey || !db) return;
+  db.ref('botData/' + S.botKey + '/missionsDone').on('value', snap => {
+    if (!snap.exists()) return;
+    S.missionsDone = snap.val();
+    try { localStorage.setItem('jardin-state', JSON.stringify(S)); } catch(e) {}
+  });
 }
 
 function _hasLocalBlobs() {
