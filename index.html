@@ -168,6 +168,7 @@ header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 22p
 .brand-photo img { width: 100%; height: 100%; object-fit: cover; }
 .brand-photo .ph-cap { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.55); color: #fff; font-size: 9px; padding: 3px 6px; letter-spacing: 0.06em; }
 .brand-photo .ph-del { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.55); color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 10px; }
+.brand-photo .ph-view { position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.55); color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 9px; display: flex; align-items: center; justify-content: center; }
 .brand-photo-upload { aspect-ratio: 1; border-radius: 4px; border: 0.5px dashed var(--border-strong); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-faint); flex-direction: column; gap: 4px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
 .brand-photo-upload:hover { border-color: var(--gold); color: var(--gold); }
 .brand-social-card { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
@@ -191,7 +192,9 @@ nav.tabs button:hover { color: var(--text); }
 nav.tabs button.active { color: var(--text); border-bottom-color: var(--gold); }
 
 section.tab { display: none; animation: fade .25s ease-out; }
-section.tab.active { display: block; }
+section.tab.active { display: block; animation: tabIn .2s ease; }
+@keyframes tabIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { section.tab.active { animation: none; } }
 @keyframes fade { from {opacity:0; transform:translateY(4px);} to {opacity:1; transform:none;} }
 
 .card {
@@ -2428,6 +2431,7 @@ function renderTabs() {
 function switchTab(key) {
   $$('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === key));
   $$('section.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-'+key));
+  try { localStorage.setItem('jardin-lastTab', key); } catch(e){}
   window.scrollTo({top:0});
   if (key === 'hoy') { if (dashOpen) buildDashboard(document.getElementById('statsDashboard')); }
   if (key === 'semillero') renderSemillero();
@@ -3722,7 +3726,7 @@ function florCardHTML(f) {
 
         <div style="margin-top:14px;"><label><i class="ti ti-photo"></i> Foto / portada</label>
           ${f.photoData ? `
-            <img class="pd-img" src="${f.photoData}" alt="" style="width:100%;max-height:40vh;object-fit:contain;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg-soft);">
+            <img class="pd-img" src="${f.photoData}" alt="">
             <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
               <button class="btn ghost tiny" data-fact="photoUp" data-id="${f.id}"><i class="ti ti-refresh"></i> Cambiar</button>
               <button class="btn ghost tiny" data-fact="photoCam" data-id="${f.id}"><i class="ti ti-camera"></i> Capturar</button>
@@ -4633,7 +4637,7 @@ function renderBrand() {
   const gal = $('#brandGallery');
   let html = '';
   (b.photos||[]).forEach(p => {
-    html += `<div class="brand-photo" data-photo="${p.id}"><img src="${p.dataUrl}" alt=""><button class="ph-del" data-phdel="${p.id}" title="eliminar">×</button>${p.caption?`<div class="ph-cap">${escapeHTML(p.caption)}</div>`:''}</div>`;
+    html += `<div class="brand-photo" data-photo="${p.id}"><img src="${p.dataUrl}" alt=""><button class="ph-view" data-phview="${p.id}" title="ver / descargar"><i class="ti ti-arrows-diagonal"></i></button><button class="ph-del" data-phdel="${p.id}" title="eliminar">×</button>${p.caption?`<div class="ph-cap">${escapeHTML(p.caption)}</div>`:''}</div>`;
   });
   html += `<div class="brand-photo-upload" id="brandPhotoUpload"><i class="ti ti-plus" style="font-size:18px;"></i><span>agregar</span></div>`;
   html += `<div class="brand-photo-upload" id="brandPhotoCapture"><i class="ti ti-camera" style="font-size:18px;"></i><span>capturar</span></div>`;
@@ -4643,6 +4647,11 @@ function renderBrand() {
     if (!confirm('Eliminar foto?')) return;
     S.brand.photos = S.brand.photos.filter(x => x.id !== +btn.dataset.phdel);
     save(); renderBrand();
+  }));
+  gal.querySelectorAll('[data-phview]').forEach(el => el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const p = S.brand.photos.find(x => x.id === +el.dataset.phview);
+    if (p) openLightbox(p.dataUrl);
   }));
   gal.querySelectorAll('[data-photo]').forEach(el => el.addEventListener('click', () => {
     const id = +el.dataset.photo;
@@ -5846,7 +5855,9 @@ setInterval(bitaNotifCheck, 30000);
 function init() {
   applyTheme(); renderTabs();
   const firstVisible = S.config.tabOrder.find(t => S.config.tabVisible[t]);
-  if (firstVisible) switchTab(firstVisible);
+  const savedTab = localStorage.getItem('jardin-lastTab');
+  const startTab = (savedTab && S.config.tabVisible[savedTab] && TABS_META[savedTab]) ? savedTab : firstVisible;
+  if (startTab) switchTab(startTab);
   injectHoyControls();
   applyHoyWidgets();
   applyHoyOrder(); applyHoyCollapsed();
