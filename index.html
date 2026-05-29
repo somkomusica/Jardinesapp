@@ -372,6 +372,18 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .sem-card .sem-meta { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); display: flex; justify-content: space-between; align-items: center; }
 .sem-card .sem-thumb { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 4px; border: 0.5px solid var(--border); }
 .sem-card .sem-group-tag { font-size: 9px; padding: 2px 6px; background: var(--gold); color: #fff; border-radius: 8px; letter-spacing: 0.06em; }
+/* Mosaico (collage de fotos) */
+.mosaic { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 72px; grid-auto-flow: dense; gap: 6px; margin-top: 14px; }
+.mtile { position: relative; border-radius: 8px; overflow: hidden; border: 0.5px solid var(--border); background: var(--bg-soft); }
+.mtile.tile-s { grid-column: span 1; grid-row: span 1; }
+.mtile.tile-m { grid-column: span 2; grid-row: span 2; }
+.mtile.tile-l { grid-column: span 4; grid-row: span 3; }
+.mtile .mosaic-img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; display: block; }
+.mtile .mtile-grip, .mtile .mtile-size { position: absolute; top: 4px; background: rgba(0,0,0,.5); color: #fff; border: none; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: .6; transition: opacity .15s; font-size: 13px; padding: 0; }
+.mtile:hover .mtile-grip, .mtile:hover .mtile-size { opacity: 1; }
+.mtile .mtile-grip { left: 4px; cursor: grab; touch-action: none; }
+.mtile .mtile-size { right: 4px; }
+@media (max-width: 480px) { .mosaic { grid-auto-rows: 60px; } }
 
 .sem-detail, .sem-form-wrap { background: var(--bg-card); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
 .sem-detail input[type="text"].sem-title-input { font-size: 16px; font-weight: 500; padding: 6px 0; border: none; box-shadow: inset 0 -1px 0 var(--border); border-radius: 0; margin-bottom: 4px; }
@@ -387,6 +399,8 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .lightbox.open { display: flex; }
 .lightbox img { max-width: 96vw; max-height: 96vh; object-fit: contain; border-radius: 6px; }
 .lightbox .lb-close { position: absolute; top: 14px; right: 16px; color: #fff; font-size: 28px; background: none; border: none; cursor: pointer; opacity: .8; }
+.lightbox .lb-download { position: absolute; top: 16px; left: 16px; color: #fff; font-size: 22px; background: rgba(255,255,255,.12); border: none; cursor: pointer; opacity: .85; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.lightbox .lb-download:hover { opacity: 1; background: rgba(255,255,255,.22); }
 .sem-slot .slot-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
 .sem-slot audio { width: 100%; margin-bottom: 6px; }
 .sem-detail .actions { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; justify-content: flex-end; padding-top: 14px; border-top: 0.5px solid var(--border); }
@@ -1415,6 +1429,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <div class="sem-toolbar" style="margin-top:14px;">
       <button class="btn gold" id="semNew"><i class="ti ti-plus"></i> Nueva semilla</button>
       <button class="btn ghost" id="groupNew"><i class="ti ti-folder-plus"></i> Nuevo grupo</button>
+      <button class="btn ghost" id="semViewToggle" title="cambiar vista"><i class="ti ti-layout-grid"></i> Mosaico</button>
       <div class="spacer"></div>
       <input type="text" id="semSearch" placeholder="buscar..." style="max-width:200px;">
     </div>
@@ -2249,7 +2264,25 @@ function save() {
   } catch(e) { toast('localStorage lleno — usá el botón ☁ para migrar medios','!'); console.error(e); }
 }
 
-// ========================= LIGHTBOX (ver imagen en grande) =========================
+// ========================= LIGHTBOX (ver imagen en grande + descargar) =========================
+async function downloadImage(src) {
+  if (!src) return;
+  try {
+    const resp = await fetch(src);
+    const blob = await resp.blob();
+    const objUrl = URL.createObjectURL(blob);
+    let name = 'jardin-imagen';
+    try {
+      const dec = decodeURIComponent(src.split('?')[0]);
+      const m = dec.match(/([^\/]+)\.([a-z0-9]{2,5})$/i);
+      if (m) name = m[1] + '.' + m[2];
+    } catch (e) {}
+    const a = document.createElement('a');
+    a.href = objUrl; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(objUrl), 5000);
+  } catch (e) { toast('No se pudo descargar el archivo', '!'); }
+}
 function openLightbox(src) {
   if (!src) return;
   let lb = document.getElementById('lightbox');
@@ -2257,8 +2290,9 @@ function openLightbox(src) {
     lb = document.createElement('div');
     lb.id = 'lightbox';
     lb.className = 'lightbox';
-    lb.innerHTML = '<button class="lb-close" aria-label="cerrar">×</button><img alt="">';
-    lb.addEventListener('click', () => lb.classList.remove('open'));
+    lb.innerHTML = '<button class="lb-close" aria-label="cerrar">×</button><button class="lb-download" aria-label="descargar"><i class="ti ti-download"></i></button><img alt="">';
+    lb.addEventListener('click', (e) => { if (e.target === lb || e.target.closest('.lb-close')) lb.classList.remove('open'); });
+    lb.querySelector('.lb-download').addEventListener('click', (e) => { e.stopPropagation(); downloadImage(lb.querySelector('img').src); });
     document.body.appendChild(lb);
   }
   lb.querySelector('img').src = src;
@@ -2266,7 +2300,7 @@ function openLightbox(src) {
 }
 // Delegación: tocar una miniatura (semilla o flor) la abre en grande
 document.addEventListener('click', (e) => {
-  const img = e.target.closest('.preview-img, .pd-img');
+  const img = e.target.closest('.preview-img, .pd-img, .mosaic-img');
   if (img && img.getAttribute('src')) { e.stopPropagation(); openLightbox(img.getAttribute('src')); }
 });
 
@@ -3912,10 +3946,46 @@ let semDetailOpen = null;
 let semFormOpen = false;
 let semFormDraft = null;
 
+let semView = localStorage.getItem('semView') || 'list';
 function renderSemillero() {
   renderSemFilter();
   renderSemForm();
+  const tg = $('#semViewToggle');
+  if (tg) {
+    tg.innerHTML = semView === 'list' ? '<i class="ti ti-layout-grid"></i> Mosaico' : '<i class="ti ti-list"></i> Lista';
+    tg.onclick = () => { semView = semView === 'list' ? 'mosaic' : 'list'; localStorage.setItem('semView', semView); renderSemillero(); };
+  }
   renderSemList();
+}
+
+// Vista mosaico: collage de fotos del Semillero, miniaturas arrastrables y redimensionables.
+function renderSemMosaic(list) {
+  let items = (S.semillas || []).filter(semMatchesFilter).filter(s => s.photoData);
+  if (semSearchTerm) {
+    const t = semSearchTerm.toLowerCase();
+    items = items.filter(i => (i.title || '').toLowerCase().includes(t) || (i.text || '').toLowerCase().includes(t));
+  }
+  if (!items.length) { list.innerHTML = '<div class="empty">sin fotos — mándale imágenes al bot o agrégalas como semilla</div>'; return; }
+  list.innerHTML = `<div class="mosaic" id="mosaicGrid">` + items.map(s => `
+    <div class="mtile tile-${s.tile || 's'}" data-mtile="${s.id}">
+      <button class="dnd-grip mtile-grip" type="button" aria-label="mover" title="mantener para mover"><i class="ti ti-arrows-move"></i></button>
+      <img class="mosaic-img" src="${s.photoData}" alt="${escapeHTML(s.title || '')}" loading="lazy">
+      <button class="mtile-size" data-msize="${s.id}" title="cambiar tamaño"><i class="ti ti-aspect-ratio"></i></button>
+    </div>`).join('') + `</div>`;
+  list.querySelectorAll('[data-msize]').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const s = (S.semillas || []).find(x => x.id === +b.dataset.msize);
+    if (!s) return;
+    s.tile = ({ s: 'm', m: 'l', l: 's' })[s.tile || 's'];
+    save(); renderSemMosaic(list);
+  }));
+  makeDraggable($('#mosaicGrid'), {
+    itemSelector: '.mtile',
+    handleSelector: '.mtile-grip',
+    lpHandleSelector: '.mtile-grip',
+    getId: el => el.dataset.mtile,
+    onReorder: (newOrderIds) => { reorderListByVisible(S.semillas, newOrderIds); save(); }
+  });
 }
 
 function renderSemFilter() {
@@ -3963,6 +4033,7 @@ function semMatchesFilter(i) {
 
 function renderSemList() {
   const list = $('#semList');
+  if (semView === 'mosaic') return renderSemMosaic(list);
   let items = (S.semillas||[]).filter(semMatchesFilter);
   if (semSearchTerm) {
     const term = semSearchTerm.toLowerCase();
