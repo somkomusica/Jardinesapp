@@ -414,6 +414,20 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .mtile .mtile-grip { left: 4px; cursor: grab; touch-action: none; }
 .mtile .mtile-size { right: 4px; }
 @media (max-width: 480px) { .mosaic { grid-auto-rows: 60px; } }
+/* Anidación (páginas) + selección múltiple en Semillero */
+.sem-breadcrumb { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; font-size: 12px; }
+.sem-breadcrumb button { background: none; border: none; color: var(--gold); cursor: pointer; padding: 2px 4px; font-size: 12px; }
+.sem-breadcrumb .bc-sep { color: var(--text-faint); }
+.sem-enter { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 11px; display: inline-flex; align-items: center; gap: 2px; padding: 2px 5px; border-radius: 6px; }
+.sem-enter.has-kids { color: var(--gold); background: var(--gold-soft); }
+.sem-enter:hover { color: var(--gold); }
+.sem-check { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 18px; padding: 0; flex-shrink: 0; }
+.sem-check.on { color: var(--gold); }
+.collapsible.sem-sel { background: var(--gold-soft); border-radius: 8px; }
+.select-bar { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: var(--bg-card); border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; gap: 12px; z-index: 9000; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.select-bar .sb-count { background: var(--gold); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+.select-bar button { background: none; border: none; color: var(--bg-card); cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; }
+.select-bar button:hover { color: var(--gold); }
 
 .sem-detail, .sem-form-wrap { background: var(--bg-card); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
 .sem-detail input[type="text"].sem-title-input { font-size: 16px; font-weight: 500; padding: 6px 0; border: none; box-shadow: inset 0 -1px 0 var(--border); border-radius: 0; margin-bottom: 4px; }
@@ -2193,7 +2207,7 @@ function migrate(state) {
     state.projects.push({id:_newId, name:'YouTube IA', type:'Canal', kind:'youtube', description:'', socialContent:'', links:[], files:[], trackingLog:[], stages: YT_STAGES.map(s=>({...s}))});
   }
   // Semillas con proyecto (default: Somko) para poder filtrar por proyecto
-  (state.semillas||[]).forEach(s => { if (!('projectId' in s)) s.projectId = 1; });
+  (state.semillas||[]).forEach(s => { if (!('projectId' in s)) s.projectId = 1; if (!('parentId' in s)) s.parentId = null; });
 
   // Flores migrate from old songs/tracks
   if ((!state.flores || !state.flores.length) && (state.songs || state.tracks)) {
@@ -4035,6 +4049,11 @@ let semFormOpen = false;
 let semFormDraft = null;
 
 let semView = localStorage.getItem('semView') || 'list';
+let semCurrentParent = null;          // página actual (null = raíz) para anidación Notion
+let semSelecting = false;             // modo selección múltiple
+let semSelected = new Set();          // ids seleccionados
+function semChildCount(id) { return (S.semillas || []).filter(s => s.parentId === id && (s.projectId||1) === S.activeProjectId).length; }
+function semPathTo(id) { const path = []; let cur = (S.semillas || []).find(s => s.id === id); let guard = 0; while (cur && guard++ < 50) { path.unshift(cur); cur = cur.parentId ? (S.semillas || []).find(s => s.id === cur.parentId) : null; } return path; }
 function renderSemillero() {
   renderSemFilter();
   renderSemForm();
@@ -4119,65 +4138,137 @@ function semMatchesFilter(i) {
   return true;
 }
 
+// Long-press genérico (touch + mouse) que no dispara si hubo movimiento.
+function attachLongPress(el, fn, ms) {
+  let timer = null, sx = 0, sy = 0, moved = false;
+  const start = (x, y) => { moved = false; sx = x; sy = y; clearTimeout(timer); timer = setTimeout(() => { if (!moved) fn(); }, ms); };
+  const move = (x, y) => { if (Math.abs(x - sx) > 10 || Math.abs(y - sy) > 10) { moved = true; clearTimeout(timer); } };
+  const cancel = () => clearTimeout(timer);
+  el.addEventListener('touchstart', e => { if (e.touches[0]) start(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+  el.addEventListener('touchmove', e => { if (e.touches[0]) move(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+  el.addEventListener('touchend', cancel);
+  el.addEventListener('mousedown', e => start(e.clientX, e.clientY));
+  el.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+  el.addEventListener('mouseup', cancel);
+  el.addEventListener('mouseleave', cancel);
+}
+function toggleSemSelect(id) {
+  if (semSelected.has(id)) semSelected.delete(id); else semSelected.add(id);
+  if (semSelected.size === 0) semSelecting = false;
+  renderSemList();
+}
+function groupSelectedSemillas() {
+  if (!semSelected.size) return;
+  const name = prompt('Nombre de la página:');
+  if (name === null) return;
+  const pageId = uid();
+  S.semillas.unshift({ id: pageId, createdAt: Date.now(), date: todayStr(), title: (name.trim() || 'Página'), text: '', link: '', photoData: null, audioData: null, audioSec: 0, groupId: null, projectId: S.activeProjectId, parentId: semCurrentParent });
+  S.semillas.forEach(s => { if (semSelected.has(s.id)) s.parentId = pageId; });
+  semSelecting = false; semSelected = new Set();
+  save(); renderSemList(); toast(`Página "${name.trim() || 'Página'}" creada`, '📄');
+}
+function deleteSelectedSemillas() {
+  if (!confirm(`¿Borrar ${semSelected.size} semilla(s)? (sus sub-items suben al nivel actual)`)) return;
+  const ids = new Set(semSelected);
+  S.semillas.forEach(s => { if (ids.has(s.parentId)) s.parentId = semCurrentParent; });
+  S.semillas = S.semillas.filter(s => !ids.has(s.id));
+  semSelecting = false; semSelected = new Set();
+  save(); renderSemList();
+}
+function renderSemSelectBar() {
+  let bar = document.getElementById('semSelectBar');
+  if (!semSelecting || !semSelected.size) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement('div'); bar.id = 'semSelectBar'; bar.className = 'select-bar'; document.body.appendChild(bar); }
+  bar.innerHTML = `<span class="sb-count">${semSelected.size}</span>
+    <button id="sbGroup"><i class="ti ti-folder-plus"></i> Agrupar</button>
+    <button id="sbDelete" title="borrar"><i class="ti ti-trash"></i></button>
+    <button id="sbCancel" title="cancelar"><i class="ti ti-x"></i></button>`;
+  bar.querySelector('#sbGroup').onclick = groupSelectedSemillas;
+  bar.querySelector('#sbDelete').onclick = deleteSelectedSemillas;
+  bar.querySelector('#sbCancel').onclick = () => { semSelecting = false; semSelected = new Set(); renderSemList(); };
+}
+function wireSemNav(list) {
+  list.querySelectorAll('[data-semnav]').forEach(b => b.addEventListener('click', () => {
+    const v = b.dataset.semnav; semCurrentParent = (v === 'root') ? null : +v; renderSemList();
+  }));
+}
+
 function renderSemList() {
   const list = $('#semList');
   if (semView === 'mosaic') return renderSemMosaic(list);
+  const searching = !!semSearchTerm;
   let items = (S.semillas||[]).filter(i => (i.projectId||1) === S.activeProjectId).filter(semMatchesFilter);
-  if (semSearchTerm) {
+  if (searching) {
     const term = semSearchTerm.toLowerCase();
     items = items.filter(i => (i.title||'').toLowerCase().includes(term) || (i.text||'').toLowerCase().includes(term));
+  } else {
+    items = items.filter(i => (i.parentId ?? null) === semCurrentParent); // anidación: nivel actual
   }
-  // Orden manual (array order); items nuevos van arriba con unshift
-  if (!items.length) { list.innerHTML = '<div class="empty">sin semillas</div>'; return; }
-  list.innerHTML = items.map(i => {
+  let crumb = '';
+  if (!searching && semCurrentParent !== null) {
+    const path = semPathTo(semCurrentParent);
+    crumb = `<div class="sem-breadcrumb"><button data-semnav="root" title="raíz"><i class="ti ti-home"></i></button>` +
+      path.map(p => `<span class="bc-sep">›</span><button data-semnav="${p.id}">${escapeHTML(p.title||'sin título')}</button>`).join('') + `</div>`;
+  }
+  if (!items.length) {
+    list.innerHTML = crumb + '<div class="empty">' + (semCurrentParent!==null ? 'esta página está vacía · agrega una semilla aquí' : 'sin semillas') + '</div>';
+    wireSemNav(list); renderSemSelectBar(); return;
+  }
+  list.innerHTML = crumb + items.map(i => {
     const isOpen = !!S.openSemillas[i.id];
+    const sel = semSelected.has(i.id);
+    const kids = semChildCount(i.id);
     const types = [];
-    if (i.text) types.push(`<i class="ti ti-align-left" title="texto"></i>`);
-    if (i.photoData) types.push(`<i class="ti ti-photo" title="foto"></i>`);
-    if (i.audioData) types.push(`<i class="ti ti-microphone" title="audio ${i.audioSec||0}s"></i>`);
-    if (i.link) types.push(`<i class="ti ti-link" title="link"></i>`);
-    const g = i.groupId ? S.semillaGroups.find(x => x.id === i.groupId) : null;
+    if (i.text) types.push(`<i class="ti ti-align-left"></i>`);
+    if (i.photoData) types.push(`<i class="ti ti-photo"></i>`);
+    if (i.audioData) types.push(`<i class="ti ti-microphone"></i>`);
+    if (i.link) types.push(`<i class="ti ti-link"></i>`);
     return `
-      <div class="collapsible ${isOpen?'open':''}" data-sem-item="${i.id}">
+      <div class="collapsible ${isOpen?'open':''} ${sel?'sem-sel':''}" data-sem-item="${i.id}">
         <div class="collapsible-head" data-sem-toggle="${i.id}">
-          <button class="dnd-grip" type="button" aria-label="reordenar" title="mantener para reordenar"><i class="ti ti-grip-vertical"></i></button>
+          ${semSelecting
+            ? `<button class="sem-check ${sel?'on':''}" data-semsel="${i.id}"><i class="ti ti-${sel?'circle-check-filled':'circle'}"></i></button>`
+            : `<button class="dnd-grip" type="button" title="mantener para reordenar"><i class="ti ti-grip-vertical"></i></button>`}
           <button class="toggle-icon" title="${isOpen?'minimizar':'expandir'}"><i class="ti ti-${isOpen?'minus':'plus'}"></i></button>
           ${i.photoData?`<img class="col-thumb" src="${i.photoData}" alt="">`:''}
           <div class="col-title">${escapeHTML(i.title||'sin título')}</div>
           <div class="col-meta">
+            <button class="sem-enter ${kids?'has-kids':''}" data-sementer="${i.id}" title="abrir como página"><i class="ti ti-${kids?'folder':'corner-down-right'}"></i>${kids?` ${kids}`:''}</button>
             ${types.join(' ')}
-            ${g?`<span class="sem-group-tag">${escapeHTML(g.name)}</span>`:''}
             <span style="opacity:0.6;">${i.date||''}</span>
           </div>
         </div>
         <div class="collapsible-body" id="semBody-${i.id}"></div>
       </div>`;
   }).join('');
-  list.querySelectorAll('[data-sem-toggle]').forEach(h => h.addEventListener('click', (e) => {
-    if (e.target.closest('.dnd-grip')) return; // no toggle si tocaron el grip
-    const id = +h.dataset.semToggle;
-    if (S.openSemillas[id]) delete S.openSemillas[id];
-    else { S.openSemillas[id] = true; semDetailOpen = id; }
-    save();
-    renderSemList();
+  wireSemNav(list);
+  list.querySelectorAll('[data-sementer]').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation(); if (semSelecting) return;
+    semCurrentParent = +b.dataset.sementer; renderSemList();
   }));
-  // Render bodies for open ones
-  Object.keys(S.openSemillas).forEach(idStr => {
-    const id = +idStr;
-    const bodyEl = $('#semBody-'+id);
-    if (bodyEl) renderSemBodyInline(id, bodyEl);
+  list.querySelectorAll('[data-semsel]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); toggleSemSelect(+b.dataset.semsel); }));
+  list.querySelectorAll('[data-sem-toggle]').forEach(h => {
+    h.addEventListener('click', (e) => {
+      if (e.target.closest('.dnd-grip') || e.target.closest('[data-sementer]') || e.target.closest('[data-semsel]')) return;
+      const id = +h.dataset.semToggle;
+      if (semSelecting) { toggleSemSelect(id); return; }
+      if (S.openSemillas[id]) delete S.openSemillas[id];
+      else { S.openSemillas[id] = true; semDetailOpen = id; }
+      save(); renderSemList();
+    });
+    attachLongPress(h, () => {
+      const id = +h.dataset.semToggle;
+      if (!semSelecting) { semSelecting = true; semSelected = new Set(); }
+      toggleSemSelect(id);
+    }, 2000);
   });
-  // Drag & drop para reordenar semillas
-  makeDraggable(list, {
-    itemSelector: '[data-sem-item]',
-    handleSelector: '.dnd-grip',
+  Object.keys(S.openSemillas).forEach(idStr => { const id = +idStr; const bodyEl = $('#semBody-'+id); if (bodyEl) renderSemBodyInline(id, bodyEl); });
+  if (!semSelecting) makeDraggable(list, {
+    itemSelector: '[data-sem-item]', handleSelector: '.dnd-grip', lpHandleSelector: '.dnd-grip',
     getId: el => el.dataset.semItem,
-    onReorder: (newOrderIds) => {
-      reorderListByVisible(S.semillas, newOrderIds);
-      save();
-      toast('Semillas reordenadas', '↕');
-    },
+    onReorder: (newOrderIds) => { reorderListByVisible(S.semillas, newOrderIds); save(); },
   });
+  renderSemSelectBar();
 }
 
 function renderSemBodyInline(id, container) {
@@ -4544,7 +4635,7 @@ function saveNewSemilla() {
 
 $('#semNew').addEventListener('click', () => {
   semFormOpen = true;
-  semFormDraft = {title:'', text:'', link:'', photoData:null, audioData:null, audioSec:0, groupId: semFilter.startsWith('group:')?+semFilter.split(':')[1]:null, projectId: S.activeProjectId};
+  semFormDraft = {title:'', text:'', link:'', photoData:null, audioData:null, audioSec:0, groupId: semFilter.startsWith('group:')?+semFilter.split(':')[1]:null, projectId: S.activeProjectId, parentId: semCurrentParent};
   renderSemillero();
   setTimeout(() => $('#nfTitle')?.focus(), 50);
 });
@@ -4590,7 +4681,7 @@ async function handlePhotoFile(file) {
     } else {
       // Direct add — create new semilla with thumbnail, then upload original
       const title = prompt('Título para la foto:', `foto ${todayStr()}`) || `foto ${todayStr()}`;
-      const newSem = {id: uid(), createdAt: Date.now(), date: todayStr(), title, text:'', link:'', audioData:null, audioSec:0, photoData: thumbDataUrl, groupId:null, projectId: S.activeProjectId};
+      const newSem = {id: uid(), createdAt: Date.now(), date: todayStr(), title, text:'', link:'', audioData:null, audioSec:0, photoData: thumbDataUrl, groupId:null, projectId: S.activeProjectId, parentId: semCurrentParent};
       S.semillas.unshift(newSem);
       save(); toast('Foto guardada','✦'); renderSemillero();
       offloadPhotoFile(newSem, file, renderSemillero);
