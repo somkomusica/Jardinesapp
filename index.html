@@ -192,6 +192,9 @@ nav.tabs button:hover { color: var(--text); }
 nav.tabs button.active { color: var(--text); border-bottom-color: var(--gold); }
 
 section.tab { display: none; animation: fade .25s ease-out; }
+.project-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--gold); }
+.project-bar .ti { font-size: 15px; opacity: .8; }
+.project-bar select { flex: 0 1 auto; min-width: 140px; padding: 5px 10px; border-radius: 8px; border: 0.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-size: 12px; font-weight: 500; letter-spacing: 0.02em; }
 section.tab.active { display: block; animation: tabIn .2s ease; }
 @keyframes tabIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { section.tab.active { animation: none; } }
@@ -1309,6 +1312,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     </div>
     <div class="search-results" id="searchResults"></div>
   </div>
+  <div class="project-bar"><i class="ti ti-folders"></i><select id="globalProjectSel" aria-label="Proyecto activo"></select></div>
 </header>
 
 <nav class="tabs" id="tabs"></nav>
@@ -1959,7 +1963,18 @@ const DEFAULT_FLORES = [
   {id:13, title:"Naturaleza",       projectId:1, loop:false,arrangement:false,recording:false,mix:false},
 ].map(f => Object.assign({key:'',chords:'',lyrics:'',notes:'',socialContent:'',description:'',links:[],files:[]}, f));
 
-const DEFAULT_PROJECTS = [{id:1, name:"SENTIR", type:"Álbum", description:"", socialContent:"", links:[], files:[], trackingLog:[]}];
+const DEFAULT_STAGES = [
+  {id:'loop',label:'Loop'},{id:'arrangement',label:'Arrangement'},
+  {id:'recording',label:'Grabación'},{id:'mix',label:'Mix'}
+];
+const YT_STAGES = [
+  {id:'canciones',label:'Canciones'},{id:'portada',label:'Portada'},
+  {id:'armado',label:'Armado'},{id:'publicado',label:'Publicado'}
+];
+const DEFAULT_PROJECTS = [
+  {id:1, name:"Somko", type:"Música", kind:"musica", description:"", socialContent:"", links:[], files:[], trackingLog:[], stages: DEFAULT_STAGES.map(s=>({...s}))},
+  {id:2, name:"YouTube IA", type:"Canal", kind:"youtube", description:"", socialContent:"", links:[], files:[], trackingLog:[], stages: YT_STAGES.map(s=>({...s}))}
+];
 
 const HABITS_CONFIG = [
   {id:"journal", name:"Journal", required:true},
@@ -1969,8 +1984,13 @@ const HABITS_CONFIG = [
   {id:"guitarra", name:"Guitarra", required:false},
   {id:"leer", name:"Leer", required:false},
 ];
-const STAGES = ['loop','arrangement','recording','mix'];
-const STAGE_LABELS = {loop:"Loop", arrangement:"Arrangement", recording:"Grabación", mix:"Mix"};
+// STAGES/STAGE_LABELS = etapas de música (legacy/fallback). Por-proyecto usar stagesOf(f).
+const STAGES = DEFAULT_STAGES.map(s=>s.id);
+const STAGE_LABELS = Object.fromEntries(DEFAULT_STAGES.map(s=>[s.id,s.label]));
+function projectStagesById(projId){ const ps=(typeof S!=='undefined'&&S.projects)?S.projects:[]; const p=ps.find(x=>x.id===projId); return (p&&Array.isArray(p.stages)&&p.stages.length)?p.stages:DEFAULT_STAGES; }
+function stagesOf(f){ return projectStagesById(f&&f.projectId); }
+function isComplete(f){ const st=stagesOf(f); return st.length>0 && st.every(s=>f[s.id]); }
+function stagesDone(f){ return stagesOf(f).filter(s=>f[s.id]).length; }
 
 const TABS_META = {
   hoy:        {label:"Hoy",        icon:"ti-sun"},
@@ -2126,6 +2146,18 @@ function migrate(state) {
   if (!Array.isArray(state.projects) || !state.projects.length) state.projects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
   if (!state.activeProjectId) state.activeProjectId = state.projects[0].id;
   state.projects.forEach(p => { if (!Array.isArray(p.trackingLog)) p.trackingLog = []; });
+  // Etapas por proyecto (música por defecto si faltan)
+  state.projects.forEach(p => { if (!Array.isArray(p.stages) || !p.stages.length) p.stages = DEFAULT_STAGES.map(s=>({...s})); });
+  // Renombrar el álbum por defecto a "Somko" (una vez) y marcar tipo música
+  const _p1 = state.projects.find(p => p.id === 1);
+  if (_p1) { if (_p1.name === 'SENTIR') _p1.name = 'Somko'; if (!_p1.kind) _p1.kind = 'musica'; }
+  // Asegurar proyecto YouTube IA (playlists IA, etapas propias)
+  if (!state.projects.some(p => p.kind === 'youtube')) {
+    const _newId = Math.max(0, ...state.projects.map(p => p.id)) + 1;
+    state.projects.push({id:_newId, name:'YouTube IA', type:'Canal', kind:'youtube', description:'', socialContent:'', links:[], files:[], trackingLog:[], stages: YT_STAGES.map(s=>({...s}))});
+  }
+  // Semillas con proyecto (default: Somko) para poder filtrar por proyecto
+  (state.semillas||[]).forEach(s => { if (!('projectId' in s)) s.projectId = 1; });
 
   // Flores migrate from old songs/tracks
   if ((!state.flores || !state.flores.length) && (state.songs || state.tracks)) {
@@ -2449,7 +2481,7 @@ function renderEstadisticas() {
   const $set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   $set('estStreak', S.streak || 0);
   const total = (S.flores || []).length;
-  const done = (S.flores || []).filter(f => STAGES.every(s => f[s])).length;
+  const done = (S.flores || []).filter(f => isComplete(f)).length;
   $set('estFloresDone', done);
   $set('estFloresTotal', total);
   $set('estSemillas', (S.semillas || []).length);
@@ -2503,7 +2535,7 @@ function renderEstadisticas() {
   if (pjEl) {
     pjEl.innerHTML = (S.projects || []).map(p => {
       const projFlores = (S.flores || []).filter(f => f.projectId === p.id);
-      const projDone = projFlores.filter(f => STAGES.every(s => f[s])).length;
+      const projDone = projFlores.filter(f => isComplete(f)).length;
       const pct = projFlores.length ? Math.round((projDone / projFlores.length) * 100) : 0;
       return `<div class="proj-stat-card">
         <div class="psc-head">
@@ -2662,11 +2694,26 @@ function renderStreak() {
 // ========================= STATS =========================
 function activeProject() { return S.projects.find(p => p.id === S.activeProjectId) || S.projects[0]; }
 function floresInProject(projId) { return S.flores.filter(f => f.projectId === projId); }
+
+// Selector de proyecto global (header) — filtra Semillero/Jardín/Flores
+function renderGlobalProjectSel() {
+  const sel = document.getElementById('globalProjectSel');
+  if (!sel) return;
+  sel.innerHTML = (S.projects || []).map(p => `<option value="${p.id}">${escapeHTML(p.name)}</option>`).join('');
+  sel.value = S.activeProjectId;
+}
+function setActiveProject(id) {
+  S.activeProjectId = +id;
+  if (typeof selectedPlantId !== 'undefined') selectedPlantId = null;
+  save();
+  renderGlobalProjectSel();
+  renderSemillero?.(); renderJardin?.(); renderAlbumStat?.(); renderFlores?.();
+}
 function renderAlbumStat() {
   const p = activeProject();
   const flores = floresInProject(p.id);
   const total = flores.length*4;
-  const done = flores.reduce((a,f) => a+STAGES.filter(s=>f[s]).length, 0);
+  const done = flores.reduce((a,f) => a+stagesDone(f), 0);
   const pct = total ? Math.round((done/total)*100) : 0;
   $('#albumPct').textContent = pct;
   $('#albumBar').style.width = pct+'%';
@@ -2782,7 +2829,7 @@ function snapshotDay(dateStr) {
   const p = activeProject();
   const flores = floresInProject(p.id);
   const total = flores.length*4;
-  const done = flores.reduce((a,f) => a+STAGES.filter(s=>f[s]).length, 0);
+  const done = flores.reduce((a,f) => a+stagesDone(f), 0);
   const albumPct = total ? Math.round((done/total)*100) : 0;
   const snap = {
     date, frase: S.mantra||'', intention: S.intention||'',
@@ -2943,7 +2990,7 @@ function renderJardinProjectHeader() {
   const p = activeProject();
   const flores = floresInProject(p.id);
   const total = flores.length*4;
-  const done = flores.reduce((a,f) => a+STAGES.filter(s=>f[s]).length, 0);
+  const done = flores.reduce((a,f) => a+stagesDone(f), 0);
   const pct = total ? Math.round((done/total)*100) : 0;
   const isOpen = !!S.expandedProject;
   const el = $('#jardinProjectHeader');
@@ -3023,13 +3070,13 @@ function renderGarden() {
   // Show ALL plantas from all projects (entries come only from Semillero)
   const allFlores = S.flores;
   // Plants in Jardín = items NOT fully complete (still growing)
-  const plantas = allFlores.filter(f => !STAGES.every(s => f[s]));
+  const plantas = allFlores.filter(f => !isComplete(f));
   // Sort
   const sort = S.jardinSort || 'progress';
   if (sort === 'progress') {
     plantas.sort((a,b) => {
-      const da = STAGES.filter(s => a[s]).length;
-      const db = STAGES.filter(s => b[s]).length;
+      const da = stagesDone(a);
+      const db = stagesDone(b);
       return db - da; // most progress first
     });
   } else if (sort === 'az') {
@@ -3041,9 +3088,9 @@ function renderGarden() {
   $$('.jardin-sort button').forEach(b => b.classList.toggle('active', b.dataset.sort === sort));
 
   const total = S.flores.length*4;
-  const done = S.flores.reduce((a,f) => a+STAGES.filter(s=>f[s]).length, 0);
+  const done = S.flores.reduce((a,f) => a+stagesDone(f), 0);
   const pct = total ? Math.round((done/total)*100) : 0;
-  const completedCount = S.flores.filter(f => STAGES.every(s => f[s])).length;
+  const completedCount = S.flores.filter(f => isComplete(f)).length;
   $('#jardinProgress').textContent = `${plantas.length} en crecimiento · ${completedCount} cosechadas · ${pct}% global`;
 
   const el = $('#gardenSvg');
@@ -3053,7 +3100,7 @@ function renderGarden() {
     return;
   }
   el.innerHTML = plantas.map(f => {
-    const ds = STAGES.filter(s => f[s]).length;
+    const ds = stagesDone(f);
     const p = Math.round((ds/4)*100);
     return `<div class="plant ${p===100?'complete':''}${selectedPlantId===f.id?' active':''}" data-flor="${f.id}" title="${escapeHTML(f.title)} — ${p}%">${plantSVG(p)}<div class="name">${escapeHTML(f.title)}</div></div>`;
   }).join('');
@@ -3078,7 +3125,7 @@ function renderPlantDetail() {
   if (!selectedPlantId) { el.innerHTML = ''; return; }
   const f = S.flores.find(x => x.id === selectedPlantId);
   if (!f) { el.innerHTML = ''; selectedPlantId = null; return; }
-  const ds = STAGES.filter(s => f[s]).length;
+  const ds = stagesDone(f);
   const pct = Math.round((ds/4)*100);
   el.innerHTML = `
     <div class="plant-detail">
@@ -3087,7 +3134,7 @@ function renderPlantDetail() {
         <div class="pct">${ds}/4 · ${pct}%</div>
       </div>
       <div class="stages">
-        ${STAGES.map(s => `<div class="stage ${f[s]?'done':''}" data-pstage="${s}">${STAGE_LABELS[s]}</div>`).join('')}
+        ${stagesOf(f).map(s => `<div class="stage ${f[s.id]?'done':''}" data-pstage="${s.id}">${s.label}</div>`).join('')}
       </div>
       <div class="flor-progress-bar" style="margin:8px 0;"><div style="width:${pct}%"></div></div>
 
@@ -3178,9 +3225,9 @@ function renderPlantDetail() {
   // Stage clicks
   el.querySelectorAll('[data-pstage]').forEach(b => b.addEventListener('click', () => {
     const stage = b.dataset.pstage;
-    const wasComplete = STAGES.every(s => f[s]);
+    const wasComplete = isComplete(f);
     f[stage] = !f[stage];
-    const nowComplete = STAGES.every(s => f[s]);
+    const nowComplete = isComplete(f);
     save(); renderGarden(); renderAlbumStat(); renderJardinProjectHeader();
     if (!wasComplete && nowComplete) {
       toast(`Cosecha — ${f.title} floreció · ahora en Flores`, '✦');
@@ -3268,7 +3315,8 @@ function addTrackingNote() {
   save(); renderTrackingLog();
 }
 
-$('#jardinProjectSel').addEventListener('change', e => { S.activeProjectId = +e.target.value; selectedPlantId = null; save(); renderJardin(); renderAlbumStat(); });
+$('#jardinProjectSel').addEventListener('change', e => setActiveProject(+e.target.value));
+$('#globalProjectSel')?.addEventListener('change', e => setActiveProject(+e.target.value));
 
 // New project modal
 let newProjType = 'Álbum';
@@ -3488,7 +3536,7 @@ function renderJarFilter() {
   if (!el) return;
   const jars = S.jars || [];
   if (!jars.length) { el.innerHTML = ''; return; }
-  const allFlores = S.flores.filter(f => STAGES.every(s => f[s]));
+  const allFlores = S.flores.filter(f => isComplete(f));
   const noJarCount = allFlores.filter(f => !f.jarId).length;
   let html = `<button class="jar-pill ${florJarFilter==='all'?'active':''}" data-jf="all">✿ Todas <span class="jar-count">${allFlores.length}</span></button>`;
   if (noJarCount > 0) html += `<button class="jar-pill ${florJarFilter==='none'?'active':''}" data-jf="none">∅ Sin frasco <span class="jar-count">${noJarCount}</span></button>`;
@@ -3670,23 +3718,23 @@ function renderFlorProjectFilter() {
 
 function florCardHTML(f) {
   const open = openFlorId === f.id;
-  const ds = STAGES.filter(s => f[s]).length;
-  const pct = Math.round((ds/4)*100);
+  const ds = stagesDone(f);
+  const pct = Math.round((ds/(stagesOf(f).length||4))*100);
   const preview = (f.lyrics||f.description||'').slice(0,90).replace(/\n/g,' ');
   const jar = (S.jars||[]).find(j => j.id === f.jarId);
-  const isComplete = ds === 4;
+  const complete = isComplete(f);
   return `
     <div class="flor-row ${open?'open':''}" data-flor="${f.id}">
       <div class="flor-head" data-toggle="${f.id}">
         <button class="dnd-grip" type="button" aria-label="reordenar" title="mantener para reordenar"><i class="ti ti-grip-vertical"></i></button>
         <div class="flor-cover">
-          ${f.photoData ? `<img src="${f.photoData}" alt="">` : `<i class="ti ti-${isComplete?'flower':'plant-2'}"></i>`}
+          ${f.photoData ? `<img src="${f.photoData}" alt="">` : `<i class="ti ti-${complete?'flower':'plant-2'}"></i>`}
         </div>
         <div style="min-width:0;">
           <div class="flor-title">${f.emoji ? `<span class="flor-emoji-display">${f.emoji}</span>` : ''}${escapeHTML(f.title)}</div>
           <div class="flor-preview">${escapeHTML(preview || 'sin letra todavía')}</div>
           <div class="flor-stage-pills">
-            ${STAGES.map(s => `<div class="sp ${f[s]?'done':''}" title="${STAGE_LABELS[s]}"></div>`).join('')}
+            ${stagesOf(f).map(s => `<div class="sp ${f[s.id]?'done':''}" title="${s.label}"></div>`).join('')}
           </div>
         </div>
         <div class="flor-meta">
@@ -3698,7 +3746,7 @@ function florCardHTML(f) {
       </div>
       <div class="flor-body ${open?'open':''}" style="margin-top:14px;padding-top:14px;border-top:0.5px dashed var(--border);">
         <div class="stages">
-          ${STAGES.map(s => `<div class="stage ${f[s]?'done':''}" data-stage="${s}">${STAGE_LABELS[s]}</div>`).join('')}
+          ${stagesOf(f).map(s => `<div class="stage ${f[s.id]?'done':''}" data-stage="${s.id}">${s.label}</div>`).join('')}
         </div>
         <div class="flor-progress-bar"><div style="width:${pct}%"></div></div>
         <div style="margin:14px 0 6px;"><label>Nombre</label><input type="text" data-ff="title" value="${escapeHTML(f.title||'')}" placeholder="nombre de la flor" style="font-weight:500;font-size:14px;"></div>
@@ -3782,7 +3830,7 @@ function renderFlores() {
   renderJarFilter();
   const list = $('#florList');
   const term = florSearchTerm.toLowerCase();
-  let flores = S.flores.filter(f => STAGES.every(s => f[s])); // solo cosechadas
+  let flores = S.flores.filter(f => isComplete(f) && (f.projectId||1) === S.activeProjectId); // cosechadas del proyecto activo
   // Update hero count (total of harvested flores)
   const heroCount = document.getElementById('heroFlorCount');
   if (heroCount) heroCount.textContent = flores.length;
@@ -3816,8 +3864,8 @@ function renderFlores() {
     }
     list.innerHTML = html;
   } else if (groupBy === 'estado') {
-    const cosechadas = flores.filter(f => STAGES.every(s => f[s]));
-    const enProgreso = flores.filter(f => !STAGES.every(s => f[s]));
+    const cosechadas = flores.filter(f => isComplete(f));
+    const enProgreso = flores.filter(f => !isComplete(f));
     let html = '';
     if (cosechadas.length) {
       html += `<div class="flor-group-header"><i class="ti ti-flower"></i> Cosechadas <span class="gh-count">${cosechadas.length}</span></div>`;
@@ -3840,9 +3888,9 @@ function renderFlores() {
     const row = el.closest('[data-flor]'); const id = +row.dataset.flor;
     const f = S.flores.find(x => x.id === id); if (!f) return;
     const stage = el.dataset.stage;
-    const wasComplete = STAGES.every(s => f[s]);
+    const wasComplete = isComplete(f);
     f[stage] = !f[stage];
-    const nowComplete = STAGES.every(s => f[s]);
+    const nowComplete = isComplete(f);
     save(); renderFlores(); renderAlbumStat(); renderGarden();
     if (!wasComplete && nowComplete) { toast(`Cosecha — ${f.title} floreció`,'✦'); if (navigator.vibrate) navigator.vibrate([60,40,60,40,100]); }
   }));
@@ -3964,7 +4012,7 @@ function renderSemillero() {
 
 // Vista mosaico: collage de fotos del Semillero, miniaturas arrastrables y redimensionables.
 function renderSemMosaic(list) {
-  let items = (S.semillas || []).filter(semMatchesFilter).filter(s => s.photoData);
+  let items = (S.semillas || []).filter(s => (s.projectId||1) === S.activeProjectId).filter(semMatchesFilter).filter(s => s.photoData);
   if (semSearchTerm) {
     const t = semSearchTerm.toLowerCase();
     items = items.filter(i => (i.title || '').toLowerCase().includes(t) || (i.text || '').toLowerCase().includes(t));
@@ -4038,7 +4086,7 @@ function semMatchesFilter(i) {
 function renderSemList() {
   const list = $('#semList');
   if (semView === 'mosaic') return renderSemMosaic(list);
-  let items = (S.semillas||[]).filter(semMatchesFilter);
+  let items = (S.semillas||[]).filter(i => (i.projectId||1) === S.activeProjectId).filter(semMatchesFilter);
   if (semSearchTerm) {
     const term = semSearchTerm.toLowerCase();
     items = items.filter(i => (i.title||'').toLowerCase().includes(term) || (i.text||'').toLowerCase().includes(term));
@@ -4460,7 +4508,7 @@ function saveNewSemilla() {
 
 $('#semNew').addEventListener('click', () => {
   semFormOpen = true;
-  semFormDraft = {title:'', text:'', link:'', photoData:null, audioData:null, audioSec:0, groupId: semFilter.startsWith('group:')?+semFilter.split(':')[1]:null};
+  semFormDraft = {title:'', text:'', link:'', photoData:null, audioData:null, audioSec:0, groupId: semFilter.startsWith('group:')?+semFilter.split(':')[1]:null, projectId: S.activeProjectId};
   renderSemillero();
   setTimeout(() => $('#nfTitle')?.focus(), 50);
 });
@@ -4506,7 +4554,7 @@ async function handlePhotoFile(file) {
     } else {
       // Direct add — create new semilla with thumbnail, then upload original
       const title = prompt('Título para la foto:', `foto ${todayStr()}`) || `foto ${todayStr()}`;
-      const newSem = {id: uid(), createdAt: Date.now(), date: todayStr(), title, text:'', link:'', audioData:null, audioSec:0, photoData: thumbDataUrl, groupId:null};
+      const newSem = {id: uid(), createdAt: Date.now(), date: todayStr(), title, text:'', link:'', audioData:null, audioSec:0, photoData: thumbDataUrl, groupId:null, projectId: S.activeProjectId};
       S.semillas.unshift(newSem);
       save(); toast('Foto guardada','✦'); renderSemillero();
       offloadPhotoFile(newSem, file, renderSemillero);
@@ -4946,7 +4994,7 @@ function buildDashboard(grid) {
 
   // ── 1. Canciones terminadas ──
   const total_flores = S.flores.length;
-  const done_flores  = S.flores.filter(f => STAGES.every(s => f[s])).length;
+  const done_flores  = S.flores.filter(f => isComplete(f)).length;
   const inprog_flores = total_flores - done_flores;
 
   // ── 2. Ingresos trimestre vs anterior ──
@@ -5476,14 +5524,14 @@ function gatherSearchHits(term) {
   const plantas = [];
   const flores = [];
   florHits.forEach(f => {
-    const isComplete = STAGES.every(s => f[s]);
+    const complete = isComplete(f);
     const proj = S.projects.find(p => p.id === f.projectId);
     const hit = {
-      icon: isComplete ? 'ti-flower' : 'ti-plant-2',
+      icon: complete ? 'ti-flower' : 'ti-plant-2',
       title: f.title || 'sin título',
       preview: _snippet(f.lyrics || f.description || f.notes || f.socialContent || '', term),
       meta: proj ? proj.name : '',
-      payload: { type: isComplete ? 'flor' : 'planta', id: f.id, projectId: f.projectId }
+      payload: { type: complete ? 'flor' : 'planta', id: f.id, projectId: f.projectId }
     };
     (isComplete ? flores : plantas).push(hit);
   });
@@ -5853,7 +5901,7 @@ function bitaNotifCheck() {
 setInterval(bitaNotifCheck, 30000);
 
 function init() {
-  applyTheme(); renderTabs();
+  applyTheme(); renderTabs(); renderGlobalProjectSel();
   const firstVisible = S.config.tabOrder.find(t => S.config.tabVisible[t]);
   const savedTab = localStorage.getItem('jardin-lastTab');
   const startTab = (savedTab && S.config.tabVisible[savedTab] && TABS_META[savedTab]) ? savedTab : firstVisible;
