@@ -1615,7 +1615,6 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     </div>
   </div>
   <div class="card">
-    <select id="florProjectFilter" style="display:none;"></select>
     <div class="flor-toolbar">
       <input type="text" id="florSearch" placeholder="buscar letra o título..." style="flex:1;">
       <select id="florGroupBy" style="display:none;"></select>
@@ -3097,7 +3096,7 @@ function renderJardinProjectHeader() {
       if (field === 'typeCustom') {
         const v = e.target.value.trim();
         if (v) { pp.type = v; }
-        save(); renderJardinProjectSelector(); renderFlorProjectFilter(); populateRiegoTargets();
+        save(); renderJardinProjectSelector(); populateRiegoTargets();
       } else if (field === 'type') {
         const v = e.target.value;
         if (v === '__custom') {
@@ -3107,12 +3106,12 @@ function renderJardinProjectHeader() {
           return;
         }
         pp.type = v;
-        save(); renderJardinProjectSelector(); renderFlorProjectFilter(); populateRiegoTargets();
+        save(); renderJardinProjectSelector(); populateRiegoTargets();
       } else {
         pp[field] = e.target.value;
         save();
         if (field === 'name') {
-          renderJardinProjectSelector(); renderFlorProjectFilter(); populateRiegoTargets();
+          renderJardinProjectSelector(); populateRiegoTargets();
         }
       }
     });
@@ -3443,7 +3442,7 @@ function createNewProject() {
   const np = {id: uid(), name, type, description:'', socialContent:'', links:[], files:[], trackingLog:[]};
   S.projects.push(np); S.activeProjectId = np.id;
   save(); closeNewProjectModal();
-  renderJardin(); renderAlbumStat(); renderFlorProjectFilter(); populateRiegoTargets();
+  renderJardin(); renderAlbumStat(); populateRiegoTargets();
   toast(`Proyecto creado · ${name}`, '✦');
 }
 $('#jardinProjectDel').addEventListener('click', () => {
@@ -3454,7 +3453,7 @@ $('#jardinProjectDel').addEventListener('click', () => {
   S.projects = S.projects.filter(x => x.id !== p.id);
   S.flores.forEach(f => { if (f.projectId === p.id) f.projectId = S.projects[0].id; });
   S.activeProjectId = S.projects[0].id; selectedPlantId = null;
-  save(); renderJardin(); renderAlbumStat(); renderFlorProjectFilter(); populateRiegoTargets();
+  save(); renderJardin(); renderAlbumStat(); populateRiegoTargets();
 });
 
 // ========================= RIEGO =========================
@@ -3797,15 +3796,6 @@ function openEmojiPicker(currentEmoji) {
     render();
   });
 }
-let florProjectFilter = 'all';
-
-function renderFlorProjectFilter() {
-  const sel = $('#florProjectFilter');
-  let opts = '<option value="all">Todos los proyectos</option>';
-  S.projects.forEach(p => opts += `<option value="${p.id}">${escapeHTML(p.name)} · ${escapeHTML(p.type)}</option>`);
-  sel.innerHTML = opts;
-  sel.value = florProjectFilter;
-}
 
 function florCardHTML(f) {
   const open = openFlorId === f.id;
@@ -3930,8 +3920,7 @@ function florCardHTML(f) {
 }
 
 function renderFlores() {
-  renderFlorProjectFilter();
-  renderJarFilter();
+   renderJarFilter();
   const list = $('#florList');
   const term = florSearchTerm.toLowerCase();
   const florSearching = !!term;
@@ -4083,7 +4072,6 @@ function renderFlores() {
   });
 }
 $('#florSearch').addEventListener('input', e => { florSearchTerm = e.target.value; renderFlores(); });
-$('#florProjectFilter').addEventListener('change', e => { florProjectFilter = e.target.value; renderFlores(); });
 $('#florGroupBy').addEventListener('change', e => { S.florGroupBy = e.target.value; save(); renderFlores(); });
 $('#jarNew').addEventListener('click', async () => {
   const name = prompt('Nombre del frasco:'); if (!name || !name.trim()) return;
@@ -6548,12 +6536,6 @@ async function offloadAudio(obj, blob, rerenderFn) {
   if (rerenderFn) rerenderFn();
 }
 
-// Upload original File object to Storage (uncompressed, preserves MIME type)
-async function _uploadFileToStorage(file, path) {
-  const ref = storage.ref(path);
-  const snapshot = await ref.put(file, {contentType: file.type});
-  return await snapshot.ref.getDownloadURL();
-}
 
 // Queue original photo File for upload — works offline
 async function offloadPhotoFile(obj, file, rerenderFn) {
