@@ -195,6 +195,30 @@ section.tab { display: none; animation: fade .25s ease-out; }
 .project-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--gold); }
 .project-bar .ti { font-size: 15px; opacity: .8; }
 .project-bar select { flex: 0 1 auto; min-width: 140px; padding: 5px 10px; border-radius: 8px; border: 0.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-size: 12px; font-weight: 500; letter-spacing: 0.02em; }
+/* Agenda de tareas */
+.agenda-add { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.agenda-add input[type="text"] { flex: 1 1 140px; min-width: 110px; }
+.agenda-add select, .agenda-add input[type="date"] { padding: 6px 8px; border-radius: 8px; border: 0.5px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-size: 12px; }
+.agenda-add .icon-only { padding: 6px 10px; }
+.agenda-item { display: flex; align-items: center; gap: 8px; padding: 8px 4px; border-bottom: 0.5px solid var(--border); }
+.agenda-item.is-today { background: var(--gold-soft); border-radius: 8px; padding: 8px; border-bottom: none; }
+.agenda-check { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 18px; padding: 0; flex-shrink: 0; }
+.agenda-check:hover { color: var(--gold); }
+.agenda-main { flex: 1; min-width: 0; }
+.agenda-text { font-size: 13px; line-height: 1.35; }
+.agenda-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 3px; }
+.agenda-prio { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; padding: 1px 6px; border-radius: 6px; }
+.agenda-prio.prio-alta { background: #f8d7d7; color: #b23; }
+.agenda-prio.prio-media { background: var(--gold-soft); color: var(--gold); }
+.agenda-prio.prio-baja { background: var(--bg-soft); color: var(--text-faint); }
+.agenda-proj { font-size: 9px; padding: 1px 6px; border-radius: 6px; background: var(--bg-soft); color: var(--text-secondary); }
+.agenda-date { font-size: 10px; color: var(--text-faint); display: inline-flex; align-items: center; gap: 3px; }
+.agenda-date.overdue { color: #c44; font-weight: 600; }
+.agenda-date.duetoday { color: var(--gold); font-weight: 600; }
+.agenda-today, .agenda-del { background: none; border: none; cursor: pointer; color: var(--text-faint); padding: 4px; font-size: 14px; flex-shrink: 0; }
+.agenda-today.on { color: var(--gold); }
+.agenda-today:hover, .agenda-del:hover { color: var(--gold); }
+.dark .agenda-prio.prio-alta { background: rgba(200,60,60,.25); color: #e88; }
 section.tab.active { display: block; animation: tabIn .2s ease; }
 @keyframes tabIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { section.tab.active { animation: none; } }
@@ -1344,6 +1368,16 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <div class="stat-bar"><div class="stat-bar-fill" id="albumBar" style="width:0%"></div></div>
     </div>
   </div>
+  <div data-widget="agenda" class="card">
+    <h2 class="section-title"><i class="ti ti-checklist"></i> Agenda</h2>
+    <div class="agenda-add">
+      <input type="text" id="agendaInput" placeholder="nueva tarea..." autocomplete="off">
+      <select id="agendaPrio" title="prioridad"><option value="alta">Alta</option><option value="media" selected>Media</option><option value="baja">Baja</option></select>
+      <input type="date" id="agendaDate" title="fecha límite">
+      <button class="btn gold icon-only" id="agendaAdd"><i class="ti ti-plus"></i></button>
+    </div>
+    <div id="agendaList"></div>
+  </div>
   <div data-widget="riego" class="card">
     <h2 class="section-title"><i class="ti ti-droplet"></i> Riego</h2>
     <div class="riego">
@@ -2018,9 +2052,9 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 const DEFAULT_CONFIG = {
   tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','conciertos','estadisticas','ajustes'],
   tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, conciertos:true, estadisticas:true, ajustes:true},
-  hoyWidgets: {voces:true, stats:true, riego:true, bitacora:true, dashboard:true},
-  hoyOrder: ['voces','stats','riego','bitacora','dashboard'],
-  hoyCollapsed: {voces:false, stats:false, riego:false, bitacora:false},
+  hoyWidgets: {voces:true, stats:true, agenda:true, riego:true, bitacora:true, dashboard:true},
+  hoyOrder: ['voces','stats','agenda','riego','bitacora','dashboard'],
+  hoyCollapsed: {voces:false, stats:false, agenda:false, riego:false, bitacora:false},
   theme: 'auto',
 };
 
@@ -2029,7 +2063,7 @@ const defaults = {
   quotes: DEFAULT_QUOTES,
   flores: DEFAULT_FLORES,
   projects: DEFAULT_PROJECTS,
-  semillas: [], semillaGroups: [], jars: [],
+  semillas: [], semillaGroups: [], jars: [], tasks: [],
   habits: {}, habitDate: '', streak: 0, habitHistory: [],
   quoteIndex: 0, quoteDate: '',
   intention: '', mantra: '', mantraDate: '',
@@ -2135,6 +2169,8 @@ function migrate(state) {
   state.config.hoyOrder = state.config.hoyOrder.filter(k => DEFAULT_CONFIG.hoyOrder.includes(k));
   DEFAULT_CONFIG.hoyOrder.forEach(k => { if (!state.config.hoyOrder.includes(k)) state.config.hoyOrder.push(k); });
   state.config.hoyCollapsed = Object.assign({}, DEFAULT_CONFIG.hoyCollapsed, state.config.hoyCollapsed || {});
+  state.config.hoyWidgets = Object.assign({}, DEFAULT_CONFIG.hoyWidgets, state.config.hoyWidgets || {});
+  if (!Array.isArray(state.tasks)) state.tasks = [];
 
   // Brand profile
   if (!state.brand) state.brand = {logoData: state['lib-logo']||'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit: state['lib-presskit']||'', gallery: state['lib-fotos']||''};
@@ -2465,7 +2501,7 @@ function switchTab(key) {
   $$('section.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-'+key));
   try { localStorage.setItem('jardin-lastTab', key); } catch(e){}
   window.scrollTo({top:0});
-  if (key === 'hoy') { if (dashOpen) buildDashboard(document.getElementById('statsDashboard')); }
+  if (key === 'hoy') { renderAgenda(); if (dashOpen) buildDashboard(document.getElementById('statsDashboard')); }
   if (key === 'semillero') renderSemillero();
   if (key === 'jardin') { renderJardin(); renderDeadlines(); }
   if (key === 'flores') renderFlores();
@@ -5407,9 +5443,74 @@ function bindMisionesDnd() {
   });
 }
 
+// ========================= AGENDA DE TAREAS (widget HOY) =========================
+const AGENDA_PRIO_RANK = { alta: 0, media: 1, baja: 2 };
+function renderAgenda() {
+  const el = document.getElementById('agendaList');
+  if (!el) return;
+  const today = todayStr();
+  const pend = (S.tasks || []).filter(t => !t.done);
+  pend.sort((a, b) => {
+    const ah = (a.scheduledFor === today) ? 0 : 1, bh = (b.scheduledFor === today) ? 0 : 1;
+    if (ah !== bh) return ah - bh;
+    const ad = a.deadline || '9999-99', bd = b.deadline || '9999-99';
+    if (ad !== bd) return ad.localeCompare(bd);
+    return (AGENDA_PRIO_RANK[a.priority] ?? 1) - (AGENDA_PRIO_RANK[b.priority] ?? 1);
+  });
+  if (!pend.length) { el.innerHTML = '<div class="empty">sin tareas pendientes · agrega una o pídele al socio</div>'; return; }
+  el.innerHTML = pend.map(t => {
+    const proj = (S.projects || []).find(p => p.id === t.projectId);
+    const overdue = t.deadline && t.deadline < today;
+    const dueToday = t.deadline === today;
+    return `<div class="agenda-item ${t.scheduledFor === today ? 'is-today' : ''}" data-task="${t.id}">
+      <button class="agenda-check" data-taskdone="${t.id}" title="completar"><i class="ti ti-circle"></i></button>
+      <div class="agenda-main">
+        <div class="agenda-text">${escapeHTML(t.text)}</div>
+        <div class="agenda-meta">
+          <span class="agenda-prio prio-${t.priority || 'media'}">${t.priority || 'media'}</span>
+          ${proj ? `<span class="agenda-proj">${escapeHTML(proj.name)}</span>` : ''}
+          ${t.deadline ? `<span class="agenda-date ${overdue ? 'overdue' : dueToday ? 'duetoday' : ''}"><i class="ti ti-calendar"></i> ${t.deadline}</span>` : ''}
+        </div>
+      </div>
+      <button class="agenda-today ${t.scheduledFor === today ? 'on' : ''}" data-tasktoday="${t.id}" title="para hoy"><i class="ti ti-sun"></i></button>
+      <button class="agenda-del" data-taskdel="${t.id}" title="borrar"><i class="ti ti-x"></i></button>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('[data-taskdone]').forEach(b => b.addEventListener('click', () => {
+    const t = (S.tasks || []).find(x => String(x.id) === b.dataset.taskdone); if (!t) return;
+    t.done = true; t.doneDate = todayStr(); save(); renderAgenda(); toast('Tarea completada', '✓');
+  }));
+  el.querySelectorAll('[data-tasktoday]').forEach(b => b.addEventListener('click', () => {
+    const t = (S.tasks || []).find(x => String(x.id) === b.dataset.tasktoday); if (!t) return;
+    t.scheduledFor = (t.scheduledFor === todayStr()) ? null : todayStr(); save(); renderAgenda();
+  }));
+  el.querySelectorAll('[data-taskdel]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.taskdel;
+    const idx = (S.tasks || []).findIndex(x => String(x.id) === id);
+    if (idx < 0) return;
+    const removed = S.tasks[idx];
+    S.tasks.splice(idx, 1); save(); renderAgenda();
+    showUndoToast('Tarea borrada', () => { S.tasks.splice(idx, 0, removed); save(); renderAgenda(); });
+  }));
+}
+function addAgendaTask() {
+  const inp = document.getElementById('agendaInput');
+  const text = (inp?.value || '').trim();
+  if (!text) return;
+  const prio = document.getElementById('agendaPrio')?.value || 'media';
+  const date = document.getElementById('agendaDate')?.value || '';
+  S.tasks = S.tasks || [];
+  S.tasks.unshift({ id: uid(), text, projectId: S.activeProjectId, priority: prio, deadline: date, scheduledFor: null, done: false, createdAt: Date.now() });
+  if (inp) inp.value = '';
+  const d = document.getElementById('agendaDate'); if (d) d.value = '';
+  save(); renderAgenda();
+}
+document.getElementById('agendaAdd')?.addEventListener('click', addAgendaTask);
+document.getElementById('agendaInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addAgendaTask(); });
+
 // ========================= HOY · WIDGETS MODULARES =========================
-const HOY_NAMES = { voces:'Voces', stats:'Progreso', riego:'Riego', bitacora:'Bitácora', dashboard:'Estadísticas' };
-const HOY_COLLAPSIBLE = { voces:1, stats:1, riego:1, bitacora:1 }; // dashboard usa su propio toggle interno
+const HOY_NAMES = { voces:'Voces', stats:'Progreso', agenda:'Agenda', riego:'Riego', bitacora:'Bitácora', dashboard:'Estadísticas' };
+const HOY_COLLAPSIBLE = { voces:1, stats:1, agenda:1, riego:1, bitacora:1 }; // dashboard usa su propio toggle interno
 
 // Envuelve el contenido de cada widget en .widget-body y le antepone una barra
 // con grip (mover) + nombre (visible al colapsar) + chevron (minimizar). Idempotente.
