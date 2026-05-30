@@ -428,6 +428,10 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .select-bar .sb-count { background: var(--gold); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
 .select-bar button { background: none; border: none; color: var(--bg-card); cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; }
 .select-bar button:hover { color: var(--gold); }
+.plant.plant-folder .folder-ico { width: 46px; height: 46px; border-radius: 10px; background: var(--gold-soft); display: flex; align-items: center; justify-content: center; position: relative; color: var(--gold); font-size: 22px; }
+.plant.plant-folder .folder-ico .fk { position: absolute; bottom: -3px; right: -3px; background: var(--gold); color: #fff; border-radius: 50%; min-width: 15px; height: 15px; font-size: 9px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
+.plant.sel, .flor-row.sem-sel { outline: 2px solid var(--gold); outline-offset: 1px; border-radius: 8px; }
+.flor-folder .flor-head { cursor: pointer; }
 
 .sem-detail, .sem-form-wrap { background: var(--bg-card); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
 .sem-detail input[type="text"].sem-title-input { font-size: 16px; font-weight: 500; padding: 6px 0; border: none; box-shadow: inset 0 -1px 0 var(--border); border-radius: 0; margin-bottom: 4px; }
@@ -2249,6 +2253,7 @@ function migrate(state) {
     if (!('audioSec' in f)) f.audioSec = 0;
     if (!('priority' in f)) f.priority = 0;
     if (!('deadline' in f)) f.deadline = '';
+    if (!('parentId' in f)) f.parentId = null;
   });
   // Project types — ensure valid
   (state.projects||[]).forEach(p => {
@@ -3116,11 +3121,35 @@ function renderJardinProjectHeader() {
   bindKvList(el, 'jardinProjectFiles', () => activeProject().files, renderJardinProjectHeader);
 }
 
+// ── Anidación + selección múltiple para Jardín/Flores (flores con parentId) ──
+let florCurrentParent = null, florSelecting = false, florSelected = new Set();
+function florChildCount(id) { return (S.flores || []).filter(f => f.parentId === id && (f.projectId||1) === S.activeProjectId).length; }
+function isFlorPage(f) { return !!f.isPage || florChildCount(f.id) > 0; }
+function florPathTo(id) { const path = []; let cur = (S.flores || []).find(f => f.id === id); let g = 0; while (cur && g++ < 50) { path.unshift(cur); cur = cur.parentId ? (S.flores || []).find(f => f.id === cur.parentId) : null; } return path; }
+function florBreadcrumb() { if (florCurrentParent === null) return ''; return `<div class="sem-breadcrumb"><button data-flornav="root" title="raíz"><i class="ti ti-home"></i></button>` + florPathTo(florCurrentParent).map(p => `<span class="bc-sep">›</span><button data-flornav="${p.id}">${escapeHTML(p.title||'')}</button>`).join('') + `</div>`; }
+function wireFlorNav(container) { container.querySelectorAll('[data-flornav]').forEach(b => b.addEventListener('click', () => { const v = b.dataset.flornav; florCurrentParent = (v === 'root') ? null : +v; renderJardin(); renderFlores(); })); }
+function toggleFlorSelect(id) { if (florSelected.has(id)) florSelected.delete(id); else florSelected.add(id); if (florSelected.size === 0) florSelecting = false; renderGarden(); renderFlores(); renderFlorSelectBar(); }
+function groupSelectedFlores() {
+  if (!florSelected.size) return;
+  const name = prompt('Nombre de la página:'); if (name === null) return;
+  const pageId = uid(); const p = activeProject();
+  S.flores.unshift({ id: pageId, title: (name.trim() || 'Página'), projectId: p.id, parentId: florCurrentParent, isPage: true, key: '', chords: '', lyrics: '', notes: '', socialContent: '', description: '', links: [], files: [], photoData: null, audioData: null, audioSec: 0, priority: 0, deadline: '' });
+  S.flores.forEach(f => { if (florSelected.has(f.id)) f.parentId = pageId; });
+  florSelecting = false; florSelected = new Set();
+  save(); renderJardin(); renderFlores(); toast(`Página "${name.trim() || 'Página'}" creada`, '📄');
+}
+function renderFlorSelectBar() {
+  let bar = document.getElementById('florSelectBar');
+  if (!florSelecting || !florSelected.size) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement('div'); bar.id = 'florSelectBar'; bar.className = 'select-bar'; document.body.appendChild(bar); }
+  bar.innerHTML = `<span class="sb-count">${florSelected.size}</span><button id="fsbGroup"><i class="ti ti-folder-plus"></i> Agrupar</button><button id="fsbCancel" title="cancelar"><i class="ti ti-x"></i></button>`;
+  bar.querySelector('#fsbGroup').onclick = groupSelectedFlores;
+  bar.querySelector('#fsbCancel').onclick = () => { florSelecting = false; florSelected = new Set(); renderGarden(); renderFlores(); renderFlorSelectBar(); };
+}
+
 function renderGarden() {
-  // Show ALL plantas from all projects (entries come only from Semillero)
-  const allFlores = S.flores;
-  // Plants in Jardín = items NOT fully complete (still growing)
-  const plantas = allFlores.filter(f => !isComplete(f));
+  // Plantas del proyecto activo, en el nivel/página actual (anidación)
+  const plantas = S.flores.filter(f => (f.projectId||1) === S.activeProjectId && (f.parentId ?? null) === florCurrentParent && (isFlorPage(f) || !isComplete(f)));
   // Sort
   const sort = S.jardinSort || 'progress';
   if (sort === 'progress') {
@@ -3144,21 +3173,33 @@ function renderGarden() {
   $('#jardinProgress').textContent = `${plantas.length} en crecimiento · ${completedCount} cosechadas · ${pct}% global`;
 
   const el = $('#gardenSvg');
+  const crumb = florCurrentParent !== null ? florBreadcrumb().replace('class="sem-breadcrumb"', 'class="sem-breadcrumb" style="width:100%;flex-basis:100%;grid-column:1/-1;"') : '';
   if (!plantas.length) {
-    el.innerHTML = '<div class="empty">sin plantas en crecimiento · siembra una semilla desde el Semillero</div>';
-    $('#plantDetail').innerHTML = '';
+    el.innerHTML = crumb + '<div class="empty">' + (florCurrentParent!==null ? 'esta página está vacía' : 'sin plantas en crecimiento · siembra una semilla desde el Semillero') + '</div>';
+    wireFlorNav(el); $('#plantDetail').innerHTML = ''; renderFlorSelectBar();
     return;
   }
-  el.innerHTML = plantas.map(f => {
+  el.innerHTML = crumb + plantas.map(f => {
+    if (isFlorPage(f)) {
+      const kids = florChildCount(f.id);
+      return `<div class="plant plant-folder ${florSelected.has(f.id)?'sel':''}" data-florfolder="${f.id}" data-flor="${f.id}" title="${escapeHTML(f.title)} · ${kids}"><div class="folder-ico"><i class="ti ti-folder"></i><span class="fk">${kids}</span></div><div class="name">${escapeHTML(f.title)}</div></div>`;
+    }
     const ds = stagesDone(f);
-    const p = Math.round((ds/4)*100);
-    return `<div class="plant ${p===100?'complete':''}${selectedPlantId===f.id?' active':''}" data-flor="${f.id}" title="${escapeHTML(f.title)} — ${p}%">${plantSVG(p)}<div class="name">${escapeHTML(f.title)}</div></div>`;
+    const p = Math.round((ds/(stagesOf(f).length||4))*100);
+    return `<div class="plant ${p===100?'complete':''}${selectedPlantId===f.id?' active':''}${florSelected.has(f.id)?' sel':''}" data-flor="${f.id}" title="${escapeHTML(f.title)} — ${p}%">${plantSVG(p)}<div class="name">${escapeHTML(f.title)}</div></div>`;
   }).join('');
-  el.querySelectorAll('.plant').forEach(pl => pl.addEventListener('click', () => {
-    selectedPlantId = selectedPlantId === +pl.dataset.flor ? null : +pl.dataset.flor;
-    renderGarden();
-  }));
-
+  wireFlorNav(el);
+  el.querySelectorAll('.plant').forEach(pl => {
+    const id = +pl.dataset.flor;
+    pl.addEventListener('click', () => {
+      if (florSelecting) { toggleFlorSelect(id); return; }
+      if (pl.dataset.florfolder) { florCurrentParent = id; renderGarden(); return; }
+      selectedPlantId = selectedPlantId === id ? null : id;
+      renderGarden();
+    });
+    attachLongPress(pl, () => { if (!florSelecting) { florSelecting = true; florSelected = new Set(); } toggleFlorSelect(id); }, 2000);
+  });
+  renderFlorSelectBar();
   renderPlantDetail();
 }
 
@@ -3773,10 +3814,23 @@ function florCardHTML(f) {
   const preview = (f.lyrics||f.description||'').slice(0,90).replace(/\n/g,' ');
   const jar = (S.jars||[]).find(j => j.id === f.jarId);
   const complete = isComplete(f);
+  const fsel = florSelected.has(f.id);
+  if (isFlorPage(f)) {
+    const kids = florChildCount(f.id);
+    return `
+    <div class="flor-row flor-folder ${fsel?'sem-sel':''}" data-flor="${f.id}" data-florfolder="${f.id}">
+      <div class="flor-head">
+        ${florSelecting ? `<button class="sem-check ${fsel?'on':''}" data-florsel="${f.id}"><i class="ti ti-${fsel?'circle-check-filled':'circle'}"></i></button>` : ''}
+        <div class="flor-cover" style="background:var(--gold-soft);"><i class="ti ti-folder" style="font-size:22px;color:var(--gold);"></i></div>
+        <div style="min-width:0;"><div class="flor-title">${escapeHTML(f.title||'Página')}</div><div class="flor-preview">${kids} elemento${kids===1?'':'s'}</div></div>
+        <div class="flor-meta"><button class="sem-enter has-kids" data-florenter="${f.id}">abrir <i class="ti ti-chevron-right"></i></button></div>
+      </div>
+    </div>`;
+  }
   return `
-    <div class="flor-row ${open?'open':''}" data-flor="${f.id}">
+    <div class="flor-row ${open?'open':''} ${fsel?'sem-sel':''}" data-flor="${f.id}">
       <div class="flor-head" data-toggle="${f.id}">
-        <button class="dnd-grip" type="button" aria-label="reordenar" title="mantener para reordenar"><i class="ti ti-grip-vertical"></i></button>
+        ${florSelecting ? `<button class="sem-check ${fsel?'on':''}" data-florsel="${f.id}"><i class="ti ti-${fsel?'circle-check-filled':'circle'}"></i></button>` : `<button class="dnd-grip" type="button" aria-label="reordenar" title="mantener para reordenar"><i class="ti ti-grip-vertical"></i></button>`}
         <div class="flor-cover">
           ${f.photoData ? `<img src="${f.photoData}" alt="">` : `<i class="ti ti-${complete?'flower':'plant-2'}"></i>`}
         </div>
@@ -3880,7 +3934,9 @@ function renderFlores() {
   renderJarFilter();
   const list = $('#florList');
   const term = florSearchTerm.toLowerCase();
-  let flores = S.flores.filter(f => isComplete(f) && (f.projectId||1) === S.activeProjectId); // cosechadas del proyecto activo
+  const florSearching = !!term;
+  let flores = S.flores.filter(f => (f.projectId||1) === S.activeProjectId && (isFlorPage(f) || isComplete(f))); // cosechadas + páginas del proyecto activo
+  if (!florSearching) flores = flores.filter(f => (f.parentId ?? null) === florCurrentParent); // anidación: nivel actual
   // Update hero count (total of harvested flores)
   const heroCount = document.getElementById('heroFlorCount');
   if (heroCount) heroCount.textContent = flores.length;
@@ -3894,7 +3950,8 @@ function renderFlores() {
   if (gbSel) gbSel.value = groupBy;
 
   if (!flores.length) {
-    list.innerHTML = '<div class="empty">sin flores · completá todas las etapas de una planta en Jardín para cosecharla</div>';
+    list.innerHTML = (florCurrentParent!==null?florBreadcrumb():'') + '<div class="empty">' + (florCurrentParent!==null?'esta página está vacía':'sin flores · completá todas las etapas de una planta en Jardín para cosecharla') + '</div>';
+    wireFlorNav(list); renderFlorSelectBar();
     return;
   }
 
@@ -3930,9 +3987,24 @@ function renderFlores() {
     list.innerHTML = flores.map(florCardHTML).join('');
   }
 
+  if (florCurrentParent !== null) list.insertAdjacentHTML('afterbegin', florBreadcrumb());
+  wireFlorNav(list);
+  list.querySelectorAll('[data-florenter]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); if (florSelecting) return; florCurrentParent = +b.dataset.florenter; renderFlores(); }));
+  list.querySelectorAll('.flor-folder').forEach(row => {
+    row.addEventListener('click', (e) => { if (e.target.closest('[data-florsel]')) return; const id = +row.dataset.florfolder; if (florSelecting) { toggleFlorSelect(id); return; } florCurrentParent = id; renderFlores(); });
+    attachLongPress(row, () => { const id = +row.dataset.florfolder; if (!florSelecting) { florSelecting = true; florSelected = new Set(); } toggleFlorSelect(id); }, 2000);
+  });
+  list.querySelectorAll('[data-florsel]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); toggleFlorSelect(+b.dataset.florsel); }));
+  list.querySelectorAll('.flor-row:not(.flor-folder) .flor-head').forEach(head => {
+    attachLongPress(head, () => { const id = +head.closest('[data-flor]').dataset.flor; if (!florSelecting) { florSelecting = true; florSelected = new Set(); } toggleFlorSelect(id); }, 2000);
+  });
+  renderFlorSelectBar();
+
   list.querySelectorAll('[data-toggle]').forEach(el => el.addEventListener('click', (e) => {
-    if (e.target.closest('.dnd-grip')) return; // no toggle si tocaron el grip
-    const id = +el.dataset.toggle; openFlorId = openFlorId === id ? null : id; renderFlores();
+    if (e.target.closest('.dnd-grip') || e.target.closest('[data-florsel]')) return;
+    const id = +el.dataset.toggle;
+    if (florSelecting) { toggleFlorSelect(id); return; }
+    openFlorId = openFlorId === id ? null : id; renderFlores();
   }));
   list.querySelectorAll('.stage').forEach(el => el.addEventListener('click', () => {
     const row = el.closest('[data-flor]'); const id = +row.dataset.flor;
@@ -4028,7 +4100,7 @@ $('#florNew').addEventListener('click', () => {
   // If currently filtering by a specific jar, assign new flor to it
   const jarId = (typeof florJarFilter === 'number') ? florJarFilter : null;
   // Creating a flor here means an archive entry — mark complete by default
-  S.flores.unshift({id, title:'Nueva flor', projectId:projId, jarId, emoji:'', key:'', chords:'', lyrics:'', notes:'', socialContent:'', description:'', links:[], files:[], photoData:null, audioData:null, audioSec:0, priority:0, loop:true, arrangement:true, recording:true, mix:true, deadline:''});
+  S.flores.unshift({id, title:'Nueva flor', projectId:projId, parentId:florCurrentParent, jarId, emoji:'', key:'', chords:'', lyrics:'', notes:'', socialContent:'', description:'', links:[], files:[], photoData:null, audioData:null, audioSec:0, priority:0, loop:true, arrangement:true, recording:true, mix:true, deadline:''});
   openFlorId = id; save(); renderFlores(); renderGarden();
   // Focus on the title input
   setTimeout(() => {
