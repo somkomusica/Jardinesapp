@@ -469,6 +469,8 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .select-bar .sb-count { background: var(--gold); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
 .select-bar button { background: none; border: none; color: var(--bg-card); cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; }
 .select-bar button:hover { color: var(--gold); }
+.select-bar button[disabled] { opacity: .4; cursor: default; }
+.select-bar .sb-hint { font-size: 11px; opacity: .8; }
 .plant.plant-folder .folder-ico { width: 46px; height: 46px; border-radius: 10px; background: var(--gold-soft); display: flex; align-items: center; justify-content: center; position: relative; color: var(--gold); font-size: 22px; }
 .plant.plant-folder .folder-ico .fk { position: absolute; bottom: -3px; right: -3px; background: var(--gold); color: #fff; border-radius: 50%; min-width: 15px; height: 15px; font-size: 9px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
 .plant.sel, .flor-row.sem-sel { outline: 2px solid var(--gold); outline-offset: 1px; border-radius: 8px; }
@@ -1504,6 +1506,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <div class="sem-toolbar" style="margin-top:14px;">
       <button class="btn gold" id="semNew"><i class="ti ti-plus"></i> Nueva semilla</button>
       <button class="btn ghost" id="groupNew"><i class="ti ti-folder-plus"></i> Nuevo grupo</button>
+      <button class="btn ghost" id="semSelectBtn"><i class="ti ti-checkbox"></i> Seleccionar</button>
       <button class="btn ghost" id="semViewToggle" title="cambiar vista"><i class="ti ti-layout-grid"></i> Mosaico</button>
       <div class="spacer"></div>
       <input type="text" id="semSearch" placeholder="buscar..." style="max-width:200px;">
@@ -1532,6 +1535,8 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <button data-sort="progress">Progreso</button>
       <button data-sort="az">A-Z</button>
       <button data-sort="priority">Prioridad</button>
+      <div class="spacer" style="flex:1;"></div>
+      <button class="btn ghost tiny" id="gardenSelectBtn"><i class="ti ti-checkbox"></i> Seleccionar</button>
     </div>
     <div class="garden-svg" id="gardenSvg"></div>
     <div id="plantDetail"></div>
@@ -2274,7 +2279,7 @@ function migrate(state) {
     state.config._canterosV1 = true;
   }
   // Semillas con proyecto (default: Somko) para poder filtrar por proyecto
-  (state.semillas||[]).forEach(s => { if (!('projectId' in s)) s.projectId = 1; if (!('parentId' in s)) s.parentId = null; });
+  (state.semillas||[]).forEach(s => { if (!('projectId' in s)) s.projectId = 1; if (!('parentId' in s)) s.parentId = null; if (!('deadline' in s)) s.deadline = ''; });
 
   // Flores migrate from old songs/tracks
   if ((!state.flores || !state.flores.length) && (state.songs || state.tracks)) {
@@ -3197,7 +3202,7 @@ function wireFlorNav(container) { container.querySelectorAll('[data-flornav]').f
 function toggleFlorSelect(id) { if (florSelected.has(id)) florSelected.delete(id); else florSelected.add(id); if (florSelected.size === 0) florSelecting = false; renderGarden(); renderFlores(); renderFlorSelectBar(); }
 function groupSelectedFlores() {
   if (!florSelected.size) return;
-  const name = prompt('Nombre de la página:'); if (name === null) return;
+  const name = prompt('Nombre de la carpeta (álbum, categoría...):'); if (name === null) return;
   const pageId = uid(); const p = activeProject();
   S.flores.unshift({ id: pageId, title: (name.trim() || 'Página'), projectId: p.id, parentId: florCurrentParent, isPage: true, key: '', chords: '', lyrics: '', notes: '', socialContent: '', description: '', links: [], files: [], photoData: null, audioData: null, audioSec: 0, priority: 0, deadline: '' });
   S.flores.forEach(f => { if (florSelected.has(f.id)) f.parentId = pageId; });
@@ -3206,10 +3211,11 @@ function groupSelectedFlores() {
 }
 function renderFlorSelectBar() {
   let bar = document.getElementById('florSelectBar');
-  if (!florSelecting || !florSelected.size) { if (bar) bar.remove(); return; }
+  if (!florSelecting) { if (bar) bar.remove(); return; } // visible apenas entrás en modo selección
   if (!bar) { bar = document.createElement('div'); bar.id = 'florSelectBar'; bar.className = 'select-bar'; document.body.appendChild(bar); }
-  bar.innerHTML = `<span class="sb-count">${florSelected.size}</span><button id="fsbGroup"><i class="ti ti-folder-plus"></i> Agrupar</button><button id="fsbCancel" title="cancelar"><i class="ti ti-x"></i></button>`;
-  bar.querySelector('#fsbGroup').onclick = groupSelectedFlores;
+  const n = florSelected.size;
+  bar.innerHTML = `<span class="sb-count">${n}</span><span class="sb-hint">${n ? 'seleccionadas' : 'tocá plantas para agrupar'}</span><button id="fsbGroup"${n<1?' disabled':''}><i class="ti ti-folder-plus"></i> Agrupar</button><button id="fsbCancel" title="salir"><i class="ti ti-x"></i></button>`;
+  bar.querySelector('#fsbGroup').onclick = () => { if (florSelected.size) groupSelectedFlores(); };
   bar.querySelector('#fsbCancel').onclick = () => { florSelecting = false; florSelected = new Set(); renderGarden(); renderFlores(); renderFlorSelectBar(); };
 }
 
@@ -3271,10 +3277,15 @@ function renderGarden() {
 
 // Sort menu — bound once
 document.addEventListener('click', e => {
-  const b = e.target.closest('.jardin-sort button');
+  const b = e.target.closest('.jardin-sort button[data-sort]');
   if (!b) return;
   S.jardinSort = b.dataset.sort;
   save(); renderGarden();
+});
+document.getElementById('gardenSelectBtn')?.addEventListener('click', () => {
+  florSelecting = !florSelecting;
+  if (!florSelecting) florSelected = new Set();
+  renderGarden();
 });
 
 function renderPlantDetail() {
@@ -3294,14 +3305,6 @@ function renderPlantDetail() {
         ${stagesOf(f).map(s => `<div class="stage ${f[s.id]?'done':''}" data-pstage="${s.id}">${s.label}</div>`).join('')}
       </div>
       <div class="flor-progress-bar" style="margin:8px 0;"><div style="width:${pct}%"></div></div>
-
-      <div class="pd-section">
-        <div class="pd-grid-3">
-          <div><label>Tonalidad</label><input type="text" data-pf="key" value="${escapeHTML(f.key||'')}" placeholder="Am, G..."></div>
-          <div><label>Progresión</label><input type="text" data-pf="chords" value="${escapeHTML(f.chords||'')}" placeholder="Am - F - C - G"></div>
-          <div><label>Prioridad</label><select data-pf="priority"><option value="0" ${(f.priority||0)===0?'selected':''}>—</option><option value="1" ${f.priority===1?'selected':''}>baja</option><option value="2" ${f.priority===2?'selected':''}>media</option><option value="3" ${f.priority===3?'selected':''}>alta</option></select></div>
-        </div>
-      </div>
 
       <div class="pd-section">
         <label>Letra con acordes</label>
@@ -3396,13 +3399,19 @@ function renderPlantDetail() {
     }
   }));
   // Field bindings
-  el.querySelectorAll('[data-pf]').forEach(inp => inp.addEventListener('input', e => {
-    const field = inp.dataset.pf;
-    if (field === 'priority') f[field] = +e.target.value;
-    else f[field] = e.target.value;
-    save();
-    if (field === 'title' || field === 'priority') renderGarden();
-  }));
+  el.querySelectorAll('[data-pf]').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const field = inp.dataset.pf;
+      if (field === 'priority') f[field] = +e.target.value;
+      else f[field] = e.target.value;
+      save(); // solo guarda; NO re-renderiza (si no, se pierde el foco y se cierra el teclado)
+    });
+    // El re-render (para reflejar el nombre en el jardín) ocurre al SALIR del campo, no en cada tecla.
+    inp.addEventListener('change', () => {
+      const field = inp.dataset.pf;
+      if (field === 'title' || field === 'priority') renderGarden();
+    });
+  });
   // Action bindings
   el.querySelectorAll('[data-pact]').forEach(b => b.addEventListener('click', () => {
     const a = b.dataset.pact;
@@ -4366,7 +4375,7 @@ function toggleSemSelect(id) {
 }
 function groupSelectedSemillas() {
   if (!semSelected.size) return;
-  const name = prompt('Nombre de la página:');
+  const name = prompt('Nombre de la carpeta (álbum, categoría...):');
   if (name === null) return;
   const pageId = uid();
   S.semillas.unshift({ id: pageId, createdAt: Date.now(), date: todayStr(), title: (name.trim() || 'Página'), text: '', link: '', photoData: null, audioData: null, audioSec: 0, groupId: null, projectId: S.activeProjectId, parentId: semCurrentParent });
@@ -4384,14 +4393,15 @@ function deleteSelectedSemillas() {
 }
 function renderSemSelectBar() {
   let bar = document.getElementById('semSelectBar');
-  if (!semSelecting || !semSelected.size) { if (bar) bar.remove(); return; }
+  if (!semSelecting) { if (bar) bar.remove(); return; } // visible apenas entrás en modo selección
   if (!bar) { bar = document.createElement('div'); bar.id = 'semSelectBar'; bar.className = 'select-bar'; document.body.appendChild(bar); }
-  bar.innerHTML = `<span class="sb-count">${semSelected.size}</span>
-    <button id="sbGroup"><i class="ti ti-folder-plus"></i> Agrupar</button>
-    <button id="sbDelete" title="borrar"><i class="ti ti-trash"></i></button>
-    <button id="sbCancel" title="cancelar"><i class="ti ti-x"></i></button>`;
-  bar.querySelector('#sbGroup').onclick = groupSelectedSemillas;
-  bar.querySelector('#sbDelete').onclick = deleteSelectedSemillas;
+  const n = semSelected.size;
+  bar.innerHTML = `<span class="sb-count">${n}</span><span class="sb-hint">${n ? 'seleccionadas' : 'tocá semillas para agrupar'}</span>
+    <button id="sbGroup"${n<1?' disabled':''}><i class="ti ti-folder-plus"></i> Agrupar</button>
+    <button id="sbDelete"${n<1?' disabled':''} title="borrar"><i class="ti ti-trash"></i></button>
+    <button id="sbCancel" title="salir"><i class="ti ti-x"></i></button>`;
+  bar.querySelector('#sbGroup').onclick = () => { if (semSelected.size) groupSelectedSemillas(); };
+  bar.querySelector('#sbDelete').onclick = () => { if (semSelected.size) deleteSelectedSemillas(); };
   bar.querySelector('#sbCancel').onclick = () => { semSelecting = false; semSelected = new Set(); renderSemList(); };
 }
 function wireSemNav(list) {
@@ -4553,7 +4563,10 @@ function renderSemBodyInline(id, container) {
       const f = inp.dataset.sf;
       if (f === 'groupId') s[f] = e.target.value?+e.target.value:null;
       else s[f] = e.target.value;
-      save();
+      save(); // solo guarda; NO re-renderiza (si no, se pierde el foco al escribir)
+    });
+    inp.addEventListener('change', () => {
+      const f = inp.dataset.sf;
       if (f === 'title' || f === 'groupId') renderSemList();
     });
   });
@@ -4662,6 +4675,11 @@ function renderSemDetail() {
         <select id="semDGroup">${groupOpts}</select>
       </div>
 
+      <div class="sem-slot">
+        <label class="slot-label"><i class="ti ti-calendar"></i> Fecha límite (opcional)</label>
+        <input type="date" id="semDDeadline" value="${escapeHTML(s.deadline||'')}">
+      </div>
+
       <div class="actions">
         <button class="btn ghost tiny" id="semDClose"><i class="ti ti-x"></i> Cerrar</button>
         <button class="btn ghost tiny danger" id="semDDel"><i class="ti ti-trash"></i> Eliminar</button>
@@ -4675,6 +4693,7 @@ function renderSemDetail() {
   $('#semDText').addEventListener('input', e => { s.text = e.target.value; save(); });
   $('#semDLink').addEventListener('input', e => { s.link = e.target.value; save(); });
   $('#semDGroup').addEventListener('change', e => { s.groupId = e.target.value?+e.target.value:null; save(); renderSemList(); });
+  $('#semDDeadline')?.addEventListener('change', e => { s.deadline = e.target.value; save(); });
   $('#semDLinkOpen')?.addEventListener('click', () => { if (s.link) window.open(s.link, '_blank'); });
 
   // Photo controls
@@ -4708,25 +4727,31 @@ function renderSemDetail() {
 function sembrarSemilla(semId) {
   const s = S.semillas.find(x => x.id === semId); if (!s) return;
   const p = activeProject();
-  if (!confirm(`Sembrar "${s.title}" como nueva planta en "${p.name}"?`)) return;
+  if (!confirm(`Sembrar "${s.title}" como planta en "${p.name}"? (la semilla pasa al Jardín)`)) return;
+  // Traspaso FIEL semilla→planta: todo lo de la semilla va a la planta, sin duplicar ni inventar.
+  // Las etapas NO se hardcodean: la planta toma las del cantero activo (todas incompletas).
   const newPlanta = {
     id: uid(),
     title: s.title || 'planta sembrada',
     projectId: S.activeProjectId,
-    key:'', chords:'',
-    lyrics: s.text || '',
+    parentId: null,
+    emoji: '',
+    key: '', chords: '',
+    lyrics: '',
     notes: '',
     socialContent: '',
     description: s.text || '',
-    links: s.link ? [{name:'fuente', url:s.link}] : [],
+    links: s.link ? [{ name: 'fuente', url: s.link }] : [],
     files: [],
     photoData: s.photoData || null,
     audioData: s.audioData || null,
     audioSec: s.audioSec || 0,
     priority: 0,
-    loop:false, arrangement:false, recording:false, mix:false,
+    deadline: s.deadline || '',
   };
-  S.flores.unshift(newPlanta); selectedPlantId = newPlanta.id;
+  S.flores.unshift(newPlanta);
+  S.semillas = S.semillas.filter(x => x.id !== semId); // la semilla se traslada (no queda copia redundante)
+  semDetailOpen = null; selectedPlantId = newPlanta.id;
   save();
   toast(`Sembrada · ${newPlanta.title}`,'✦');
   if (navigator.vibrate) navigator.vibrate([60,40,100]);
@@ -4849,6 +4874,11 @@ $('#semNew').addEventListener('click', () => {
 $('#groupNew').addEventListener('click', () => {
   const name = prompt('Nombre del grupo:'); if (!name) return;
   S.semillaGroups.push({id: uid(), name: name.trim()}); save(); renderSemillero();
+});
+$('#semSelectBtn')?.addEventListener('click', () => {
+  semSelecting = !semSelecting;
+  if (!semSelecting) semSelected = new Set();
+  renderSemList();
 });
 $('#semSearch').addEventListener('input', e => { semSearchTerm = e.target.value; renderSemList(); });
 
