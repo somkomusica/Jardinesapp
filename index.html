@@ -465,7 +465,7 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .sem-check { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 18px; padding: 0; flex-shrink: 0; }
 .sem-check.on { color: var(--gold); }
 .collapsible.sem-sel { background: var(--gold-soft); border-radius: 8px; }
-.select-bar { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: var(--bg-card); border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; gap: 12px; z-index: 9000; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.select-bar { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: var(--bg-card); border-radius: 12px; padding: 8px 14px; display: flex; align-items: center; gap: 10px; z-index: 9000; box-shadow: 0 6px 20px rgba(0,0,0,.25); flex-wrap: wrap; max-width: 92vw; justify-content: center; }
 .select-bar .sb-count { background: var(--gold); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
 .select-bar button { background: none; border: none; color: var(--bg-card); cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; }
 .select-bar button:hover { color: var(--gold); }
@@ -2989,9 +2989,11 @@ function renderDiario() {
     return `
     <div class="diario-day">
       <div class="diario-head">
-        <div><div class="diario-date">${lab}</div><div class="diario-meta">rituales ${d.reqDone||0}/${d.reqTotal||4} · ${d.riego||0} riegos · álbum ${d.albumPct||0}%</div></div>
+        <div><div class="diario-date">${lab}</div><div class="diario-meta">rituales ${d.reqDone||0}/${d.reqTotal||4}${d.albumPct?` · ${d.albumPct}%`:''}</div></div>
         <button class="btn ghost tiny" data-deld="${d.date}"><i class="ti ti-trash"></i></button>
       </div>
+      ${(d.gratitud&&d.gratitud.filter(g=>(g||'').trim()).length)?`<div class="diario-block"><div class="blk-label">Agradecí</div>${d.gratitud.filter(g=>(g||'').trim()).map(escapeHTML).join(' · ')}</div>`:''}
+      ${(d.tareasHechas&&d.tareasHechas.length)?`<div class="diario-block"><div class="blk-label">Hice</div>${d.tareasHechas.map(escapeHTML).join(' · ')}</div>`:''}
       ${d.frase?`<div class="diario-block"><div class="blk-label">Frase</div>"${escapeHTML(d.frase)}"</div>`:''}
       ${d.intention?`<div class="diario-block"><div class="blk-label">Intención</div>${escapeHTML(d.intention)}</div>`:''}
       ${hasMissions?`<div class="diario-block"><div class="blk-label">Misiones</div>
@@ -3193,7 +3195,7 @@ function renderJardinProjectHeader() {
 }
 
 // ── Anidación + selección múltiple para Jardín/Flores (flores con parentId) ──
-let florCurrentParent = null, florSelecting = false, florSelected = new Set();
+let florCurrentParent = null, florSelecting = false, florSelected = new Set(), florMoveMode = false;
 function florChildCount(id) { return (S.flores || []).filter(f => f.parentId === id && (f.projectId||1) === S.activeProjectId).length; }
 function isFlorPage(f) { return !!f.isPage || florChildCount(f.id) > 0; }
 function florPathTo(id) { const path = []; let cur = (S.flores || []).find(f => f.id === id); let g = 0; while (cur && g++ < 50) { path.unshift(cur); cur = cur.parentId ? (S.flores || []).find(f => f.id === cur.parentId) : null; } return path; }
@@ -3209,14 +3211,38 @@ function groupSelectedFlores() {
   florSelecting = false; florSelected = new Set();
   save(); renderJardin(); renderFlores(); toast(`Página "${name.trim() || 'Página'}" creada`, '📄');
 }
+function florFolders() {
+  // Carpetas (páginas) del cantero activo que NO estén seleccionadas (no se puede mover una carpeta a sí misma)
+  return S.flores.filter(f => (f.projectId||1) === S.activeProjectId && isFlorPage(f) && !florSelected.has(f.id));
+}
+function moveSelectedFloresTo(parentId) {
+  if (!florSelected.size) return;
+  S.flores.forEach(f => { if (florSelected.has(f.id)) f.parentId = parentId; });
+  const n = florSelected.size;
+  florSelecting = false; florSelected = new Set(); florMoveMode = false;
+  save(); renderGarden(); renderFlores();
+  toast(`${n} ${parentId ? 'movida(s) a la carpeta' : 'sacada(s) a la raíz'}`, '📁');
+}
 function renderFlorSelectBar() {
   let bar = document.getElementById('florSelectBar');
-  if (!florSelecting) { if (bar) bar.remove(); return; } // visible apenas entrás en modo selección
+  if (!florSelecting) { if (bar) bar.remove(); florMoveMode = false; return; } // visible apenas entrás en modo selección
   if (!bar) { bar = document.createElement('div'); bar.id = 'florSelectBar'; bar.className = 'select-bar'; document.body.appendChild(bar); }
   const n = florSelected.size;
-  bar.innerHTML = `<span class="sb-count">${n}</span><span class="sb-hint">${n ? 'seleccionadas' : 'tocá plantas para agrupar'}</span><button id="fsbGroup"${n<1?' disabled':''}><i class="ti ti-folder-plus"></i> Agrupar</button><button id="fsbCancel" title="salir"><i class="ti ti-x"></i></button>`;
+  if (florMoveMode) {
+    const folders = florFolders();
+    bar.innerHTML = `<span class="sb-hint">Mover a:</span>`
+      + `<button data-movefolder="root"><i class="ti ti-home"></i> Raíz</button>`
+      + folders.map(f => `<button data-movefolder="${f.id}"><i class="ti ti-folder"></i> ${escapeHTML(f.title)}</button>`).join('')
+      + (folders.length ? '' : '<span class="sb-hint">(no hay carpetas — creá una con Agrupar)</span>')
+      + `<button id="fsbBack" title="volver"><i class="ti ti-arrow-back-up"></i></button>`;
+    bar.querySelectorAll('[data-movefolder]').forEach(b => b.onclick = () => moveSelectedFloresTo(b.dataset.movefolder === 'root' ? null : +b.dataset.movefolder));
+    bar.querySelector('#fsbBack').onclick = () => { florMoveMode = false; renderFlorSelectBar(); };
+    return;
+  }
+  bar.innerHTML = `<span class="sb-count">${n}</span><span class="sb-hint">${n ? 'seleccionadas' : 'tocá para agrupar'}</span><button id="fsbGroup"${n<1?' disabled':''}><i class="ti ti-folder-plus"></i> Nueva carpeta</button><button id="fsbMove"${n<1?' disabled':''}><i class="ti ti-folder-symlink"></i> Mover a</button><button id="fsbCancel" title="salir"><i class="ti ti-x"></i></button>`;
   bar.querySelector('#fsbGroup').onclick = () => { if (florSelected.size) groupSelectedFlores(); };
-  bar.querySelector('#fsbCancel').onclick = () => { florSelecting = false; florSelected = new Set(); renderGarden(); renderFlores(); renderFlorSelectBar(); };
+  bar.querySelector('#fsbMove').onclick = () => { if (florSelected.size) { florMoveMode = true; renderFlorSelectBar(); } };
+  bar.querySelector('#fsbCancel').onclick = () => { florSelecting = false; florSelected = new Set(); florMoveMode = false; renderGarden(); renderFlores(); renderFlorSelectBar(); };
 }
 
 function renderGarden() {
@@ -4268,6 +4294,7 @@ let semView = localStorage.getItem('semView') || 'list';
 let semCurrentParent = null;          // página actual (null = raíz) para anidación Notion
 let semSelecting = false;             // modo selección múltiple
 let semSelected = new Set();          // ids seleccionados
+let semMoveMode = false;              // selector de carpeta destino
 function semChildCount(id) { return (S.semillas || []).filter(s => s.parentId === id && (s.projectId||1) === S.activeProjectId).length; }
 function semPathTo(id) { const path = []; let cur = (S.semillas || []).find(s => s.id === id); let guard = 0; while (cur && guard++ < 50) { path.unshift(cur); cur = cur.parentId ? (S.semillas || []).find(s => s.id === cur.parentId) : null; } return path; }
 function renderSemillero() {
@@ -4391,18 +4418,43 @@ function deleteSelectedSemillas() {
   semSelecting = false; semSelected = new Set();
   save(); renderSemList();
 }
+function semFolders() {
+  // Carpetas = semillas que ya tienen hijos (actúan como página), del cantero activo y no seleccionadas
+  return S.semillas.filter(s => (s.projectId||1) === S.activeProjectId && semChildCount(s.id) > 0 && !semSelected.has(s.id));
+}
+function moveSelectedSemillasTo(parentId) {
+  if (!semSelected.size) return;
+  S.semillas.forEach(s => { if (semSelected.has(s.id)) s.parentId = parentId; });
+  const n = semSelected.size;
+  semSelecting = false; semSelected = new Set(); semMoveMode = false;
+  save(); renderSemList();
+  toast(`${n} ${parentId ? 'movida(s) a la carpeta' : 'sacada(s) a la raíz'}`, '📁');
+}
 function renderSemSelectBar() {
   let bar = document.getElementById('semSelectBar');
-  if (!semSelecting) { if (bar) bar.remove(); return; } // visible apenas entrás en modo selección
+  if (!semSelecting) { if (bar) bar.remove(); semMoveMode = false; return; } // visible apenas entrás en modo selección
   if (!bar) { bar = document.createElement('div'); bar.id = 'semSelectBar'; bar.className = 'select-bar'; document.body.appendChild(bar); }
   const n = semSelected.size;
+  if (semMoveMode) {
+    const folders = semFolders();
+    bar.innerHTML = `<span class="sb-hint">Mover a:</span>`
+      + `<button data-movefolder="root"><i class="ti ti-home"></i> Raíz</button>`
+      + folders.map(s => `<button data-movefolder="${s.id}"><i class="ti ti-folder"></i> ${escapeHTML(s.title||'Página')}</button>`).join('')
+      + (folders.length ? '' : '<span class="sb-hint">(no hay carpetas — creá una con Agrupar)</span>')
+      + `<button id="sbBack" title="volver"><i class="ti ti-arrow-back-up"></i></button>`;
+    bar.querySelectorAll('[data-movefolder]').forEach(b => b.onclick = () => moveSelectedSemillasTo(b.dataset.movefolder === 'root' ? null : +b.dataset.movefolder));
+    bar.querySelector('#sbBack').onclick = () => { semMoveMode = false; renderSemSelectBar(); };
+    return;
+  }
   bar.innerHTML = `<span class="sb-count">${n}</span><span class="sb-hint">${n ? 'seleccionadas' : 'tocá semillas para agrupar'}</span>
-    <button id="sbGroup"${n<1?' disabled':''}><i class="ti ti-folder-plus"></i> Agrupar</button>
+    <button id="sbGroup"${n<1?' disabled':''}><i class="ti ti-folder-plus"></i> Nueva carpeta</button>
+    <button id="sbMove"${n<1?' disabled':''}><i class="ti ti-folder-symlink"></i> Mover a</button>
     <button id="sbDelete"${n<1?' disabled':''} title="borrar"><i class="ti ti-trash"></i></button>
     <button id="sbCancel" title="salir"><i class="ti ti-x"></i></button>`;
   bar.querySelector('#sbGroup').onclick = () => { if (semSelected.size) groupSelectedSemillas(); };
+  bar.querySelector('#sbMove').onclick = () => { if (semSelected.size) { semMoveMode = true; renderSemSelectBar(); } };
   bar.querySelector('#sbDelete').onclick = () => { if (semSelected.size) deleteSelectedSemillas(); };
-  bar.querySelector('#sbCancel').onclick = () => { semSelecting = false; semSelected = new Set(); renderSemList(); };
+  bar.querySelector('#sbCancel').onclick = () => { semSelecting = false; semSelected = new Set(); semMoveMode = false; renderSemList(); };
 }
 function wireSemNav(list) {
   list.querySelectorAll('[data-semnav]').forEach(b => b.addEventListener('click', () => {
