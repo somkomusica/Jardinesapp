@@ -1482,7 +1482,6 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <div style="display:flex;justify-content:flex-end;margin-top:14px;">
       <button class="btn gold tiny" id="bitaSave"><i class="ti ti-moon-stars"></i> Cerrar jornada</button>
     </div>
-    <div class="bitacora-history" id="bitaHistory"></div>
   </div>
 
   <!-- DASHBOARD DE ESTADÍSTICAS -->
@@ -2923,6 +2922,7 @@ function cerrarJornada() {
 $('#bitaSave').addEventListener('click', closeDayNow);
 function renderBitaHistory() {
   const el = $('#bitaHistory');
+  if (!el) return; // el historial vive ahora en la pestaña Diario, no en HOY
   if (!S.bitacora.length) { el.innerHTML = '<div class="empty">aún no hay entradas guardadas</div>'; return; }
   el.innerHTML = S.bitacora.slice(0,14).map(b => {
     const grat = (b.gratitud || []).filter(g => (g||'').trim());
