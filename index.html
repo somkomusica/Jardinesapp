@@ -219,6 +219,47 @@ section.tab { display: none; animation: fade .25s ease-out; }
 .agenda-today.on { color: var(--gold); }
 .agenda-today:hover, .agenda-del:hover { color: var(--gold); }
 .dark .agenda-prio.prio-alta { background: rgba(200,60,60,.25); color: #e88; }
+/* Tareas · podio (orden = importancia) */
+.tarea-item { border-radius: 8px; }
+.tarea-item.podio { background: var(--gold-soft); padding: 8px; border-bottom: none; margin-bottom: 2px; }
+.tarea-medal { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+.tarea-num { font-size: 11px; color: var(--text-faint); flex-shrink: 0; width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+.tarea-item .dnd-grip { background: none; border: none; color: var(--text-faint); cursor: grab; padding: 4px; flex-shrink: 0; touch-action: none; font-size: 14px; }
+.tarea-item .dnd-grip:hover { color: var(--gold); }
+.tareas-done-note { font-size: 11px; color: var(--text-faint); padding: 8px 4px 0; }
+.tareas-toggle { display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; padding: 7px; background: none; border: 0.5px dashed var(--border-strong); border-radius: 8px; color: var(--text-secondary); font-size: 11px; letter-spacing: 0.04em; cursor: pointer; transition: all .15s; }
+.tareas-toggle:hover { border-color: var(--gold); color: var(--gold); }
+.bita-hecha { display: flex; align-items: center; gap: 7px; font-size: 13px; padding: 5px 0; color: var(--text); }
+.bita-hecha i { color: var(--gold); flex-shrink: 0; }
+.bita-hecha span:first-of-type { flex: 1; min-width: 0; }
+.agenda-check.armed { color: var(--gold); }
+.tarea-item.confirming { background: var(--gold-soft); }
+.tarea-confirm { display: inline-flex; align-items: center; gap: 5px; background: var(--gold); color: #fff; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11px; letter-spacing: 0.03em; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.tarea-confirm:hover { filter: brightness(1.06); }
+/* Barra de canteros + editor de etapas */
+.project-bar .gpb-btn { background: none; border: 0.5px solid var(--border); color: var(--text-secondary); border-radius: 7px; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-left: 4px; }
+.project-bar .gpb-btn:hover { border-color: var(--gold); color: var(--gold); }
+.stage-templates { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 12px; }
+.stage-templates .lbl { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); }
+.stage-templates button { font-size: 11px; padding: 4px 9px; border-radius: 14px; border: 0.5px solid var(--border-strong); background: var(--bg-card); color: var(--text); cursor: pointer; }
+.stage-templates button:hover { border-color: var(--gold); color: var(--gold); }
+#stageEditorList { max-height: 42vh; overflow-y: auto; }
+.stage-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
+.stage-row .dnd-grip { background: none; border: none; color: var(--text-faint); cursor: grab; padding: 4px; flex-shrink: 0; touch-action: none; font-size: 14px; }
+.stage-row .st-num { font-size: 11px; color: var(--text-faint); width: 16px; text-align: center; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.stage-row input { flex: 1; min-width: 0; }
+.stage-row .st-del { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 4px; flex-shrink: 0; }
+.stage-row .st-del:hover { color: #c44; }
+/* El motor · próximos pasos de plantas en Tareas */
+.psteps-head { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); margin: 14px 0 4px; display: flex; align-items: center; gap: 6px; }
+.pstep-item .pstep-stage { color: var(--gold); }
+.pstep-ico { color: var(--text-faint); font-size: 15px; flex-shrink: 0; padding: 4px; }
+/* Flores · favoritas + sello de cosecha (archivo encontrable) */
+.flor-fav { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 2px 4px; font-size: 14px; line-height: 1; }
+.flor-fav.on, .flor-fav:hover { color: var(--gold); }
+.flor-harvest { font-size: 9px; color: var(--text-faint); letter-spacing: 0.03em; }
+.pct.done { color: var(--gold); }
+#florFavToggle.active { color: var(--gold); border-color: var(--gold); }
 section.tab.active { display: block; animation: tabIn .2s ease; }
 @keyframes tabIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { section.tab.active { animation: none; } }
@@ -1354,7 +1395,10 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     </div>
     <div class="search-results" id="searchResults"></div>
   </div>
-  <div class="project-bar"><i class="ti ti-folders"></i><select id="globalProjectSel" aria-label="Proyecto activo"></select></div>
+  <div class="project-bar"><i class="ti ti-folders"></i><select id="globalProjectSel" aria-label="Cantero activo"></select>
+    <button id="globalProjEdit" class="gpb-btn" title="editar etapas del cantero"><i class="ti ti-list-check"></i></button>
+    <button id="globalProjNew" class="gpb-btn" title="nuevo cantero"><i class="ti ti-plus"></i></button>
+  </div>
 </header>
 
 <nav class="tabs" id="tabs"></nav>
@@ -1387,14 +1431,15 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     </div>
   </div>
   <div data-widget="agenda" class="card">
-    <h2 class="section-title"><i class="ti ti-checklist"></i> Agenda</h2>
+    <h2 class="section-title"><i class="ti ti-list-check"></i> Tareas</h2>
+    <p class="tab-hint">se acumulan día a día · el socio sube arriba las más importantes hacia tus metas · arrastrá para reordenar</p>
     <div class="agenda-add">
       <input type="text" id="agendaInput" placeholder="nueva tarea..." autocomplete="off">
-      <select id="agendaPrio" title="prioridad"><option value="alta">Alta</option><option value="media" selected>Media</option><option value="baja">Baja</option></select>
-      <input type="date" id="agendaDate" title="fecha límite">
+      <input type="date" id="agendaDate" title="fecha (opcional)">
       <button class="btn gold icon-only" id="agendaAdd"><i class="ti ti-plus"></i></button>
     </div>
     <div id="agendaList"></div>
+    <div id="plantStepsWrap"></div>
   </div>
   <div data-widget="riego" class="card">
     <h2 class="section-title"><i class="ti ti-droplet"></i> Riego</h2>
@@ -1413,8 +1458,10 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <h2 class="section-title"><i class="ti ti-book"></i> Bitácora del día</h2>
 
     <div class="bita-section">
-      <h3><i class="ti ti-quote"></i> Frase del día</h3>
-      <input type="text" class="mantra-input" id="mantraInput" maxlength="120" placeholder="una verdad para hoy..." style="font-size:16px;text-align:left;">
+      <h3><i class="ti ti-heart-handshake"></i> 3 razones para agradecer</h3>
+      <input type="text" class="flat" id="grat-0" maxlength="120" placeholder="1 · ...">
+      <input type="text" class="flat" id="grat-1" maxlength="120" placeholder="2 · ..." style="margin-top:4px;">
+      <input type="text" class="flat" id="grat-2" maxlength="120" placeholder="3 · ..." style="margin-top:4px;">
     </div>
 
     <div class="bita-section">
@@ -1422,44 +1469,14 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <div id="habitsTracking"></div>
     </div>
 
-    <div class="bita-section">
-      <h3><i class="ti ti-target"></i> Intención</h3>
-      <input type="text" class="flat" id="intention" placeholder="una palabra, una verdad para hoy...">
-    </div>
-
-    <div class="bita-section">
-      <h3><i class="ti ti-flag"></i> Misiones</h3>
-      <div class="label"><span class="num">1</span>Enfoque profundo</div>
-      <input type="text" class="flat" id="mission-deep" placeholder="la única cosa que importa hoy...">
-      <hr class="sep">
-      <div class="label gold"><span class="num">2</span>Prioridades</div>
-      <input type="text" class="flat" id="mission-p1" placeholder="prioridad 1...">
-      <input type="text" class="flat" id="mission-p2" placeholder="prioridad 2..." style="margin-top:4px;">
-      <hr class="sep">
-      <div class="label gray"><span class="num">3</span>Tareas mínimas</div>
-      <div class="mission-tasks" id="missionTasks">
-        <div class="mission-task" data-mtask="t1">
-          <button class="dnd-grip" type="button" aria-label="reordenar tarea"><i class="ti ti-grip-vertical"></i></button>
-          <input type="text" class="flat" id="mission-t1" placeholder="tarea 1...">
-        </div>
-        <div class="mission-task" data-mtask="t2">
-          <button class="dnd-grip" type="button" aria-label="reordenar tarea"><i class="ti ti-grip-vertical"></i></button>
-          <input type="text" class="flat" id="mission-t2" placeholder="tarea 2...">
-        </div>
-        <div class="mission-task" data-mtask="t3">
-          <button class="dnd-grip" type="button" aria-label="reordenar tarea"><i class="ti ti-grip-vertical"></i></button>
-          <input type="text" class="flat" id="mission-t3" placeholder="tarea 3...">
-        </div>
-      </div>
+    <div class="bita-section" id="bitaHechasSection" style="display:none;">
+      <h3><i class="ti ti-circle-check"></i> Tareas hechas hoy</h3>
+      <div id="bitaTareasHechas"></div>
     </div>
 
     <div class="bita-section">
       <h3><i class="ti ti-leaf"></i> Reflexión</h3>
-      <div class="bitacora-prompts">
-        <div class="bitacora-prompt"><label>Qué floreció hoy</label><textarea id="bita-florecio" rows="2" placeholder="el momento que sí..."></textarea></div>
-        <div class="bitacora-prompt"><label>Qué regué</label><textarea id="bita-regue" rows="2" placeholder="dónde puse atención..."></textarea></div>
-        <div class="bitacora-prompt"><label>Qué podé</label><textarea id="bita-pode" rows="2" placeholder="qué solté, qué dejé ir..."></textarea></div>
-      </div>
+      <textarea id="bita-florecio" rows="3" placeholder="lo que quieras anotar del día... (opcional)"></textarea>
     </div>
 
     <div style="display:flex;justify-content:flex-end;margin-top:14px;">
@@ -1618,6 +1635,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <div class="flor-toolbar">
       <input type="text" id="florSearch" placeholder="buscar letra o título..." style="flex:1;">
       <select id="florGroupBy" style="display:none;"></select>
+      <button class="btn ghost" id="florFavToggle" title="solo favoritas"><i class="ti ti-star"></i></button>
       <button class="btn ghost" id="jarNew"><i class="ti ti-jar"></i> Nuevo frasco</button>
       <button class="btn gold" id="florNew"><i class="ti ti-plus"></i> Nueva flor</button>
     </div>
@@ -1852,8 +1870,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       </div>
     </div>
     <div class="config-section">
-      <h3><i class="ti ti-brand-whatsapp" style="margin-right:6px;color:#25D366;"></i>Bot WhatsApp</h3>
-      <p style="font-size:11px;color:var(--text-secondary);margin-bottom:12px;">Para conectar el bot, necesitas tu ID de Firebase. Cópialo y pégalo en el archivo <code>.env</code> del bot.</p>
+      <h3><i class="ti ti-robot" style="margin-right:6px;color:var(--gold);"></i>Bot</h3>
       <div class="config-item">
         <div>
           <div class="config-name">Bot Key</div>
@@ -1867,15 +1884,6 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
           <input type="text" class="flat" id="botKeyInput" placeholder="c854eacb-6ed0-4cdd-..." style="flex:1;font-size:11px;">
           <button class="btn ghost tiny" id="setBotKeyBtn"><i class="ti ti-check"></i> Aplicar</button>
         </div>
-      </div>
-      <div class="config-item" style="flex-direction:column;align-items:flex-start;gap:8px;">
-        <div class="config-name">Instrucciones rápidas</div>
-        <ol style="font-size:11px;color:var(--text-secondary);line-height:1.8;padding-left:16px;">
-          <li>Ve a <code>bot/</code> y ejecuta <code>npm install</code></li>
-          <li>Copia <code>.env.example</code> → <code>.env</code> y pega tu ID arriba</li>
-          <li>Descarga la cuenta de servicio desde Firebase Console → Configuración del proyecto → Cuentas de servicio → Generar nueva clave privada → guárdala como <code>bot/serviceAccount.json</code></li>
-          <li>Ejecuta <code>node index.js</code> y escanea el QR con WhatsApp</li>
-        </ol>
       </div>
     </div>
   </div>
@@ -1948,6 +1956,27 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <div class="modal-actions">
       <button class="btn ghost tiny" id="newProjCancel">Cancelar</button>
       <button class="btn gold tiny" id="newProjCreate"><i class="ti ti-check"></i> Crear</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="stageEditorModal">
+  <div class="modal-card">
+    <h3><i class="ti ti-list-check" style="margin-right:6px;"></i><span id="stageEditorTitle">Etapas</span></h3>
+    <p class="tab-hint" style="margin-bottom:10px;">El camino de cada planta en este cantero. Agregá, renombrá, reordená (arrastrá) o quitá. Renombrar y reordenar no pierde tu progreso.</p>
+    <div class="stage-templates">
+      <span class="lbl">Plantillas:</span>
+      <button type="button" data-stpl="musica">Música</button>
+      <button type="button" data-stpl="video">Video</button>
+      <button type="button" data-stpl="imagen">Imágenes</button>
+      <button type="button" data-stpl="master">Masters</button>
+      <button type="button" data-stpl="simple">Simple</button>
+    </div>
+    <div id="stageEditorList"></div>
+    <button class="btn ghost tiny" id="stageEditorAdd" style="margin-top:8px;"><i class="ti ti-plus"></i> Agregar etapa</button>
+    <div class="modal-actions">
+      <button class="btn ghost tiny" id="stageEditorCancel">Cancelar</button>
+      <button class="btn gold tiny" id="stageEditorSave"><i class="ti ti-check"></i> Guardar</button>
     </div>
   </div>
 </div>
@@ -2042,6 +2071,18 @@ function projectStagesById(projId){ const ps=(typeof S!=='undefined'&&S.projects
 function stagesOf(f){ return projectStagesById(f&&f.projectId); }
 function isComplete(f){ const st=stagesOf(f); return st.length>0 && st.every(s=>f[s.id]); }
 function stagesDone(f){ return stagesOf(f).filter(s=>f[s.id]).length; }
+function florStageById(f, stageId){ return stagesOf(f).find(s => s.id === stageId) || null; }
+function florNextStage(f){ const st = stagesOf(f); for (const s of st) { if (!f[s.id]) return s; } return null; }
+// EL MOTOR: marcar/desmarcar una etapa registra (o quita) el avance del día → aparece en
+// "Tareas hechas hoy" y en la Bitácora. La planta es la fuente de verdad; esto deja el rastro.
+function setStageDone(f, stageId, done){
+  f[stageId] = done;
+  if (done && isComplete(f) && !f.harvestedAt) f.harvestedAt = todayStr(); // sello de cosecha (para el archivo)
+  const st = florStageById(f, stageId); const label = st ? st.label : stageId;
+  const today = todayStr();
+  S.tasks = (S.tasks || []).filter(t => !(t.florId === f.id && t.stageId === stageId && t.done && t.doneDate === today));
+  if (done) S.tasks.push({ id: uid(), text: f.title + ' · ' + label, florId: f.id, stageId, projectId: f.projectId, priority:'media', deadline:'', scheduledFor:null, done:true, doneDate: today, createdAt: Date.now() });
+}
 
 const TABS_META = {
   hoy:        {label:"Hoy",        icon:"ti-sun"},
@@ -2069,9 +2110,9 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 const DEFAULT_CONFIG = {
   tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','conciertos','estadisticas','ajustes'],
   tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, conciertos:true, estadisticas:true, ajustes:true},
-  hoyWidgets: {voces:true, stats:true, agenda:true, riego:true, bitacora:true, dashboard:true},
-  hoyOrder: ['voces','stats','agenda','riego','bitacora','dashboard'],
-  hoyCollapsed: {voces:false, stats:false, agenda:false, riego:false, bitacora:false},
+  hoyWidgets: {agenda:true, bitacora:true, voces:false, stats:false, riego:false, dashboard:false},
+  hoyOrder: ['agenda','bitacora'],
+  hoyCollapsed: {agenda:false, bitacora:false, voces:false, stats:false, riego:false},
   theme: 'auto',
 };
 
@@ -2089,6 +2130,7 @@ const defaults = {
   'lib-logo':'', 'lib-fotos':'', 'lib-presskit':'',
   links: [], services: [], expenses: [], conciertos: [],
   bitacora: [], bita_florecio:'', bita_regue:'', bita_pode:'', bitaDate:'',
+  gratitud: ['','',''], gratDate:'',
   closedDate: '', nextPlan: null,
   dailyLog: [], riegoSessions: [],
   activeProjectId: 1,
@@ -2187,6 +2229,19 @@ function migrate(state) {
   DEFAULT_CONFIG.hoyOrder.forEach(k => { if (!state.config.hoyOrder.includes(k)) state.config.hoyOrder.push(k); });
   state.config.hoyCollapsed = Object.assign({}, DEFAULT_CONFIG.hoyCollapsed, state.config.hoyCollapsed || {});
   state.config.hoyWidgets = Object.assign({}, DEFAULT_CONFIG.hoyWidgets, state.config.hoyWidgets || {});
+  // Poda llaves de widgets que ya no existen (p.ej. 'rituales', que ahora vive dentro de bitácora)
+  Object.keys(state.config.hoyWidgets).forEach(k => { if (!(k in DEFAULT_CONFIG.hoyWidgets)) delete state.config.hoyWidgets[k]; });
+  // HOY v4: solo Tareas + Bitácora (rituales vive dentro de bitácora). Fuerza el layout una vez.
+  if (!state.config._hoyV4) {
+    state.config.hoyOrder = DEFAULT_CONFIG.hoyOrder.slice();
+    state.config.hoyWidgets = Object.assign({}, DEFAULT_CONFIG.hoyWidgets);
+    state.config.hoyCollapsed = Object.assign({}, DEFAULT_CONFIG.hoyCollapsed);
+    delete state.config.hoyWidgets.rituales;
+    state.config._hoyV4 = true;
+  }
+  // Gratitud diaria (3 razones)
+  if (!Array.isArray(state.gratitud)) state.gratitud = ['','',''];
+  while (state.gratitud.length < 3) state.gratitud.push('');
   if (!Array.isArray(state.tasks)) state.tasks = [];
 
   // Brand profile
@@ -2208,6 +2263,18 @@ function migrate(state) {
   if (!state.projects.some(p => p.kind === 'youtube')) {
     const _newId = Math.max(0, ...state.projects.map(p => p.id)) + 1;
     state.projects.push({id:_newId, name:'YouTube IA', type:'Canal', kind:'youtube', description:'', socialContent:'', links:[], files:[], trackingLog:[], stages: YT_STAGES.map(s=>({...s}))});
+  }
+  // Canteros del ecosistema (Imágenes / Masters / Mostrarme) — aditivo, una sola vez, sin tocar los existentes
+  if (!state.config._canterosV1) {
+    const have = new Set((state.projects||[]).map(p => (p.name||'').toLowerCase()));
+    const seed = [
+      {name:'Imágenes', type:'Visual', kind:'imagen',  stages:[{id:'idea',label:'Idea'},{id:'boceto',label:'Boceto'},{id:'final',label:'Final'}]},
+      {name:'Masters',  type:'Koolmena', kind:'master', stages:[{id:'recibido',label:'Recibido'},{id:'trabajando',label:'Trabajando'},{id:'entregado',label:'Entregado'},{id:'cobrado',label:'Cobrado'}]},
+      {name:'Mostrarme',type:'Presencia',kind:'mostrar',stages:[{id:'idea',label:'Idea'},{id:'grabar',label:'Grabar'},{id:'publicado',label:'Publicado'}]},
+    ];
+    let _nid = Math.max(0, ...state.projects.map(p => p.id)) + 1;
+    seed.forEach(s => { if (!have.has(s.name.toLowerCase())) state.projects.push({id:_nid++, name:s.name, type:s.type, kind:s.kind, description:'', socialContent:'', links:[], files:[], trackingLog:[], stages:s.stages}); });
+    state.config._canterosV1 = true;
   }
   // Semillas con proyecto (default: Somko) para poder filtrar por proyecto
   (state.semillas||[]).forEach(s => { if (!('projectId' in s)) s.projectId = 1; if (!('parentId' in s)) s.parentId = null; });
@@ -2479,11 +2546,14 @@ function dailyCheck() {
   }
   if (S.mantraDate !== today) { S.mantra=''; S.mantraDate=today; }
   if (S.bitaDate !== today) {
-    if (S.bitaDate && S.closedDate !== S.bitaDate && (S.bita_florecio || S.bita_regue || S.bita_pode)) {
-      S.bitacora.unshift({date:S.bitaDate, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode});
+    const hadGrat = (S.gratitud||[]).some(g => (g||'').trim());
+    const hechasDia = (S.tasks||[]).filter(t => t.done && t.doneDate === S.bitaDate).map(t => t.text);
+    if (S.bitaDate && S.closedDate !== S.bitaDate && (S.bita_florecio || S.bita_regue || S.bita_pode || hadGrat || hechasDia.length)) {
+      S.bitacora.unshift({date:S.bitaDate, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode, gratitud:(S.gratitud||[]).slice(0,3), tareasHechas:hechasDia});
       if (S.bitacora.length > 60) S.bitacora = S.bitacora.slice(0,60);
     }
     S.bita_florecio=''; S.bita_regue=''; S.bita_pode=''; S.bitaDate=today;
+    S.gratitud=['','','']; S.gratDate=today;
   }
   if (typeof refreshHoyInputs === 'function') refreshHoyInputs();
   save();
@@ -2677,8 +2747,8 @@ $('#quoteDel').addEventListener('click', () => {
   renderQuote(); save();
 });
 
-function renderMantra() { $('#mantraInput').value = S.mantra||''; }
-$('#mantraInput').addEventListener('input', e => { S.mantra = e.target.value; save(); });
+function renderMantra() { const el = $('#mantraInput'); if (el) el.value = S.mantra||''; }
+$('#mantraInput')?.addEventListener('input', e => { S.mantra = e.target.value; save(); });
 
 // ========================= HABITS (per-habit tracking) =========================
 function getHabitStreak(habitId) {
@@ -2779,50 +2849,51 @@ function bindField(id) {
   el.value = S[id] || '';
   el.addEventListener('input', e => { S[id] = e.target.value; save(); });
 }
-['intention','mission-deep','mission-p1','mission-p2','mission-t1','mission-t2','mission-t3','lib-logo','lib-fotos','lib-presskit'].forEach(bindField);
+['lib-logo','lib-fotos','lib-presskit'].forEach(bindField);
 
 // ========================= BITACORA =========================
-function bindBita(field, id) { const el=$('#'+id); el.value=S[field]||''; el.addEventListener('input', e => { S[field]=e.target.value; save(); }); }
-bindBita('bita_florecio','bita-florecio'); bindBita('bita_regue','bita-regue'); bindBita('bita_pode','bita-pode');
+function bindBita(field, id) { const el=$('#'+id); if(!el) return; el.value=S[field]||''; el.addEventListener('input', e => { S[field]=e.target.value; save(); }); }
+bindBita('bita_florecio','bita-florecio');
+// Gratitud diaria: 3 razones (S.gratitud[0..2])
+function bindGratitud() {
+  for (let i = 0; i < 3; i++) {
+    const el = $('#grat-' + i); if (!el) continue;
+    el.value = (S.gratitud && S.gratitud[i]) || '';
+    el.addEventListener('input', e => { S.gratitud = S.gratitud || ['','','']; S.gratitud[i] = e.target.value; save(); });
+  }
+}
+bindGratitud();
 // Re-fill HOY inputs from S after a programmatic state change (close/rollover)
 function refreshHoyInputs() {
   const set = (sel, val) => { const el = $(sel); if (el) el.value = val || ''; };
-  set('#mantraInput', S.mantra);
-  set('#intention', S.intention);
-  ['deep','p1','p2','t1','t2','t3'].forEach(k => set('#mission-'+k, S['mission-'+k]));
   set('#bita-florecio', S.bita_florecio);
   set('#bita-regue', S.bita_regue);
   set('#bita-pode', S.bita_pode);
+  for (let i = 0; i < 3; i++) set('#grat-' + i, (S.gratitud && S.gratitud[i]) || '');
 }
 
-// Open the "Sembrar mañana" modal (the close-day flow)
-function openCloseDayModal() {
-  if (!S.bita_florecio && !S.bita_regue && !S.bita_pode) {
-    toast('Escribí al menos una respuesta de la reflexión antes de cerrar', '!');
+// Cerrar la jornada: directo, sin modal. Las Tareas NO se tocan (son backlog acumulativo).
+function closeDayNow() {
+  const hasGrat = (S.gratitud || []).some(x => (x || '').trim());
+  const hasHechas = tareasHechasHoy().length > 0;
+  if (!S.bita_florecio && !S.bita_regue && !S.bita_pode && !hasGrat && !hasHechas) {
+    toast('Escribí algo en la bitácora antes de cerrar', '!');
     return;
   }
-  const tomorrow = tomorrowStr();
-  const pre = (S.nextPlan && S.nextPlan.date === tomorrow) ? S.nextPlan : {};
-  $('#closeDayDate').textContent = fmtDate(tomorrow);
-  $('#planDeep').value = pre.deep || '';
-  $('#planP1').value = pre.p1 || '';
-  $('#planP2').value = pre.p2 || '';
-  $('#planT1').value = pre.t1 || '';
-  $('#planT2').value = pre.t2 || '';
-  $('#planT3').value = pre.t3 || '';
-  $('#closeDayModal').classList.add('open');
-  setTimeout(() => $('#planDeep').focus(), 60);
+  if (S.closedDate === todayStr() && !confirm('Ya cerraste hoy. ¿Volver a guardar la bitácora del día?')) return;
+  cerrarJornada();
 }
-function closeCloseDayModal() { $('#closeDayModal').classList.remove('open'); }
+function closeCloseDayModal() { const m = $('#closeDayModal'); if (m) m.classList.remove('open'); }
 
-// Archive today, reset the slate, and seed tomorrow's missions
-function cerrarJornada(plan) {
+// Archive today and reset the slate (rituales + bitácora + gratitud). Tareas se mantienen.
+function cerrarJornada() {
   const today = todayStr();
   // Archive once per day (avoid double-counting habits/streak if re-closed)
   if (S.closedDate !== today) {
     S.bitacora = S.bitacora.filter(b => b.date !== today);
-    if (S.bita_florecio || S.bita_regue || S.bita_pode) {
-      S.bitacora.unshift({date:today, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode});
+    const hechasHoy = tareasHechasHoy().map(t => t.text);
+    if (S.bita_florecio || S.bita_regue || S.bita_pode || (S.gratitud||[]).some(g => (g||'').trim()) || hechasHoy.length) {
+      S.bitacora.unshift({date:today, florecio:S.bita_florecio, regue:S.bita_regue, pode:S.bita_pode, gratitud:(S.gratitud||[]).slice(0,3), tareasHechas:hechasHoy});
       if (S.bitacora.length > 60) S.bitacora = S.bitacora.slice(0,60);
     }
     const reqIds = HABITS_CONFIG.filter(h=>h.required).map(h=>h.id);
@@ -2833,45 +2904,38 @@ function cerrarJornada(plan) {
     if (S.habitHistory.length > 365) S.habitHistory = S.habitHistory.slice(-365);
     S.streak = (reqIds.length && doneReq === reqIds.length) ? (S.streak||0)+1 : 0;
   }
-  // Snapshot full day (captures rituales + intención + misiones + reflexión)
+  // Snapshot full day (rituales + gratitud + reflexión)
   snapshotDay(today);
-  // Seed tomorrow
-  S.nextPlan = {date: tomorrowStr(), deep:plan.deep, p1:plan.p1, p2:plan.p2, t1:plan.t1, t2:plan.t2, t3:plan.t3};
   S.closedDate = today;
-  // Reset the slate: rituales + bitácora + intención + frase + misiones del día cerrado
+  S.nextPlan = null;
+  // Reset the slate
   S.habits = {};
-  S.intention = ''; S.mantra = '';
   S.bita_florecio = ''; S.bita_regue = ''; S.bita_pode = '';
-  ['mission-deep','mission-p1','mission-p2','mission-t1','mission-t2','mission-t3'].forEach(k => S[k]='');
+  S.gratitud = ['','',''];
   save();
   refreshHoyInputs();
   renderHabits(); renderStreak(); renderHeatmap(); renderBitaHistory(); renderDiario();
-  applyMissionLock();
-  closeCloseDayModal();
-  toast('Jornada cerrada · mañana ya está sembrado','✦');
+  toast('Jornada cerrada · descansá','✦');
   if (navigator.vibrate) navigator.vibrate(30);
 }
 
-$('#bitaSave').addEventListener('click', openCloseDayModal);
-$('#closeDayCancel').addEventListener('click', closeCloseDayModal);
-$('#closeDayModal').addEventListener('click', e => { if (e.target.id === 'closeDayModal') closeCloseDayModal(); });
-$('#closeDayConfirm').addEventListener('click', () => {
-  cerrarJornada({
-    deep: $('#planDeep').value.trim(),
-    p1: $('#planP1').value.trim(), p2: $('#planP2').value.trim(),
-    t1: $('#planT1').value.trim(), t2: $('#planT2').value.trim(), t3: $('#planT3').value.trim(),
-  });
-});
+$('#bitaSave').addEventListener('click', closeDayNow);
 function renderBitaHistory() {
   const el = $('#bitaHistory');
   if (!S.bitacora.length) { el.innerHTML = '<div class="empty">aún no hay entradas guardadas</div>'; return; }
-  el.innerHTML = S.bitacora.slice(0,14).map(b => `
+  el.innerHTML = S.bitacora.slice(0,14).map(b => {
+    const grat = (b.gratitud || []).filter(g => (g||'').trim());
+    const hechas = (b.tareasHechas || []).filter(Boolean);
+    return `
     <div class="bitacora-entry">
       <div class="date">${b.date}</div>
-      ${b.florecio?`<div class="line"><b>Floreció:</b> ${escapeHTML(b.florecio)}</div>`:''}
+      ${grat.length?`<div class="line"><b>Agradecí:</b> ${grat.map(escapeHTML).join(' · ')}</div>`:''}
+      ${hechas.length?`<div class="line"><b>Hice:</b> ${hechas.map(escapeHTML).join(' · ')}</div>`:''}
+      ${b.florecio?`<div class="line"><b>Reflexión:</b> ${escapeHTML(b.florecio)}</div>`:''}
       ${b.regue?`<div class="line"><b>Regué:</b> ${escapeHTML(b.regue)}</div>`:''}
       ${b.pode?`<div class="line"><b>Podé:</b> ${escapeHTML(b.pode)}</div>`:''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ========================= DIARIO =========================
@@ -2889,6 +2953,8 @@ function snapshotDay(dateStr) {
     date, frase: S.mantra||'', intention: S.intention||'',
     habits: habitsDone, reqDone, reqTotal: reqIds.length,
     missions: {deep:S['mission-deep']||'', p1:S['mission-p1']||'', p2:S['mission-p2']||'', t1:S['mission-t1']||'', t2:S['mission-t2']||'', t3:S['mission-t3']||''},
+    gratitud: (S.gratitud||[]).slice(0,3),
+    tareasHechas: (S.tasks||[]).filter(t => t.done && t.doneDate === date).map(t => t.text),
     bitacora: {florecio:S.bita_florecio||'', regue:S.bita_regue||'', pode:S.bita_pode||''},
     riego: (S.riegoSessions||[]).filter(r => r.date===date).length,
     albumPct,
@@ -3243,7 +3309,7 @@ function renderPlantDetail() {
 
       <div class="pd-section">
         <label>Descripción</label>
-        <textarea data-pf="description" rows="2" placeholder="qué cuenta esta canción, su origen...">${escapeHTML(f.description||'')}</textarea>
+        <textarea data-pf="description" rows="2" placeholder="qué cuenta esta obra, su origen...">${escapeHTML(f.description||'')}</textarea>
       </div>
 
       <div class="pd-section">
@@ -3316,9 +3382,9 @@ function renderPlantDetail() {
   el.querySelectorAll('[data-pstage]').forEach(b => b.addEventListener('click', () => {
     const stage = b.dataset.pstage;
     const wasComplete = isComplete(f);
-    f[stage] = !f[stage];
+    setStageDone(f, stage, !f[stage]);
     const nowComplete = isComplete(f);
-    save(); renderGarden(); renderAlbumStat(); renderJardinProjectHeader();
+    save(); renderGarden(); renderAlbumStat(); renderJardinProjectHeader(); renderAgenda?.();
     if (!wasComplete && nowComplete) {
       toast(`Cosecha — ${f.title} floreció · ahora en Flores`, '✦');
       if (navigator.vibrate) navigator.vibrate([60,40,60,40,100]);
@@ -3433,18 +3499,86 @@ $('#newProjName').addEventListener('keydown', e => { if (e.key === 'Enter') crea
 $('#newProjCustom').addEventListener('keydown', e => { if (e.key === 'Enter') createNewProject(); });
 $('#newProjCreate').addEventListener('click', createNewProject);
 function createNewProject() {
-  const name = $('#newProjName').value.trim() || 'Proyecto sin nombre';
+  const name = $('#newProjName').value.trim() || 'Cantero sin nombre';
   let type = newProjType;
   if (type === 'Otro') {
     const c = $('#newProjCustom').value.trim();
     type = c || 'Otro';
   }
-  const np = {id: uid(), name, type, description:'', socialContent:'', links:[], files:[], trackingLog:[]};
+  // Nace con etapas livianas (no las de música); el editor se abre para que las defina.
+  const np = {id: uid(), name, type, description:'', socialContent:'', links:[], files:[], trackingLog:[], stages: STAGE_TEMPLATES.simple.map(s=>({...s}))};
   S.projects.push(np); S.activeProjectId = np.id;
   save(); closeNewProjectModal();
-  renderJardin(); renderAlbumStat(); populateRiegoTargets();
-  toast(`Proyecto creado · ${name}`, '✦');
+  renderGlobalProjectSel(); renderJardin(); renderAlbumStat(); populateRiegoTargets();
+  toast(`Cantero creado · ${name}`, '✦');
+  openStageEditor(np.id);
 }
+
+// ========================= EDITOR DE ETAPAS (canteros) =========================
+const STAGE_TEMPLATES = {
+  musica: [{id:'loop',label:'Loop'},{id:'arrangement',label:'Arrangement'},{id:'recording',label:'Grabación'},{id:'mix',label:'Mix'}],
+  video:  [{id:'canciones',label:'Canciones'},{id:'portada',label:'Portada'},{id:'armado',label:'Armado'},{id:'publicado',label:'Publicado'}],
+  imagen: [{id:'idea',label:'Idea'},{id:'boceto',label:'Boceto'},{id:'final',label:'Final'}],
+  master: [{id:'recibido',label:'Recibido'},{id:'trabajando',label:'Trabajando'},{id:'entregado',label:'Entregado'},{id:'cobrado',label:'Cobrado'}],
+  simple: [{id:'porhacer',label:'Por hacer'},{id:'haciendo',label:'Haciendo'},{id:'hecho',label:'Hecho'}],
+};
+function genStageId(){ return 'st' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
+let stageDraft = [];          // [{_k, id, label}]  id=null si es etapa nueva (preserva progreso al renombrar/reordenar)
+let stageEditorProjId = null;
+let _stageRowSeq = 0;
+function stageDraftFrom(stages){ return (stages||[]).map(s => ({_k:'k'+(_stageRowSeq++), id:s.id, label:s.label})); }
+function openStageEditor(projId){
+  const p = (S.projects||[]).find(x => x.id === projId); if (!p) return;
+  stageEditorProjId = projId;
+  stageDraft = stageDraftFrom((p.stages && p.stages.length) ? p.stages : STAGE_TEMPLATES.simple);
+  const t = $('#stageEditorTitle'); if (t) t.textContent = 'Etapas · ' + p.name;
+  renderStageEditorList();
+  $('#stageEditorModal').classList.add('open');
+}
+function closeStageEditor(){ $('#stageEditorModal').classList.remove('open'); }
+function renderStageEditorList(){
+  const host = $('#stageEditorList'); if (!host) return;
+  if (!stageDraft.length) { host.innerHTML = '<div class="empty">sin etapas · agregá una o elegí una plantilla</div>'; return; }
+  host.innerHTML = stageDraft.map((s,i) => `
+    <div class="stage-row" data-k="${s._k}">
+      <button class="dnd-grip" type="button" aria-label="reordenar"><i class="ti ti-grip-vertical"></i></button>
+      <span class="st-num">${i+1}</span>
+      <input type="text" class="st-input" value="${escapeHTML(s.label)}" placeholder="nombre de la etapa...">
+      <button class="st-del" type="button" title="quitar"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+  host.querySelectorAll('.stage-row').forEach(row => {
+    const k = row.dataset.k;
+    row.querySelector('.st-input').addEventListener('input', e => { const d = stageDraft.find(x=>x._k===k); if (d) d.label = e.target.value; });
+    row.querySelector('.st-del').addEventListener('click', () => { stageDraft = stageDraft.filter(x=>x._k!==k); renderStageEditorList(); });
+  });
+  makeDraggable(host, {
+    itemSelector:'.stage-row', handleSelector:'.dnd-grip', getId: el => el.dataset.k,
+    onReorder: (newKeys) => { stageDraft = newKeys.map(k => stageDraft.find(x=>x._k===k)).filter(Boolean); renderStageEditorList(); },
+  });
+}
+document.getElementById('stageEditorAdd')?.addEventListener('click', () => {
+  stageDraft.push({_k:'k'+(_stageRowSeq++), id:null, label:''}); renderStageEditorList();
+  setTimeout(() => { const ins = document.querySelector('#stageEditorList .stage-row:last-child .st-input'); if (ins) ins.focus(); }, 30);
+});
+$$('#stageEditorModal .stage-templates button').forEach(b => b.addEventListener('click', () => {
+  const tpl = STAGE_TEMPLATES[b.dataset.stpl]; if (!tpl) return;
+  stageDraft = stageDraftFrom(tpl); renderStageEditorList();
+}));
+document.getElementById('stageEditorCancel')?.addEventListener('click', closeStageEditor);
+document.getElementById('stageEditorModal')?.addEventListener('click', e => { if (e.target.id === 'stageEditorModal') closeStageEditor(); });
+document.getElementById('stageEditorSave')?.addEventListener('click', () => {
+  const p = (S.projects||[]).find(x => x.id === stageEditorProjId); if (!p) { closeStageEditor(); return; }
+  const finalStages = stageDraft.map(s => ({ id: s.id || genStageId(), label: (s.label||'').trim() })).filter(s => s.label);
+  if (!finalStages.length) { toast('Dejá al menos una etapa', '!'); return; }
+  p.stages = finalStages;
+  if (typeof selectedPlantId !== 'undefined') selectedPlantId = null;
+  save();
+  renderJardin?.(); renderFlores?.(); renderAlbumStat?.(); populateRiegoTargets?.();
+  closeStageEditor();
+  toast('Etapas guardadas', '✓');
+});
+document.getElementById('globalProjEdit')?.addEventListener('click', () => openStageEditor(S.activeProjectId));
+document.getElementById('globalProjNew')?.addEventListener('click', openNewProjectModal);
 $('#jardinProjectDel').addEventListener('click', () => {
   if (S.projects.length <= 1) { toast('Necesitas al menos un proyecto'); return; }
   const p = activeProject();
@@ -3620,6 +3754,7 @@ function renderDeadlines() {
 let openFlorId = null;
 let florSearchTerm = '';
 let florJarFilter = 'all'; // 'all' | 'none' | jarId
+let florFavOnly = false;   // mostrar solo favoritas (★)
 
 function renderJarFilter() {
   const el = document.getElementById('jarFilter');
@@ -3832,10 +3967,12 @@ function florCardHTML(f) {
           </div>
         </div>
         <div class="flor-meta">
-          <span class="pct">${pct}%</span>
+          <button class="flor-fav ${f.fav?'on':''}" data-florfav="${f.id}" title="${f.fav?'quitar de favoritas':'marcar favorita'}"><i class="ti ti-star${f.fav?'-filled':''}"></i></button>
+          ${complete ? `<span class="pct done"><i class="ti ti-flower"></i></span>` : `<span class="pct">${pct}%</span>`}
+          ${complete && f.harvestedAt ? `<span class="flor-harvest">cosechada ${fmtDate(f.harvestedAt)}</span>` : ''}
           ${jar ? `<span class="jar-tag">${jar.emoji||'🍯'} ${escapeHTML(jar.name)}</span>` : ''}
           <span>${escapeHTML(f.key||'—')}</span>
-          ${f.deadline ? deadlineBadge(f.deadline) : ''}
+          ${f.deadline && !complete ? deadlineBadge(f.deadline) : ''}
         </div>
       </div>
       <div class="flor-body ${open?'open':''}" style="margin-top:14px;padding-top:14px;border-top:0.5px dashed var(--border);">
@@ -3854,7 +3991,7 @@ function florCardHTML(f) {
           <div><label><i class="ti ti-jar"></i> Frasco</label><select data-ff="jarId"><option value="">— sin frasco —</option>${(S.jars||[]).map(j => `<option value="${j.id}" ${j.id===f.jarId?'selected':''}>${j.emoji||'🍯'} ${escapeHTML(j.name)}</option>`).join('')}</select></div>
         </div>
         <div><label>Letra con acordes</label><textarea data-ff="lyrics" rows="10" placeholder="la letra... pon acordes entre [Am] [F] sobre las sílabas">${escapeHTML(f.lyrics||'')}</textarea></div>
-        <div style="margin-top:10px;"><label>Descripción</label><textarea data-ff="description" rows="2" placeholder="qué cuenta esta canción, su origen...">${escapeHTML(f.description||'')}</textarea></div>
+        <div style="margin-top:10px;"><label>Descripción</label><textarea data-ff="description" rows="2" placeholder="qué cuenta esta obra, su origen...">${escapeHTML(f.description||'')}</textarea></div>
         <div style="margin-top:10px;"><label>Notas de interpretación / producción</label><textarea data-ff="notes" rows="3">${escapeHTML(f.notes||'')}</textarea></div>
         <div style="margin-top:10px;"><label>Contenido redes sociales</label><textarea data-ff="socialContent" rows="3" placeholder="copy para teaser, caption para reel...">${escapeHTML(f.socialContent||'')}</textarea></div>
 
@@ -3933,6 +4070,9 @@ function renderFlores() {
   if (florJarFilter === 'none') flores = flores.filter(f => !f.jarId);
   else if (florJarFilter !== 'all') flores = flores.filter(f => f.jarId === florJarFilter);
   if (term) flores = flores.filter(f => f.title.toLowerCase().includes(term) || (f.lyrics||'').toLowerCase().includes(term));
+  if (florFavOnly) flores = flores.filter(f => f.fav && !isFlorPage(f));
+  const favBtn = document.getElementById('florFavToggle');
+  if (favBtn) { favBtn.classList.toggle('active', florFavOnly); favBtn.innerHTML = `<i class="ti ti-star${florFavOnly?'-filled':''}"></i>`; }
 
   const groupBy = S.florGroupBy || 'none';
   const gbSel = $('#florGroupBy');
@@ -3989,8 +4129,13 @@ function renderFlores() {
   });
   renderFlorSelectBar();
 
+  list.querySelectorAll('[data-florfav]').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const f = S.flores.find(x => x.id === +b.dataset.florfav); if (!f) return;
+    f.fav = !f.fav; save(); renderFlores(); toast(f.fav ? 'Favorita ★' : 'Quitada de favoritas', f.fav ? '★' : '');
+  }));
   list.querySelectorAll('[data-toggle]').forEach(el => el.addEventListener('click', (e) => {
-    if (e.target.closest('.dnd-grip') || e.target.closest('[data-florsel]')) return;
+    if (e.target.closest('.dnd-grip') || e.target.closest('[data-florsel]') || e.target.closest('[data-florfav]')) return;
     const id = +el.dataset.toggle;
     if (florSelecting) { toggleFlorSelect(id); return; }
     openFlorId = openFlorId === id ? null : id; renderFlores();
@@ -4000,9 +4145,9 @@ function renderFlores() {
     const f = S.flores.find(x => x.id === id); if (!f) return;
     const stage = el.dataset.stage;
     const wasComplete = isComplete(f);
-    f[stage] = !f[stage];
+    setStageDone(f, stage, !f[stage]);
     const nowComplete = isComplete(f);
-    save(); renderFlores(); renderAlbumStat(); renderGarden();
+    save(); renderFlores(); renderAlbumStat(); renderGarden(); renderAgenda?.();
     if (!wasComplete && nowComplete) { toast(`Cosecha — ${f.title} floreció`,'✦'); if (navigator.vibrate) navigator.vibrate([60,40,60,40,100]); }
   }));
   list.querySelectorAll('[data-ff]').forEach(inp => inp.addEventListener('input', e => {
@@ -4072,6 +4217,7 @@ function renderFlores() {
   });
 }
 $('#florSearch').addEventListener('input', e => { florSearchTerm = e.target.value; renderFlores(); });
+$('#florFavToggle')?.addEventListener('click', () => { florFavOnly = !florFavOnly; renderFlores(); });
 $('#florGroupBy').addEventListener('change', e => { S.florGroupBy = e.target.value; save(); renderFlores(); });
 $('#jarNew').addEventListener('click', async () => {
   const name = prompt('Nombre del frasco:'); if (!name || !name.trim()) return;
@@ -5232,9 +5378,9 @@ function buildDashboard(grid) {
   const riegoMes = (S.riegoSessions||[]).filter(r => sameYM(r.date, y, mo)).reduce((a,r) => a+(r.minutes||0), 0);
 
   grid.innerHTML = `
-    <!-- Canciones -->
+    <!-- Flores -->
     <div class="stat-card">
-      <div class="label"><i class="ti ti-music" style="margin-right:4px;"></i>Canciones</div>
+      <div class="label"><i class="ti ti-flower" style="margin-right:4px;"></i>Flores</div>
       <div class="sd-val">${done_flores}<span style="font-size:14px;color:var(--text-faint);margin-left:6px;">/ ${total_flores}</span></div>
       <div class="sd-bar"><div class="sd-bar-fill" style="width:${total_flores?Math.round(done_flores/total_flores*100):0}%"></div></div>
       <div class="sd-sub">${inprog_flores} en progreso</div>
@@ -5586,7 +5732,8 @@ function reorderListByVisible(arr, newVisibleIds) {
 
 // Wire misiones (HTML estático, se hace una vez)
 function bindMisionesDnd() {
-  makeDraggable($('#missionTasks'), {
+  const el = $('#missionTasks'); if (!el) return; // misiones removidas en el rediseño v3 → no-op
+  makeDraggable(el, {
     itemSelector: '.mission-task',
     handleSelector: '.dnd-grip',
     getId: el => el.querySelector('input')?.id || el.dataset.mtask,
@@ -5594,46 +5741,88 @@ function bindMisionesDnd() {
   });
 }
 
-// ========================= AGENDA DE TAREAS (widget HOY) =========================
-const AGENDA_PRIO_RANK = { alta: 0, media: 1, baja: 2 };
+// ========================= TAREAS (podio acumulativo · widget HOY) =========================
+// El orden del array S.tasks ES la importancia (arriba = más importante). El socio lo
+// reordena hacia las metas; Somko también arrastra a mano. Top 3 = podio.
+const TAREA_MEDALS = ['🥇','🥈','🥉'];
+const TAREAS_PODIO = 3;       // cuántas se ven plegadas (el podio)
+let tareasExpanded = false;   // estado en memoria del "ver todas"
+let taskConfirmId = null;     // tarea esperando confirmación de "completar"
+let stepsExpanded = false;    // "ver todos" de próximos pasos de plantas
+let stepConfirmKey = null;    // paso de planta esperando confirmación (florId:stageId)
+// Las tareas completadas hoy quedan registradas en la Bitácora del día (en vivo).
+function tareasHechasHoy() {
+  const today = todayStr();
+  return (S.tasks || []).filter(t => t.done && t.doneDate === today);
+}
+function renderBitaTareasHechas() {
+  const host = document.getElementById('bitaTareasHechas');
+  const sec = document.getElementById('bitaHechasSection');
+  if (!host || !sec) return;
+  const hechas = tareasHechasHoy();
+  if (!hechas.length) { sec.style.display = 'none'; host.innerHTML = ''; return; }
+  sec.style.display = '';
+  host.innerHTML = hechas.map(t => {
+    const proj = (S.projects || []).find(p => p.id === t.projectId);
+    return `<div class="bita-hecha"><i class="ti ti-circle-check"></i> <span>${escapeHTML(t.text)}</span>${proj ? `<span class="agenda-proj">${escapeHTML(proj.name)}</span>` : ''}</div>`;
+  }).join('');
+}
 function renderAgenda() {
   const el = document.getElementById('agendaList');
+  renderBitaTareasHechas();
+  renderPlantSteps();
   if (!el) return;
   const today = todayStr();
-  const pend = (S.tasks || []).filter(t => !t.done);
-  pend.sort((a, b) => {
-    const ah = (a.scheduledFor === today) ? 0 : 1, bh = (b.scheduledFor === today) ? 0 : 1;
-    if (ah !== bh) return ah - bh;
-    const ad = a.deadline || '9999-99', bd = b.deadline || '9999-99';
-    if (ad !== bd) return ad.localeCompare(bd);
-    return (AGENDA_PRIO_RANK[a.priority] ?? 1) - (AGENDA_PRIO_RANK[b.priority] ?? 1);
-  });
-  if (!pend.length) { el.innerHTML = '<div class="empty">sin tareas pendientes · agrega una o pídele al socio</div>'; return; }
-  el.innerHTML = pend.map(t => {
+  const pend = (S.tasks || []).filter(t => !t.done); // sin re-ordenar: el array = importancia
+  const doneToday = (S.tasks || []).filter(t => t.done && t.doneDate === today).length;
+  const doneNote = doneToday ? `<div class="tareas-done-note">✓ ${doneToday} hecha${doneToday>1?'s':''} hoy</div>` : '';
+  if (!pend.length) {
+    el.innerHTML = '<div class="empty">sin tareas · agregá una o pedile al socio que te arme el día</div>' + doneNote;
+    return;
+  }
+  const collapsed = !tareasExpanded && pend.length > TAREAS_PODIO;
+  const visible = collapsed ? pend.slice(0, TAREAS_PODIO) : pend;
+  let html = visible.map((t, i) => {
     const proj = (S.projects || []).find(p => p.id === t.projectId);
     const overdue = t.deadline && t.deadline < today;
     const dueToday = t.deadline === today;
-    return `<div class="agenda-item ${t.scheduledFor === today ? 'is-today' : ''}" data-task="${t.id}">
-      <button class="agenda-check" data-taskdone="${t.id}" title="completar"><i class="ti ti-circle"></i></button>
+    const podio = i < 3;
+    const rank = podio ? `<span class="tarea-medal">${TAREA_MEDALS[i]}</span>` : `<span class="tarea-num">${i+1}</span>`;
+    const hasMeta = proj || t.deadline;
+    const confirming = String(t.id) === String(taskConfirmId);
+    return `<div class="agenda-item tarea-item${podio ? ' podio' : ''}${confirming ? ' confirming' : ''}" data-task="${t.id}">
+      <button class="agenda-check${confirming ? ' armed' : ''}" data-taskcheck="${t.id}" title="${confirming ? 'cancelar' : 'completar'}"><i class="ti ti-${confirming ? 'circle-check' : 'circle'}"></i></button>
+      ${rank}
       <div class="agenda-main">
         <div class="agenda-text">${escapeHTML(t.text)}</div>
-        <div class="agenda-meta">
-          <span class="agenda-prio prio-${t.priority || 'media'}">${t.priority || 'media'}</span>
+        ${hasMeta ? `<div class="agenda-meta">
           ${proj ? `<span class="agenda-proj">${escapeHTML(proj.name)}</span>` : ''}
-          ${t.deadline ? `<span class="agenda-date ${overdue ? 'overdue' : dueToday ? 'duetoday' : ''}"><i class="ti ti-calendar"></i> ${t.deadline}</span>` : ''}
-        </div>
+          ${t.deadline ? `<span class="agenda-date ${overdue ? 'overdue' : dueToday ? 'duetoday' : ''}"><i class="ti ti-calendar"></i> ${fmtDate(t.deadline)}</span>` : ''}
+        </div>` : ''}
       </div>
-      <button class="agenda-today ${t.scheduledFor === today ? 'on' : ''}" data-tasktoday="${t.id}" title="para hoy"><i class="ti ti-sun"></i></button>
-      <button class="agenda-del" data-taskdel="${t.id}" title="borrar"><i class="ti ti-x"></i></button>
+      ${confirming
+        ? `<button class="tarea-confirm" data-taskdone="${t.id}"><i class="ti ti-check"></i> Completar tarea</button>`
+        : `<button class="dnd-grip" type="button" aria-label="reordenar"><i class="ti ti-grip-vertical"></i></button>
+      <button class="agenda-del" data-taskdel="${t.id}" title="borrar"><i class="ti ti-x"></i></button>`}
     </div>`;
   }).join('');
+  if (pend.length > TAREAS_PODIO) {
+    html += collapsed
+      ? `<button class="tareas-toggle" data-tareas-toggle><i class="ti ti-chevron-down"></i> ver todas (${pend.length - TAREAS_PODIO} más)</button>`
+      : `<button class="tareas-toggle" data-tareas-toggle><i class="ti ti-chevron-up"></i> ver menos</button>`;
+  }
+  html += doneNote;
+  el.innerHTML = html;
+  const tg = el.querySelector('[data-tareas-toggle]');
+  if (tg) tg.addEventListener('click', () => { tareasExpanded = !tareasExpanded; renderAgenda(); });
+  el.querySelectorAll('[data-taskcheck]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.taskcheck;
+    taskConfirmId = (String(taskConfirmId) === String(id)) ? null : id; // toca = pide confirmar; toca de nuevo = cancela
+    renderAgenda();
+  }));
   el.querySelectorAll('[data-taskdone]').forEach(b => b.addEventListener('click', () => {
     const t = (S.tasks || []).find(x => String(x.id) === b.dataset.taskdone); if (!t) return;
-    t.done = true; t.doneDate = todayStr(); save(); renderAgenda(); toast('Tarea completada', '✓');
-  }));
-  el.querySelectorAll('[data-tasktoday]').forEach(b => b.addEventListener('click', () => {
-    const t = (S.tasks || []).find(x => String(x.id) === b.dataset.tasktoday); if (!t) return;
-    t.scheduledFor = (t.scheduledFor === todayStr()) ? null : todayStr(); save(); renderAgenda();
+    t.done = true; t.doneDate = todayStr(); taskConfirmId = null; save(); renderAgenda(); toast('Tarea completada', '✓');
   }));
   el.querySelectorAll('[data-taskdel]').forEach(b => b.addEventListener('click', () => {
     const id = b.dataset.taskdel;
@@ -5643,25 +5832,93 @@ function renderAgenda() {
     S.tasks.splice(idx, 1); save(); renderAgenda();
     showUndoToast('Tarea borrada', () => { S.tasks.splice(idx, 0, removed); save(); renderAgenda(); });
   }));
+  // Arrastrar para reordenar = fijar importancia (reordena el array completo respetando las hechas)
+  makeDraggable(el, {
+    itemSelector: '.tarea-item',
+    handleSelector: '.dnd-grip',
+    getId: it => it.dataset.task,
+    onReorder: (newIds) => { reorderListByVisible(S.tasks, newIds); save(); renderAgenda(); toast('Tareas reordenadas', '↕'); },
+  });
 }
 function addAgendaTask() {
   const inp = document.getElementById('agendaInput');
   const text = (inp?.value || '').trim();
   if (!text) return;
-  const prio = document.getElementById('agendaPrio')?.value || 'media';
   const date = document.getElementById('agendaDate')?.value || '';
   S.tasks = S.tasks || [];
-  S.tasks.unshift({ id: uid(), text, projectId: S.activeProjectId, priority: prio, deadline: date, scheduledFor: null, done: false, createdAt: Date.now() });
+  // Se acumula al final (importancia baja hasta que el socio o vos la suban)
+  S.tasks.push({ id: uid(), text, projectId: S.activeProjectId, priority: 'media', deadline: date, scheduledFor: null, done: false, createdAt: Date.now() });
   if (inp) inp.value = '';
   const d = document.getElementById('agendaDate'); if (d) d.value = '';
-  save(); renderAgenda();
+  save(); renderAgenda(); toast('Tarea agregada', '🌱');
 }
 document.getElementById('agendaAdd')?.addEventListener('click', addAgendaTask);
 document.getElementById('agendaInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addAgendaTask(); });
 
+// ===== EL MOTOR · próximos pasos de las plantas = tareas automáticas =====
+// La próxima etapa incompleta de cada planta activa (de TODOS los canteros) aparece como
+// un paso accionable. Completarlo avanza la planta y deja el registro del día.
+function buildPlantSteps() {
+  const steps = [];
+  (S.flores || []).forEach(f => {
+    if (isFlorPage(f) || isComplete(f)) return;
+    const ns = florNextStage(f); if (!ns) return;
+    const proj = (S.projects || []).find(p => p.id === f.projectId);
+    steps.push({ florId: f.id, stageId: ns.id, title: f.title, stageLabel: ns.label, cantero: proj ? proj.name : '' });
+  });
+  return steps;
+}
+function renderPlantSteps() {
+  const host = document.getElementById('plantStepsWrap'); if (!host) return;
+  const steps = buildPlantSteps();
+  if (!steps.length) { host.innerHTML = ''; return; }
+  const PODIO = 3;
+  const collapsed = !stepsExpanded && steps.length > PODIO;
+  const vis = collapsed ? steps.slice(0, PODIO) : steps;
+  let html = '<div class="psteps-head"><i class="ti ti-plant-2"></i> Próximos pasos · de tus plantas</div>';
+  html += vis.map(s => {
+    const key = s.florId + ':' + s.stageId;
+    const confirming = key === stepConfirmKey;
+    return `<div class="agenda-item pstep-item${confirming ? ' confirming' : ''}" data-stepkey="${key}">
+      <button class="agenda-check${confirming ? ' armed' : ''}" data-stepcheck="${key}" title="${confirming ? 'cancelar' : 'avanzar etapa'}"><i class="ti ti-${confirming ? 'circle-check' : 'circle'}"></i></button>
+      <div class="agenda-main">
+        <div class="agenda-text">${escapeHTML(s.title)} · <span class="pstep-stage">${escapeHTML(s.stageLabel)}</span></div>
+        ${s.cantero ? `<div class="agenda-meta"><span class="agenda-proj">${escapeHTML(s.cantero)}</span></div>` : ''}
+      </div>
+      ${confirming
+        ? `<button class="tarea-confirm" data-stepdone="${key}"><i class="ti ti-check"></i> Completar etapa</button>`
+        : `<i class="ti ti-plant-2 pstep-ico" title="próximo paso de una planta"></i>`}
+    </div>`;
+  }).join('');
+  if (steps.length > PODIO) {
+    html += collapsed
+      ? `<button class="tareas-toggle" data-steps-toggle><i class="ti ti-chevron-down"></i> ver todos (${steps.length - PODIO} más)</button>`
+      : `<button class="tareas-toggle" data-steps-toggle><i class="ti ti-chevron-up"></i> ver menos</button>`;
+  }
+  host.innerHTML = html;
+  host.querySelector('[data-steps-toggle]')?.addEventListener('click', () => { stepsExpanded = !stepsExpanded; renderPlantSteps(); });
+  host.querySelectorAll('[data-stepcheck]').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.stepcheck;
+    stepConfirmKey = (stepConfirmKey === k) ? null : k;
+    renderPlantSteps();
+  }));
+  host.querySelectorAll('[data-stepdone]').forEach(b => b.addEventListener('click', () => {
+    const idx = b.dataset.stepdone.indexOf(':');
+    const fid = b.dataset.stepdone.slice(0, idx), sid = b.dataset.stepdone.slice(idx + 1);
+    const f = (S.flores || []).find(x => String(x.id) === fid); if (!f) return;
+    const wasComplete = isComplete(f);
+    setStageDone(f, sid, true);
+    stepConfirmKey = null;
+    save();
+    renderAgenda(); renderGarden?.(); renderFlores?.(); renderAlbumStat?.();
+    if (!wasComplete && isComplete(f)) toast(`🌸 ${f.title} floreció · al archivo`, '✦');
+    else toast('Etapa completada', '✓');
+  }));
+}
+
 // ========================= HOY · WIDGETS MODULARES =========================
-const HOY_NAMES = { voces:'Voces', stats:'Progreso', agenda:'Agenda', riego:'Riego', bitacora:'Bitácora', dashboard:'Estadísticas' };
-const HOY_COLLAPSIBLE = { voces:1, stats:1, agenda:1, riego:1, bitacora:1 }; // dashboard usa su propio toggle interno
+const HOY_NAMES = { agenda:'Tareas', bitacora:'Bitácora', voces:'Voces', stats:'Progreso', riego:'Riego', dashboard:'Estadísticas' };
+const HOY_COLLAPSIBLE = { agenda:1, bitacora:1, voces:1, stats:1, riego:1 }; // dashboard usa su propio toggle interno
 
 // Envuelve el contenido de cada widget en .widget-body y le antepone una barra
 // con grip (mover) + nombre (visible al colapsar) + chevron (minimizar). Idempotente.
