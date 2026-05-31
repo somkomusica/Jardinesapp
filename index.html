@@ -2107,9 +2107,9 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 const DEFAULT_CONFIG = {
   tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','conciertos','estadisticas','ajustes'],
   tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, conciertos:true, estadisticas:true, ajustes:true},
-  hoyWidgets: {agenda:true, bitacora:true, voces:false, stats:false, riego:false, dashboard:false},
+  hoyWidgets: {agenda:true, bitacora:true},
   hoyOrder: ['agenda','bitacora'],
-  hoyCollapsed: {agenda:false, bitacora:false, voces:false, stats:false, riego:false},
+  hoyCollapsed: {agenda:false, bitacora:false},
   theme: 'auto',
 };
 
@@ -2709,9 +2709,12 @@ document.body.addEventListener('touchend', e => {
   else if (dx < 0 && idx < visible.length-1) switchTab(visible[idx+1]);
 }, {passive: true});
 function applyHoyWidgets() {
-  Object.entries(S.config.hoyWidgets).forEach(([k,v]) => {
-    const el = document.querySelector(`[data-widget="${k}"]`);
-    if (el) el.style.display = v ? '' : 'none';
+  // Recorre los widgets que EXISTEN en HOY y oculta todo lo que no esté habilitado en config.
+  // Así, aunque un cliente viejo re-agregue voces/stats/riego/dashboard a la config sincronizada,
+  // el cliente nuevo los oculta igual (solo muestra lo que está explícitamente en true).
+  document.querySelectorAll('#tab-hoy [data-widget]').forEach(el => {
+    const k = el.dataset.widget;
+    el.style.display = S.config.hoyWidgets[k] ? '' : 'none';
   });
 }
 
