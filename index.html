@@ -2098,11 +2098,8 @@ const TABS_META = {
 };
 
 const HOY_WIDGETS_META = {
-  voces:     {name:"Voces",            desc:"Banco de citas rotatorias"},
-  stats:     {name:"Stats",            desc:"Racha y % de álbum"},
-  riego:     {name:"Riego",            desc:"Pomodoro 25min"},
-  bitacora:  {name:"Bitácora del día", desc:"Frase, rituales, intención, misiones, reflexión"},
-  dashboard: {name:"Estadísticas",     desc:"Panel de métricas colapsable"},
+  agenda:    {name:"Tareas",           desc:"Tu podio del día + próximos pasos de las plantas"},
+  bitacora:  {name:"Bitácora del día", desc:"Gratitud, rituales, tareas hechas y reflexión"},
 };
 
 const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
@@ -2121,7 +2118,7 @@ const defaults = {
   quotes: DEFAULT_QUOTES,
   flores: DEFAULT_FLORES,
   projects: DEFAULT_PROJECTS,
-  semillas: [], semillaGroups: [], jars: [], tasks: [],
+  semillas: [], semillaGroups: [], jars: [], tasks: [], botMemory: [],
   habits: {}, habitDate: '', streak: 0, habitHistory: [],
   quoteIndex: 0, quoteDate: '',
   intention: '', mantra: '', mantraDate: '',
@@ -2243,6 +2240,7 @@ function migrate(state) {
   if (!Array.isArray(state.gratitud)) state.gratitud = ['','',''];
   while (state.gratitud.length < 3) state.gratitud.push('');
   if (!Array.isArray(state.tasks)) state.tasks = [];
+  if (!Array.isArray(state.botMemory)) state.botMemory = []; // memoria durable del socio
 
   // Brand profile
   if (!state.brand) state.brand = {logoData: state['lib-logo']||'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit: state['lib-presskit']||'', gallery: state['lib-fotos']||''};
