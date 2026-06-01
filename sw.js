@@ -1,5 +1,5 @@
 // Jardín Service Worker — Network First con auto-update
-const CACHE_NAME = 'jardin-v13-mover';
+const CACHE_NAME = 'jardin-v14-barra';
 const ESSENTIAL_FILES = [
   './',
   './index.html',
