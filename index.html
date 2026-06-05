@@ -665,6 +665,76 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 .dw-days.urgent { color: var(--gold); font-weight: 600; background: var(--gold-soft); }
 .dw-days.overdue { color: #c44; font-weight: 600; background: rgba(204,68,68,0.10); }
 
+/* AFINADOR (guitar tuner) */
+.tuner-card { text-align: center; }
+.tuner-stage { margin: 20px 0 6px; }
+.tuner-note {
+  font-size: 88px; font-weight: 200; line-height: 1;
+  letter-spacing: -0.03em; color: var(--text); transition: color .12s;
+}
+.tuner-note.intune { color: #3fbf6f; }
+.tuner-note.off { color: var(--gold); }
+.tuner-oct { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-faint); min-height: 14px; margin-top: 2px; }
+.tuner-meter { max-width: 420px; margin: 18px auto 0; }
+.tm-scale { display: flex; justify-content: space-between; align-items: center; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); padding: 0 2px 5px; }
+.tm-scale .tm-center { color: var(--text-secondary); }
+.tm-track {
+  position: relative; height: 14px; border-radius: 8px;
+  background: var(--bg-soft, rgba(255,255,255,.05));
+  border: 0.5px solid var(--border); overflow: hidden;
+}
+.tm-zone {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 10%; transform: translateX(-50%);
+  background: rgba(63,191,111,.18);
+  border-left: 0.5px solid rgba(63,191,111,.5); border-right: 0.5px solid rgba(63,191,111,.5);
+}
+.tm-needle {
+  position: absolute; top: -3px; bottom: -3px; left: 50%; width: 3px;
+  background: var(--gold); border-radius: 2px; transform: translateX(-50%);
+  transition: left .08s linear, background .12s;
+}
+.tm-needle.intune { background: #3fbf6f; }
+.tuner-cents { font-size: 12px; color: var(--text-secondary); margin-top: 9px; font-variant-numeric: tabular-nums; }
+.tuner-hz { font-size: 11px; color: var(--text-faint); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.tuner-actions { margin-top: 18px; }
+.tuner-status { font-size: 11px; color: var(--text-faint); min-height: 14px; margin-top: 10px; }
+
+/* MEDIDOR DE VOLUMEN (dB / monitoreo) */
+.util-sep { height: 1px; background: var(--border); margin: 22px 0 4px; opacity: .6; }
+.dbm-readout { font-size: 52px; font-weight: 200; line-height: 1; letter-spacing: -0.02em; color: var(--text); margin: 14px 0 2px; font-variant-numeric: tabular-nums; }
+.dbm-readout .dbm-unit { font-size: 16px; color: var(--text-faint); margin-left: 4px; letter-spacing: 0; }
+.dbm-meter { max-width: 420px; margin: 16px auto 0; }
+.dbm-track {
+  position: relative; height: 16px; border-radius: 8px;
+  background: var(--bg-soft, rgba(255,255,255,.05));
+  border: 0.5px solid var(--border); overflow: hidden;
+}
+.dbm-zone {
+  position: absolute; top: 0; bottom: 0; left: 40%; width: 14%;
+  background: rgba(63,191,111,.20);
+  border-left: 0.5px solid rgba(63,191,111,.55); border-right: 0.5px solid rgba(63,191,111,.55);
+  z-index: 1; pointer-events: none;
+}
+.dbm-fill {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 0%;
+  background: var(--gold); opacity: .55;
+  transition: width .06s linear, background .15s;
+}
+.dbm-fill.ok   { background: #3fbf6f; opacity: .6; }
+.dbm-fill.low  { background: var(--gold); opacity: .45; }
+.dbm-fill.high { background: #c44; opacity: .6; }
+.dbm-peak {
+  position: absolute; top: -2px; bottom: -2px; left: 0%; width: 2px;
+  background: var(--text); border-radius: 2px; z-index: 2;
+  transition: left .1s linear;
+}
+.dbm-scale { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); padding: 5px 2px 0; }
+.dbm-status { font-size: 12px; color: var(--text-secondary); margin-top: 10px; min-height: 16px; }
+.dbm-status.ok   { color: #3fbf6f; font-weight: 600; }
+.dbm-status.low  { color: var(--gold); }
+.dbm-status.high { color: #c44; font-weight: 600; }
+.dbm-actions { margin-top: 14px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
 /* RIEGO — Modo fullscreen (focus inmersivo) */
 .riego-fullscreen {
   position: fixed; inset: 0;
@@ -1498,6 +1568,59 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <div class="stats-dashboard" id="statsDashboard"></div>
     </div>
   </div>
+
+  <!-- UTILIDADES (al fondo de HOY) -->
+  <div data-widget="utilidades" class="card" id="utilCard" style="padding:14px 18px;">
+    <div class="dash-toggle" id="utilToggle">
+      <h2 class="section-title" style="margin-bottom:0;"><i class="ti ti-tool"></i> Utilidades</h2>
+      <i class="ti ti-chevron-down dash-arrow" id="utilArrow"></i>
+    </div>
+    <div id="utilBody" style="display:none;">
+      <div class="tuner-card" style="text-align:center;">
+        <h3 style="margin:14px 0 2px;font-size:13px;letter-spacing:.04em;"><i class="ti ti-music" style="margin-right:6px;"></i>Afinador</h3>
+        <p class="tab-hint">cromático · cualquier nota · tocá una nota a la vez · verde = afinada</p>
+        <div class="tuner-stage">
+          <div class="tuner-note" id="tunerNote">–</div>
+          <div class="tuner-oct" id="tunerOct"></div>
+          <div class="tuner-meter">
+            <div class="tm-scale"><span>♭ baja</span><span class="tm-center">afinada</span><span>alta ♯</span></div>
+            <div class="tm-track">
+              <div class="tm-zone"></div>
+              <div class="tm-needle" id="tunerNeedle"></div>
+            </div>
+            <div class="tuner-cents" id="tunerCents">— cents</div>
+            <div class="tuner-hz" id="tunerHz">— Hz</div>
+          </div>
+        </div>
+        <div class="tuner-actions">
+          <button class="btn gold" id="tunerToggle"><i class="ti ti-microphone"></i> Empezar</button>
+        </div>
+        <p class="tuner-status" id="tunerStatus"></p>
+      </div>
+
+      <div class="util-sep"></div>
+
+      <div class="dbm-card" style="text-align:center;">
+        <h3 style="margin:14px 0 2px;font-size:13px;letter-spacing:.04em;"><i class="ti ti-gauge" style="margin-right:6px;"></i>Medidor de volumen</h3>
+        <p class="tab-hint">nivel de monitoreo en la sala · verde = tu punto para mezclar/masterizar</p>
+        <div class="dbm-readout"><span id="dbmVal">–</span><span class="dbm-unit">dB</span></div>
+        <div class="dbm-meter">
+          <div class="dbm-track">
+            <div class="dbm-zone" id="dbmZone"></div>
+            <div class="dbm-fill" id="dbmFill"></div>
+            <div class="dbm-peak" id="dbmPeak"></div>
+          </div>
+          <div class="dbm-scale"><span>silencio</span><span>fuerte</span></div>
+        </div>
+        <div class="dbm-status" id="dbmStatus">—</div>
+        <div class="dbm-actions">
+          <button class="btn gold" id="dbmToggle"><i class="ti ti-microphone"></i> Empezar</button>
+          <button class="btn ghost" id="dbmCalib" disabled><i class="ti ti-target"></i> Fijar mi punto</button>
+        </div>
+        <p class="tab-hint" id="dbmHint" style="margin-top:8px;">Poné tu música al volumen al que mezclás mejor y tocá "Fijar mi punto": centra la zona verde ahí. Mide por el micrófono (la sala), no la señal de tu DAW.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- SEMILLERO -->
@@ -2106,6 +2229,7 @@ const TABS_META = {
 const HOY_WIDGETS_META = {
   agenda:    {name:"Tareas",           desc:"Tu podio del día + próximos pasos de las plantas"},
   bitacora:  {name:"Bitácora del día", desc:"Gratitud, rituales, tareas hechas y reflexión"},
+  utilidades:{name:"Utilidades",       desc:"Afinador cromático (y futuras herramientas)"},
 };
 
 const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
@@ -2113,8 +2237,8 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 const DEFAULT_CONFIG = {
   tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','conciertos','estadisticas','ajustes'],
   tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, conciertos:true, estadisticas:true, ajustes:true},
-  hoyWidgets: {agenda:true, bitacora:true},
-  hoyOrder: ['agenda','bitacora'],
+  hoyWidgets: {agenda:true, bitacora:true, utilidades:true},
+  hoyOrder: ['agenda','bitacora','utilidades'],
   hoyCollapsed: {agenda:false, bitacora:false},
   theme: 'auto',
 };
@@ -2220,6 +2344,11 @@ function migrate(state) {
     const si = state.config.tabOrder.indexOf('servicios');
     if (si >= 0) state.config.tabOrder.splice(si+1, 0, 'conciertos');
   }
+  // Afinador dejó de ser pestaña (ahora vive en Utilidades, al fondo de HOY): lo quitamos si quedó
+  if (state.config.tabOrder.includes('afinador')) {
+    state.config.tabOrder = state.config.tabOrder.filter(t => t !== 'afinador');
+  }
+  if ('afinador' in state.config.tabVisible) delete state.config.tabVisible.afinador;
   DEFAULT_CONFIG.tabOrder.forEach(t => { if (!state.config.tabOrder.includes(t)) state.config.tabOrder.push(t); });
   // Ensure new tabs are visible by default
   Object.keys(DEFAULT_CONFIG.tabVisible).forEach(t => { if (!(t in state.config.tabVisible)) state.config.tabVisible[t] = true; });
@@ -2593,7 +2722,8 @@ function switchTab(key) {
   $$('section.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-'+key));
   try { localStorage.setItem('jardin-lastTab', key); } catch(e){}
   window.scrollTo({top:0});
-  if (key === 'hoy') { renderAgenda(); if (dashOpen) buildDashboard(document.getElementById('statsDashboard')); }
+  if (typeof stopUtilAudio === 'function') stopUtilAudio(); // Utilidades vive en HOY: al cambiar de pestaña, apaga el mic
+  if (key === 'hoy') { renderAgenda(); renderAfinador(); if (dashOpen) buildDashboard(document.getElementById('statsDashboard')); }
   if (key === 'semillero') renderSemillero();
   if (key === 'jardin') { renderJardin(); renderDeadlines(); }
   if (key === 'flores') renderFlores();
@@ -5002,11 +5132,31 @@ async function toggleRecording(context) {
   if (isRecording) { stopRecording(); return; }
   recordingContext = context;
   try {
-    recordingStream = await navigator.mediaDevices.getUserMedia({audio: true});
+    // Alta fidelidad para música: apagamos los procesadores de llamada (eco/ruido/ganancia
+    // automática) que distorsionan guitarra y voz cantada. Pedimos 48kHz y estéreo (advisory:
+    // si el mic es mono, igual funciona). Si el navegador rechaza las constraints, reintentamos
+    // con audio simple para no quedarnos sin grabar.
+    const hifi = {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: false,
+      channelCount: 2,
+      sampleRate: 48000
+    };
+    try {
+      recordingStream = await navigator.mediaDevices.getUserMedia({audio: hifi});
+    } catch (inner) {
+      recordingStream = await navigator.mediaDevices.getUserMedia({audio: true});
+    }
   } catch (err) { toast('Sin acceso al micrófono'); return; }
   audioChunks = [];
   const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
-  mediaRecorder = mime ? new MediaRecorder(recordingStream, {mimeType: mime}) : new MediaRecorder(recordingStream);
+  const recOpts = mime ? {mimeType: mime, audioBitsPerSecond: 256000} : {audioBitsPerSecond: 256000};
+  try {
+    mediaRecorder = new MediaRecorder(recordingStream, recOpts);
+  } catch (e) {
+    mediaRecorder = mime ? new MediaRecorder(recordingStream, {mimeType: mime}) : new MediaRecorder(recordingStream);
+  }
   mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
   mediaRecorder.onstop = () => {
     const blob = new Blob(audioChunks, {type: mediaRecorder.mimeType || 'audio/webm'});
@@ -5075,6 +5225,263 @@ async function toggleRecording(context) {
 function stopRecording() {
   if (!isRecording) return;
   try { mediaRecorder.stop(); } catch(e){}
+}
+
+// ========================= AFINADOR (guitar tuner) =========================
+let tunerActive = false, tunerStream = null, tunerCtx = null, tunerAnalyser = null;
+let tunerBuf = null, tunerRAF = null, tunerSmoothHz = 0, tunerLast = 0;
+const NOTE_NAMES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+function freqToNote(freq) {
+  const midi = Math.round(69 + 12*Math.log2(freq/440));
+  const name = NOTE_NAMES_SHARP[((midi%12)+12)%12];
+  const octave = Math.floor(midi/12) - 1;
+  const ref = 440 * Math.pow(2,(midi-69)/12);
+  const cents = Math.round(1200*Math.log2(freq/ref));
+  return {name, octave, cents};
+}
+
+// Detección de tono por autocorrelación (ACF) con interpolación parabólica.
+function autoCorrelate(buf, sampleRate) {
+  const SIZE = buf.length;
+  let rms = 0;
+  for (let i=0;i<SIZE;i++){ const v=buf[i]; rms += v*v; }
+  rms = Math.sqrt(rms/SIZE);
+  if (rms < 0.01) return -1; // demasiado silencio para leer
+  let start = 0, end = SIZE-1;
+  const thres = 0.2;
+  for (let i=0;i<SIZE/2;i++){ if (Math.abs(buf[i]) < thres){ start=i; break; } }
+  for (let i=1;i<SIZE/2;i++){ if (Math.abs(buf[SIZE-i]) < thres){ end=SIZE-i; break; } }
+  const b = buf.slice(start, end);
+  const n = b.length;
+  if (n < 64) return -1;
+  const c = new Float32Array(n);
+  for (let lag=0; lag<n; lag++){
+    let sum = 0;
+    for (let i=0; i<n-lag; i++) sum += b[i]*b[i+lag];
+    c[lag] = sum;
+  }
+  let d = 0; while (d < n-1 && c[d] > c[d+1]) d++;
+  let maxval = -1, maxpos = -1;
+  for (let i=d; i<n; i++){ if (c[i] > maxval){ maxval = c[i]; maxpos = i; } }
+  if (maxpos <= 0) return -1;
+  let T0 = maxpos;
+  const x1 = c[T0-1]||0, x2 = c[T0], x3 = c[T0+1]||0;
+  const a = (x1 + x3 - 2*x2)/2, bb = (x3 - x1)/2;
+  if (a) T0 = T0 - bb/(2*a);
+  const freq = sampleRate / T0;
+  if (freq < 50 || freq > 2000) return -1; // rango cromático amplio (≈ G1 → C7)
+  return freq;
+}
+
+function tunerLoop(ts) {
+  if (!tunerActive || !tunerAnalyser) return;
+  tunerRAF = requestAnimationFrame(tunerLoop);
+  if (ts && ts - tunerLast < 55) return; // ~18 lecturas/seg (liviano en celular)
+  tunerLast = ts || 0;
+  tunerAnalyser.getFloatTimeDomainData(tunerBuf);
+  const freq = autoCorrelate(tunerBuf, tunerCtx.sampleRate);
+  const noteEl = $('#tunerNote'), octEl = $('#tunerOct'), centsEl = $('#tunerCents'),
+        hzEl = $('#tunerHz'), needle = $('#tunerNeedle');
+  if (freq > 0) {
+    tunerSmoothHz = tunerSmoothHz ? tunerSmoothHz*0.7 + freq*0.3 : freq; // suaviza el salto
+    const f = tunerSmoothHz;
+    const {name, octave, cents} = freqToNote(f);
+    const intune = Math.abs(cents) <= 5;
+    if (noteEl){ noteEl.textContent = name; noteEl.className = 'tuner-note ' + (intune?'intune':'off'); }
+    if (octEl) octEl.textContent = 'octava ' + octave;
+    if (centsEl) centsEl.textContent = (cents>0?'+':'') + cents + ' cents · ' + (intune?'afinada ✓':(cents<0?'baja ♭':'alta ♯'));
+    if (hzEl) hzEl.textContent = f.toFixed(1) + ' Hz';
+    if (needle){
+      const pct = Math.max(-50, Math.min(50, cents)) + 50;
+      needle.style.left = pct + '%';
+      needle.className = 'tm-needle ' + (intune?'intune':'');
+    }
+  } else {
+    if (noteEl){ noteEl.textContent = '–'; noteEl.className = 'tuner-note'; }
+    if (octEl) octEl.textContent = '';
+    if (centsEl) centsEl.textContent = '— cents';
+    if (hzEl) hzEl.textContent = '— Hz';
+    if (needle){ needle.style.left = '50%'; needle.className = 'tm-needle'; }
+    tunerSmoothHz = 0;
+  }
+}
+
+async function startTuner() {
+  if (tunerActive) return;
+  if (typeof stopDbMeter === 'function') stopDbMeter(); // un solo mic a la vez
+  const statusEl = $('#tunerStatus');
+  try {
+    tunerStream = await navigator.mediaDevices.getUserMedia({audio:{
+      echoCancellation:false, noiseSuppression:false, autoGainControl:false
+    }});
+  } catch(e) {
+    try { tunerStream = await navigator.mediaDevices.getUserMedia({audio:true}); }
+    catch(e2){ if (statusEl) statusEl.textContent = 'Sin acceso al micrófono'; toast('Sin acceso al micrófono'); return; }
+  }
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) { if (statusEl) statusEl.textContent = 'Tu navegador no soporta audio en vivo'; return; }
+  tunerCtx = new Ctx();
+  if (tunerCtx.state === 'suspended') { try { await tunerCtx.resume(); } catch(e){} }
+  const src = tunerCtx.createMediaStreamSource(tunerStream);
+  tunerAnalyser = tunerCtx.createAnalyser();
+  tunerAnalyser.fftSize = 2048;
+  tunerBuf = new Float32Array(tunerAnalyser.fftSize);
+  src.connect(tunerAnalyser);
+  tunerActive = true; tunerLast = 0;
+  const btn = $('#tunerToggle');
+  if (btn) btn.innerHTML = '<i class="ti ti-player-stop-filled"></i> Detener';
+  if (statusEl) statusEl.textContent = 'escuchando… tocá una cuerda';
+  tunerRAF = requestAnimationFrame(tunerLoop);
+}
+
+function stopTuner() {
+  if (!tunerActive && !tunerStream && !tunerCtx) return;
+  tunerActive = false;
+  if (tunerRAF) cancelAnimationFrame(tunerRAF);
+  tunerRAF = null;
+  if (tunerStream) { tunerStream.getTracks().forEach(t=>t.stop()); tunerStream = null; }
+  if (tunerCtx) { try { tunerCtx.close(); } catch(e){} tunerCtx = null; }
+  tunerAnalyser = null; tunerBuf = null; tunerSmoothHz = 0;
+  const btn = $('#tunerToggle'); if (btn) btn.innerHTML = '<i class="ti ti-microphone"></i> Empezar';
+  const statusEl = $('#tunerStatus'); if (statusEl) statusEl.textContent = '';
+  const noteEl = $('#tunerNote'); if (noteEl){ noteEl.textContent='–'; noteEl.className='tuner-note'; }
+  const octEl=$('#tunerOct'); if(octEl) octEl.textContent='';
+  const centsEl=$('#tunerCents'); if(centsEl) centsEl.textContent='— cents';
+  const hzEl=$('#tunerHz'); if(hzEl) hzEl.textContent='— Hz';
+  const needle=$('#tunerNeedle'); if(needle){ needle.style.left='50%'; needle.className='tm-needle'; }
+}
+
+// ========================= MEDIDOR DE VOLUMEN (dB / monitoreo de sala) =========================
+// Mide el nivel que entra por el micrófono (la sala / lo que sale por los parlantes), NO la señal
+// digital del DAW. Sirve para monitorear a un volumen consistente: el "sweet spot" se CALIBRA a la
+// sala con el botón "Fijar mi punto". El número es relativo (dBFS del mic), no dB SPL absolutos.
+let dbmActive=false, dbmStream=null, dbmCtx=null, dbmAnalyser=null, dbmBuf=null, dbmRAF=null;
+let dbmSmooth=-100, dbmPeakHold=-100, dbmPeakAt=0, dbmLast=0;
+const DB_MIN=-60, DB_MAX=0, DB_BAND=4; // zona verde = punto ± DB_BAND dB
+
+function dbRef(){ const v=parseFloat(localStorage.getItem('jardin-dbRef')); return isNaN(v) ? -24 : v; }
+function setDbRef(v){ try{ localStorage.setItem('jardin-dbRef', String(v)); }catch(e){} }
+function dbToPct(db){ return Math.max(0, Math.min(100, (db-DB_MIN)/(DB_MAX-DB_MIN)*100)); }
+
+function renderDbZone(){
+  const zone=$('#dbmZone'); if(!zone) return;
+  const c=dbRef(), lo=dbToPct(c-DB_BAND), hi=dbToPct(c+DB_BAND);
+  zone.style.left=lo+'%'; zone.style.width=Math.max(3,hi-lo)+'%';
+}
+
+function dbmLoop(ts){
+  if(!dbmActive || !dbmAnalyser) return;
+  dbmRAF=requestAnimationFrame(dbmLoop);
+  if(ts && ts-dbmLast<50) return; // ~20 lecturas/seg
+  dbmLast=ts||0;
+  dbmAnalyser.getFloatTimeDomainData(dbmBuf);
+  let sum=0; for(let i=0;i<dbmBuf.length;i++){ const v=dbmBuf[i]; sum+=v*v; }
+  const rms=Math.sqrt(sum/dbmBuf.length);
+  let db = rms>0 ? 20*Math.log10(rms) : -100;
+  if(db<DB_MIN) db=DB_MIN;
+  // ataque rápido, caída lenta (como un medidor real)
+  if(db>dbmSmooth) dbmSmooth = dbmSmooth*0.4 + db*0.6;
+  else dbmSmooth = dbmSmooth*0.85 + db*0.15;
+  const d=dbmSmooth;
+  const now = ts || performance.now();
+  if(d>dbmPeakHold){ dbmPeakHold=d; dbmPeakAt=now; }
+  else if(now-dbmPeakAt>1500){ dbmPeakHold=Math.max(d, dbmPeakHold-0.6); }
+  const valEl=$('#dbmVal'), fill=$('#dbmFill'), peak=$('#dbmPeak'), status=$('#dbmStatus');
+  if(valEl) valEl.textContent = d<=DB_MIN+0.5 ? '–' : d.toFixed(1);
+  if(fill) fill.style.width = dbToPct(d)+'%';
+  if(peak) peak.style.left = dbToPct(dbmPeakHold)+'%';
+  const c=dbRef();
+  let st='—', cls='';
+  if(d<=DB_MIN+1){ st='silencio'; cls=''; }
+  else if(d < c-DB_BAND){ st='bajo · subí un poco'; cls='low'; }
+  else if(d > c+DB_BAND){ st='alto · bajá un poco'; cls='high'; }
+  else { st='en tu punto ✓'; cls='ok'; }
+  if(status){ status.textContent=st; status.className='dbm-status '+cls; }
+  if(fill) fill.className='dbm-fill '+cls;
+}
+
+async function startDbMeter(){
+  if(dbmActive) return;
+  if (typeof stopTuner === 'function') stopTuner(); // un solo mic a la vez
+  try{
+    dbmStream=await navigator.mediaDevices.getUserMedia({audio:{
+      echoCancellation:false, noiseSuppression:false, autoGainControl:false
+    }});
+  }catch(e){
+    try{ dbmStream=await navigator.mediaDevices.getUserMedia({audio:true}); }
+    catch(e2){ toast('Sin acceso al micrófono'); return; }
+  }
+  const Ctx=window.AudioContext||window.webkitAudioContext;
+  if(!Ctx){ toast('Tu navegador no soporta audio en vivo'); return; }
+  dbmCtx=new Ctx();
+  if(dbmCtx.state==='suspended'){ try{ await dbmCtx.resume(); }catch(e){} }
+  const src=dbmCtx.createMediaStreamSource(dbmStream);
+  dbmAnalyser=dbmCtx.createAnalyser();
+  dbmAnalyser.fftSize=1024;
+  dbmBuf=new Float32Array(dbmAnalyser.fftSize);
+  src.connect(dbmAnalyser);
+  dbmActive=true; dbmSmooth=-100; dbmPeakHold=-100; dbmLast=0;
+  const btn=$('#dbmToggle'); if(btn) btn.innerHTML='<i class="ti ti-player-stop-filled"></i> Detener';
+  const cal=$('#dbmCalib'); if(cal) cal.disabled=false;
+  renderDbZone();
+  dbmRAF=requestAnimationFrame(dbmLoop);
+}
+
+function stopDbMeter(){
+  if(!dbmActive && !dbmStream && !dbmCtx) return;
+  dbmActive=false;
+  if(dbmRAF) cancelAnimationFrame(dbmRAF); dbmRAF=null;
+  if(dbmStream){ dbmStream.getTracks().forEach(t=>t.stop()); dbmStream=null; }
+  if(dbmCtx){ try{ dbmCtx.close(); }catch(e){} dbmCtx=null; }
+  dbmAnalyser=null; dbmBuf=null;
+  const btn=$('#dbmToggle'); if(btn) btn.innerHTML='<i class="ti ti-microphone"></i> Empezar';
+  const cal=$('#dbmCalib'); if(cal) cal.disabled=true;
+  const valEl=$('#dbmVal'); if(valEl) valEl.textContent='–';
+  const fill=$('#dbmFill'); if(fill){ fill.style.width='0%'; fill.className='dbm-fill'; }
+  const peak=$('#dbmPeak'); if(peak) peak.style.left='0%';
+  const status=$('#dbmStatus'); if(status){ status.textContent='—'; status.className='dbm-status'; }
+}
+
+function calibrarDb(){
+  if(!dbmActive){ toast('Empezá el medidor primero'); return; }
+  if(dbmSmooth<=DB_MIN+1){ toast('No escucho nada · poné tu música'); return; }
+  setDbRef(Math.round(dbmSmooth*10)/10);
+  renderDbZone();
+  toast('Punto fijado en '+dbRef().toFixed(1)+' dB','✦');
+}
+
+// Apaga todo el audio en vivo de Utilidades (afinador + medidor).
+function stopUtilAudio(){
+  if (typeof stopTuner === 'function') stopTuner();
+  if (typeof stopDbMeter === 'function') stopDbMeter();
+}
+
+let utilOpen = false;
+function renderAfinador() {
+  const btn = $('#tunerToggle');
+  if (btn && !btn._wired) {
+    btn._wired = true;
+    btn.addEventListener('click', () => { tunerActive ? stopTuner() : startTuner(); });
+  }
+  const dbBtn = $('#dbmToggle');
+  if (dbBtn && !dbBtn._wired) {
+    dbBtn._wired = true;
+    dbBtn.addEventListener('click', () => { dbmActive ? stopDbMeter() : startDbMeter(); });
+  }
+  const dbCal = $('#dbmCalib');
+  if (dbCal && !dbCal._wired) { dbCal._wired = true; dbCal.addEventListener('click', calibrarDb); }
+  renderDbZone();
+  const toggle = $('#utilToggle'), body = $('#utilBody');
+  if (toggle && body && !toggle._wired) {
+    toggle._wired = true;
+    toggle.addEventListener('click', () => {
+      utilOpen = !utilOpen;
+      body.style.display = utilOpen ? 'block' : 'none';
+      toggle.classList.toggle('open', utilOpen);
+      if (!utilOpen) stopUtilAudio(); // cerrar la sección apaga el mic
+    });
+  }
 }
 
 // ========================= BRAND PROFILE =========================
@@ -6002,8 +6409,8 @@ function renderPlantSteps() {
 }
 
 // ========================= HOY · WIDGETS MODULARES =========================
-const HOY_NAMES = { agenda:'Tareas', bitacora:'Bitácora', voces:'Voces', stats:'Progreso', riego:'Riego', dashboard:'Estadísticas' };
-const HOY_COLLAPSIBLE = { agenda:1, bitacora:1, voces:1, stats:1, riego:1 }; // dashboard usa su propio toggle interno
+const HOY_NAMES = { agenda:'Tareas', bitacora:'Bitácora', voces:'Voces', stats:'Progreso', riego:'Riego', dashboard:'Estadísticas', utilidades:'Utilidades' };
+const HOY_COLLAPSIBLE = { agenda:1, bitacora:1, voces:1, stats:1, riego:1 }; // dashboard y utilidades usan su propio toggle interno
 
 // Envuelve el contenido de cada widget en .widget-body y le antepone una barra
 // con grip (mover) + nombre (visible al colapsar) + chevron (minimizar). Idempotente.
