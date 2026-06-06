@@ -729,6 +729,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
   transition: left .1s linear;
 }
 .dbm-scale { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); padding: 5px 2px 0; }
+.dbm-scale .tm-center { color: #3fbf6f; }
 .dbm-status { font-size: 12px; color: var(--text-secondary); margin-top: 10px; min-height: 16px; }
 .dbm-status.ok   { color: #3fbf6f; font-weight: 600; }
 .dbm-status.low  { color: var(--gold); }
@@ -1602,7 +1603,7 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 
       <div class="dbm-card" style="text-align:center;">
         <h3 style="margin:14px 0 2px;font-size:13px;letter-spacing:.04em;"><i class="ti ti-gauge" style="margin-right:6px;"></i>Medidor de volumen</h3>
-        <p class="tab-hint">nivel de monitoreo en la sala · verde = tu punto para mezclar/masterizar</p>
+        <p class="tab-hint">volumen de monitoreo en la sala (dB tipo SPL) · verde = 75–85 dB, el rango pro para mezclar/masterizar</p>
         <div class="dbm-readout"><span id="dbmVal">–</span><span class="dbm-unit">dB</span></div>
         <div class="dbm-meter">
           <div class="dbm-track">
@@ -1610,14 +1611,14 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
             <div class="dbm-fill" id="dbmFill"></div>
             <div class="dbm-peak" id="dbmPeak"></div>
           </div>
-          <div class="dbm-scale"><span>silencio</span><span>fuerte</span></div>
+          <div class="dbm-scale"><span>bajo</span><span class="tm-center">75–85 ✓</span><span>alto</span></div>
         </div>
         <div class="dbm-status" id="dbmStatus">—</div>
         <div class="dbm-actions">
           <button class="btn gold" id="dbmToggle"><i class="ti ti-microphone"></i> Empezar</button>
-          <button class="btn ghost" id="dbmCalib" disabled><i class="ti ti-target"></i> Fijar mi punto</button>
+          <button class="btn ghost" id="dbmCalib" disabled><i class="ti ti-target"></i> Calibrar</button>
         </div>
-        <p class="tab-hint" id="dbmHint" style="margin-top:8px;">Poné tu música al volumen al que mezclás mejor y tocá "Fijar mi punto": centra la zona verde ahí. Mide por el micrófono (la sala), no la señal de tu DAW.</p>
+        <p class="tab-hint" id="dbmHint" style="margin-top:8px;">El número es <b>aprox</b>: mide por el micrófono (la sala), no la señal de tu DAW. Para que coincida con la realidad, tocá <b>Calibrar</b> y poné los dB que marque un medidor/app de SPL. La zona verde (75–85 dB) es el estándar de monitoreo.</p>
       </div>
     </div>
   </div>
@@ -5230,6 +5231,7 @@ function stopRecording() {
 // ========================= AFINADOR (guitar tuner) =========================
 let tunerActive = false, tunerStream = null, tunerCtx = null, tunerAnalyser = null;
 let tunerBuf = null, tunerRAF = null, tunerSmoothHz = 0, tunerLast = 0;
+let tunerLastGoodAt = 0, tunerCand = 0, tunerCandCount = 0; // estabilidad: confirmación + sostén de nota
 const NOTE_NAMES_SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 
 function freqToNote(freq) {
@@ -5265,6 +5267,9 @@ function autoCorrelate(buf, sampleRate) {
   let maxval = -1, maxpos = -1;
   for (let i=d; i<n; i++){ if (c[i] > maxval){ maxval = c[i]; maxpos = i; } }
   if (maxpos <= 0) return -1;
+  // Claridad: un tono real tiene un pico de autocorrelación fuerte respecto a su energía;
+  // el ruido ambiente no. Descartamos lecturas poco claras para no saltar de nota con el ruido.
+  if (c[0] > 0 && (maxval / c[0]) < 0.45) return -1;
   let T0 = maxpos;
   const x1 = c[T0-1]||0, x2 = c[T0], x3 = c[T0+1]||0;
   const a = (x1 + x3 - 2*x2)/2, bb = (x3 - x1)/2;
@@ -5279,12 +5284,28 @@ function tunerLoop(ts) {
   tunerRAF = requestAnimationFrame(tunerLoop);
   if (ts && ts - tunerLast < 55) return; // ~18 lecturas/seg (liviano en celular)
   tunerLast = ts || 0;
+  const now = ts || performance.now();
   tunerAnalyser.getFloatTimeDomainData(tunerBuf);
   const freq = autoCorrelate(tunerBuf, tunerCtx.sampleRate);
   const noteEl = $('#tunerNote'), octEl = $('#tunerOct'), centsEl = $('#tunerCents'),
         hzEl = $('#tunerHz'), needle = $('#tunerNeedle');
   if (freq > 0) {
-    tunerSmoothHz = tunerSmoothHz ? tunerSmoothHz*0.7 + freq*0.3 : freq; // suaviza el salto
+    if (!tunerSmoothHz) {
+      tunerSmoothHz = freq; // primer enganche
+    } else {
+      const semis = Math.abs(12 * Math.log2(freq / tunerSmoothHz));
+      if (semis < 1.5) {
+        // misma nota → suavizado fuerte: la lectura queda firme, no tiembla
+        tunerSmoothHz = tunerSmoothHz * 0.8 + freq * 0.2;
+        tunerCand = 0; tunerCandCount = 0;
+      } else {
+        // otra nota → exige varias lecturas seguidas antes de cambiar (mata el salto por ruido)
+        if (tunerCand && Math.abs(12 * Math.log2(freq / tunerCand)) < 1.0) { tunerCand = tunerCand * 0.5 + freq * 0.5; tunerCandCount++; }
+        else { tunerCand = freq; tunerCandCount = 1; }
+        if (tunerCandCount >= 3) { tunerSmoothHz = tunerCand; tunerCand = 0; tunerCandCount = 0; }
+      }
+    }
+    tunerLastGoodAt = now;
     const f = tunerSmoothHz;
     const {name, octave, cents} = freqToNote(f);
     const intune = Math.abs(cents) <= 5;
@@ -5298,12 +5319,14 @@ function tunerLoop(ts) {
       needle.className = 'tm-needle ' + (intune?'intune':'');
     }
   } else {
+    // sin tono claro: mantené la última nota un momento (evita parpadeo con el ruido); después limpiá
+    if (tunerSmoothHz && now - tunerLastGoodAt < 900) return;
+    tunerSmoothHz = 0; tunerCand = 0; tunerCandCount = 0;
     if (noteEl){ noteEl.textContent = '–'; noteEl.className = 'tuner-note'; }
     if (octEl) octEl.textContent = '';
     if (centsEl) centsEl.textContent = '— cents';
     if (hzEl) hzEl.textContent = '— Hz';
     if (needle){ needle.style.left = '50%'; needle.className = 'tm-needle'; }
-    tunerSmoothHz = 0;
   }
 }
 
@@ -5329,9 +5352,10 @@ async function startTuner() {
   tunerBuf = new Float32Array(tunerAnalyser.fftSize);
   src.connect(tunerAnalyser);
   tunerActive = true; tunerLast = 0;
+  tunerSmoothHz = 0; tunerCand = 0; tunerCandCount = 0; tunerLastGoodAt = 0;
   const btn = $('#tunerToggle');
   if (btn) btn.innerHTML = '<i class="ti ti-player-stop-filled"></i> Detener';
-  if (statusEl) statusEl.textContent = 'escuchando… tocá una cuerda';
+  if (statusEl) statusEl.textContent = 'escuchando… tocá una nota';
   tunerRAF = requestAnimationFrame(tunerLoop);
 }
 
@@ -5342,7 +5366,7 @@ function stopTuner() {
   tunerRAF = null;
   if (tunerStream) { tunerStream.getTracks().forEach(t=>t.stop()); tunerStream = null; }
   if (tunerCtx) { try { tunerCtx.close(); } catch(e){} tunerCtx = null; }
-  tunerAnalyser = null; tunerBuf = null; tunerSmoothHz = 0;
+  tunerAnalyser = null; tunerBuf = null; tunerSmoothHz = 0; tunerCand = 0; tunerCandCount = 0;
   const btn = $('#tunerToggle'); if (btn) btn.innerHTML = '<i class="ti ti-microphone"></i> Empezar';
   const statusEl = $('#tunerStatus'); if (statusEl) statusEl.textContent = '';
   const noteEl = $('#tunerNote'); if (noteEl){ noteEl.textContent='–'; noteEl.className='tuner-note'; }
@@ -5352,21 +5376,26 @@ function stopTuner() {
   const needle=$('#tunerNeedle'); if(needle){ needle.style.left='50%'; needle.className='tm-needle'; }
 }
 
-// ========================= MEDIDOR DE VOLUMEN (dB / monitoreo de sala) =========================
+// ========================= MEDIDOR DE VOLUMEN (dB tipo SPL / monitoreo de sala) =========================
 // Mide el nivel que entra por el micrófono (la sala / lo que sale por los parlantes), NO la señal
-// digital del DAW. Sirve para monitorear a un volumen consistente: el "sweet spot" se CALIBRA a la
-// sala con el botón "Fijar mi punto". El número es relativo (dBFS del mic), no dB SPL absolutos.
+// digital del DAW. Lo mostramos como dB tipo SPL (positivo: el "idioma" de los 75–85 dB que se usan
+// para mezclar/masterizar). La zona verde está FIJA en 75–85 dB (el estándar de monitoreo). El número
+// es APROXIMADO salvo que calibres con un medidor/app de SPL real (botón "Calibrar") — ahí queda exacto
+// a tu sala. El micrófono de cada equipo es distinto, por eso la calibración se guarda por dispositivo.
 let dbmActive=false, dbmStream=null, dbmCtx=null, dbmAnalyser=null, dbmBuf=null, dbmRAF=null;
 let dbmSmooth=-100, dbmPeakHold=-100, dbmPeakAt=0, dbmLast=0;
-const DB_MIN=-60, DB_MAX=0, DB_BAND=4; // zona verde = punto ± DB_BAND dB
+const DBFS_FLOOR=-60;          // piso de silencio del micrófono (dBFS)
+const SPL_MIN=45, SPL_MAX=100; // rango visible del medidor (dB tipo SPL)
+const SPL_LO=75, SPL_HI=85;    // zona verde = sweet spot de monitoreo (estándar pro)
+const DB_OFFSET_DEFAULT=100;   // dBFS + offset ≈ dB SPL; default plausible (calibrable)
 
-function dbRef(){ const v=parseFloat(localStorage.getItem('jardin-dbRef')); return isNaN(v) ? -24 : v; }
-function setDbRef(v){ try{ localStorage.setItem('jardin-dbRef', String(v)); }catch(e){} }
-function dbToPct(db){ return Math.max(0, Math.min(100, (db-DB_MIN)/(DB_MAX-DB_MIN)*100)); }
+function dbOffset(){ const v=parseFloat(localStorage.getItem('jardin-dbOffset')); return isNaN(v) ? DB_OFFSET_DEFAULT : v; }
+function setDbOffset(v){ try{ localStorage.setItem('jardin-dbOffset', String(v)); }catch(e){} }
+function splToPct(spl){ return Math.max(0, Math.min(100, (spl-SPL_MIN)/(SPL_MAX-SPL_MIN)*100)); }
 
 function renderDbZone(){
   const zone=$('#dbmZone'); if(!zone) return;
-  const c=dbRef(), lo=dbToPct(c-DB_BAND), hi=dbToPct(c+DB_BAND);
+  const lo=splToPct(SPL_LO), hi=splToPct(SPL_HI);
   zone.style.left=lo+'%'; zone.style.width=Math.max(3,hi-lo)+'%';
 }
 
@@ -5378,25 +5407,26 @@ function dbmLoop(ts){
   dbmAnalyser.getFloatTimeDomainData(dbmBuf);
   let sum=0; for(let i=0;i<dbmBuf.length;i++){ const v=dbmBuf[i]; sum+=v*v; }
   const rms=Math.sqrt(sum/dbmBuf.length);
-  let db = rms>0 ? 20*Math.log10(rms) : -100;
-  if(db<DB_MIN) db=DB_MIN;
+  let db = rms>0 ? 20*Math.log10(rms) : -100; // dBFS del micrófono
+  if(db<DBFS_FLOOR) db=DBFS_FLOOR;
   // ataque rápido, caída lenta (como un medidor real)
   if(db>dbmSmooth) dbmSmooth = dbmSmooth*0.4 + db*0.6;
   else dbmSmooth = dbmSmooth*0.85 + db*0.15;
-  const d=dbmSmooth;
   const now = ts || performance.now();
-  if(d>dbmPeakHold){ dbmPeakHold=d; dbmPeakAt=now; }
-  else if(now-dbmPeakAt>1500){ dbmPeakHold=Math.max(d, dbmPeakHold-0.6); }
+  if(dbmSmooth>dbmPeakHold){ dbmPeakHold=dbmSmooth; dbmPeakAt=now; }
+  else if(now-dbmPeakAt>1500){ dbmPeakHold=Math.max(dbmSmooth, dbmPeakHold-0.6); }
+  const off=dbOffset();
+  const spl=dbmSmooth+off, splPeak=dbmPeakHold+off; // dB tipo SPL (aprox o calibrado)
+  const silencio = dbmSmooth <= DBFS_FLOOR+1;
   const valEl=$('#dbmVal'), fill=$('#dbmFill'), peak=$('#dbmPeak'), status=$('#dbmStatus');
-  if(valEl) valEl.textContent = d<=DB_MIN+0.5 ? '–' : d.toFixed(1);
-  if(fill) fill.style.width = dbToPct(d)+'%';
-  if(peak) peak.style.left = dbToPct(dbmPeakHold)+'%';
-  const c=dbRef();
+  if(valEl) valEl.textContent = silencio ? '–' : String(Math.round(spl));
+  if(fill) fill.style.width = (silencio?0:splToPct(spl))+'%';
+  if(peak) peak.style.left = (silencio?0:splToPct(splPeak))+'%';
   let st='—', cls='';
-  if(d<=DB_MIN+1){ st='silencio'; cls=''; }
-  else if(d < c-DB_BAND){ st='bajo · subí un poco'; cls='low'; }
-  else if(d > c+DB_BAND){ st='alto · bajá un poco'; cls='high'; }
-  else { st='en tu punto ✓'; cls='ok'; }
+  if(silencio){ st='silencio'; cls=''; }
+  else if(spl < SPL_LO){ st='bajo · subí un poco'; cls='low'; }
+  else if(spl > SPL_HI){ st='alto · bajá un poco'; cls='high'; }
+  else { st='en tu punto ✓ · 75–85 dB'; cls='ok'; }
   if(status){ status.textContent=st; status.className='dbm-status '+cls; }
   if(fill) fill.className='dbm-fill '+cls;
 }
@@ -5445,10 +5475,16 @@ function stopDbMeter(){
 
 function calibrarDb(){
   if(!dbmActive){ toast('Empezá el medidor primero'); return; }
-  if(dbmSmooth<=DB_MIN+1){ toast('No escucho nada · poné tu música'); return; }
-  setDbRef(Math.round(dbmSmooth*10)/10);
+  if(dbmSmooth<=DBFS_FLOOR+1){ toast('No escucho nada · poné tu música'); return; }
+  const cur = Math.round(dbmSmooth + dbOffset());
+  const ans = prompt('Calibrar a tu sala.\n¿Cuántos dB marca tu medidor/app de SPL ahora mismo?\n(Dejá vacío para usar 80. Sirve para que el número coincida con la realidad.)', String(cur));
+  if(ans===null) return; // canceló
+  let real = parseFloat(String(ans).replace(',','.'));
+  if(isNaN(real)) real = 80;
+  real = Math.max(30, Math.min(120, real));
+  setDbOffset(real - dbmSmooth);
   renderDbZone();
-  toast('Punto fijado en '+dbRef().toFixed(1)+' dB','✦');
+  toast('Calibrado · ahora marcás ~'+Math.round(dbmSmooth+dbOffset())+' dB','✦');
 }
 
 // Apaga todo el audio en vivo de Utilidades (afinador + medidor).
