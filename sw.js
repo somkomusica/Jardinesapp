@@ -1,5 +1,5 @@
 // Jardín Service Worker — Network First con auto-update
-const CACHE_NAME = 'jardin-v17-afinador-estable-spl';
+const CACHE_NAME = 'jardin-v18-referencias';
 const ESSENTIAL_FILES = [
   './',
   './index.html',

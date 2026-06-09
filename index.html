@@ -455,6 +455,17 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .mtile .mtile-grip { left: 4px; cursor: grab; touch-action: none; }
 .mtile .mtile-size { right: 4px; }
 @media (max-width: 480px) { .mosaic { grid-auto-rows: 60px; } }
+/* Referencias — muro visual (reusa .mosaic/.mtile) */
+.mtile .mtile-actions { position: absolute; top: 4px; right: 4px; display: flex; gap: 4px; opacity: .55; transition: opacity .15s; }
+.mtile:hover .mtile-actions { opacity: 1; }
+.mtile .mtile-act { background: rgba(0,0,0,.5); color: #fff; border: none; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; padding: 0; }
+.mtile .mtile-act.danger:hover { background: #b5402f; }
+.mtile.ref-link { background: linear-gradient(135deg, var(--gold-soft), var(--bg-soft)); }
+.mtile .ref-linkface { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px; text-align: center; color: var(--gold); }
+.mtile .ref-linkface i { font-size: 22px; }
+.mtile .ref-linkface span { font-size: 11px; color: var(--text-secondary); line-height: 1.3; max-height: 3.9em; overflow: hidden; }
+.mtile .ref-source { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 9.5px; letter-spacing: .04em; padding: 3px 6px; display: flex; align-items: center; gap: 4px; text-decoration: none; }
+.mtile .ref-source:hover { background: rgba(0,0,0,.75); }
 /* Anidación (páginas) + selección múltiple en Semillero */
 .sem-breadcrumb { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; font-size: 12px; }
 .sem-breadcrumb button { background: none; border: none; color: var(--gold); cursor: pointer; padding: 2px 4px; font-size: 12px; }
@@ -1643,6 +1654,23 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
   </div>
 </section>
 
+<!-- REFERENCIAS -->
+<section class="tab" id="tab-referencias">
+  <div class="card">
+    <h2 class="section-title"><i class="ti ti-layout-grid"></i> Referencias</h2>
+    <p class="tab-hint">tu muro visual · lo que te inspira pero no es un proyecto · pegá una imagen o un link · arrastrá para acomodar · agrupá a tu manera</p>
+    <div class="sem-toolbar" style="margin-top:14px;">
+      <button class="btn gold" id="refAddImg"><i class="ti ti-photo-plus"></i> Imagen</button>
+      <button class="btn ghost" id="refAddLink"><i class="ti ti-link"></i> Link</button>
+      <button class="btn ghost" id="refNewBoard"><i class="ti ti-folder-plus"></i> Nuevo tablero</button>
+      <div class="spacer"></div>
+      <input type="text" id="refSearch" placeholder="buscar..." style="max-width:200px;">
+    </div>
+    <div class="sem-filter" id="refBoards"></div>
+    <div id="refsList"></div>
+  </div>
+</section>
+
 <!-- JARDÍN -->
 <section class="tab" id="tab-jardin">
   <div class="card">
@@ -2219,6 +2247,7 @@ const TABS_META = {
   semillero:  {label:"Semillero",  icon:"ti-seedling"},
   jardin:     {label:"Jardín",     icon:"ti-plant-2"},
   flores:     {label:"Flores",     icon:"ti-flower"},
+  referencias:{label:"Referencias", icon:"ti-layout-grid"},
   diario:     {label:"Diario",     icon:"ti-notebook"},
   marca:      {label:"Marca",      icon:"ti-stack"},
   servicios:  {label:"Servicios",  icon:"ti-briefcase"},
@@ -2236,8 +2265,8 @@ const HOY_WIDGETS_META = {
 const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 
 const DEFAULT_CONFIG = {
-  tabOrder: ['hoy','semillero','jardin','flores','diario','marca','servicios','conciertos','estadisticas','ajustes'],
-  tabVisible: {hoy:true, semillero:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, conciertos:true, estadisticas:true, ajustes:true},
+  tabOrder: ['hoy','semillero','referencias','jardin','flores','diario','marca','servicios','conciertos','estadisticas','ajustes'],
+  tabVisible: {hoy:true, semillero:true, referencias:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, conciertos:true, estadisticas:true, ajustes:true},
   hoyWidgets: {agenda:true, bitacora:true, utilidades:true},
   hoyOrder: ['agenda','bitacora','utilidades'],
   hoyCollapsed: {agenda:false, bitacora:false},
@@ -2249,7 +2278,7 @@ const defaults = {
   quotes: DEFAULT_QUOTES,
   flores: DEFAULT_FLORES,
   projects: DEFAULT_PROJECTS,
-  semillas: [], semillaGroups: [], jars: [], tasks: [], botMemory: [],
+  semillas: [], semillaGroups: [], jars: [], tasks: [], botMemory: [], refs: [],
   habits: {}, habitDate: '', streak: 0, habitHistory: [],
   quoteIndex: 0, quoteDate: '',
   intention: '', mantra: '', mantraDate: '',
@@ -2345,6 +2374,11 @@ function migrate(state) {
     const si = state.config.tabOrder.indexOf('servicios');
     if (si >= 0) state.config.tabOrder.splice(si+1, 0, 'conciertos');
   }
+  // Colocar Referencias justo después de Semillero para usuarios existentes (no al final)
+  if (!state.config.tabOrder.includes('referencias')) {
+    const si = state.config.tabOrder.indexOf('semillero');
+    if (si >= 0) state.config.tabOrder.splice(si+1, 0, 'referencias');
+  }
   // Afinador dejó de ser pestaña (ahora vive en Utilidades, al fondo de HOY): lo quitamos si quedó
   if (state.config.tabOrder.includes('afinador')) {
     state.config.tabOrder = state.config.tabOrder.filter(t => t !== 'afinador');
@@ -2377,6 +2411,7 @@ function migrate(state) {
   while (state.gratitud.length < 3) state.gratitud.push('');
   if (!Array.isArray(state.tasks)) state.tasks = [];
   if (!Array.isArray(state.botMemory)) state.botMemory = []; // memoria durable del socio
+  if (!Array.isArray(state.refs)) state.refs = []; // muro de Referencias (lo que alimenta, nunca planta)
 
   // Brand profile
   if (!state.brand) state.brand = {logoData: state['lib-logo']||'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit: state['lib-presskit']||'', gallery: state['lib-fotos']||''};
@@ -2726,6 +2761,7 @@ function switchTab(key) {
   if (typeof stopUtilAudio === 'function') stopUtilAudio(); // Utilidades vive en HOY: al cambiar de pestaña, apaga el mic
   if (key === 'hoy') { renderAgenda(); renderAfinador(); if (dashOpen) buildDashboard(document.getElementById('statsDashboard')); }
   if (key === 'semillero') renderSemillero();
+  if (key === 'referencias') renderReferencias();
   if (key === 'jardin') { renderJardin(); renderDeadlines(); }
   if (key === 'flores') renderFlores();
   if (key === 'diario') renderDiario();
@@ -4471,6 +4507,129 @@ function renderSemMosaic(list) {
   });
 }
 
+// ========================= REFERENCIAS (muro visual) =========================
+// Una referencia ALIMENTA pero nunca es planta. Vive en su propio muro, libre de orden.
+//   {id, kind:'image'|'link', title, photoData, sourceUrl, tile:'s'|'m'|'l', board:'', createdAt}
+let refBoard = 'all';      // tablero (categoría) activo
+let refSearchTerm = '';
+
+function refMatchesBoard(r) {
+  if (refBoard === 'all') return true;
+  if (refBoard === 'none') return !r.board;
+  return r.board === refBoard;
+}
+
+function renderRefBoards() {
+  const el = $('#refBoards'); if (!el) return;
+  const boards = [...new Set((S.refs||[]).map(r => r.board).filter(Boolean))].sort();
+  let html = `<button data-rb="all" class="${refBoard==='all'?'active':''}">Todas</button>`;
+  html += `<button data-rb="none" class="${refBoard==='none'?'active':''}">Sin tablero</button>`;
+  boards.forEach(b => {
+    html += `<button data-rb="${escapeHTML(b)}" class="group-pill ${refBoard===b?'active':''}"><i class="ti ti-folder"></i> ${escapeHTML(b)} <span class="muted" style="margin-left:2px;">×</span></button>`;
+  });
+  el.innerHTML = html;
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => {
+    const key = b.dataset.rb;
+    if (key !== 'all' && key !== 'none' && e.target.textContent === '×') {
+      if (confirm(`Eliminar el tablero "${key}"? (las referencias no se borran, quedan sin tablero)`)) {
+        (S.refs||[]).forEach(r => { if (r.board === key) r.board = ''; });
+        if (refBoard === key) refBoard = 'all';
+        save(); renderReferencias();
+      }
+      return;
+    }
+    refBoard = key; renderReferencias();
+  }));
+}
+
+function renderReferencias() {
+  // Toolbar (idempotente)
+  const bImg = $('#refAddImg'), bLink = $('#refAddLink'), bBoard = $('#refNewBoard'), search = $('#refSearch');
+  if (bImg) bImg.onclick = () => { photoContext = {type:'ref-new'}; $('#photoInput').click(); };
+  if (bLink) bLink.onclick = addRefLink;
+  if (bBoard) bBoard.onclick = () => {
+    const name = prompt('Nombre del tablero (ej: "paleta volcán", "estética video"):');
+    if (name && name.trim()) { refBoard = name.trim(); toast(`Tablero "${name.trim()}" · arrastrá referencias acá con el botón de carpeta`, '📂'); renderReferencias(); }
+  };
+  if (search && !search._wired) { search._wired = true; search.addEventListener('input', e => { refSearchTerm = e.target.value; renderRefList(); }); }
+  renderRefBoards();
+  renderRefList();
+}
+
+function renderRefList() {
+  const list = $('#refsList'); if (!list) return;
+  let items = (S.refs||[]).filter(refMatchesBoard);
+  if (refSearchTerm) {
+    const t = refSearchTerm.toLowerCase();
+    items = items.filter(r => (r.title||'').toLowerCase().includes(t) || (r.sourceUrl||'').toLowerCase().includes(t) || (r.board||'').toLowerCase().includes(t));
+  }
+  if (!items.length) {
+    list.innerHTML = '<div class="empty">muro vacío — agregá una imagen o un link, o mandáselos al bot</div>';
+    return;
+  }
+  list.innerHTML = `<div class="mosaic" id="refsGrid">` + items.map(r => {
+    const inner = r.photoData
+      ? `<img class="mosaic-img" src="${r.photoData}" alt="${escapeHTML(r.title||'')}" loading="lazy">`
+      : `<div class="ref-linkface"><i class="ti ti-link"></i><span>${escapeHTML(r.title || refDomain(r.sourceUrl) || 'link')}</span></div>`;
+    const caption = r.kind === 'link' && r.sourceUrl
+      ? `<a class="ref-source" href="${escapeHTML(r.sourceUrl)}" target="_blank" rel="noopener" title="${escapeHTML(r.sourceUrl)}"><i class="ti ti-external-link"></i> ${escapeHTML(refDomain(r.sourceUrl))}</a>`
+      : '';
+    return `<div class="mtile tile-${r.tile||'s'} ${r.kind==='link'?'ref-link':''}" data-rtile="${r.id}">
+      <button class="dnd-grip mtile-grip" type="button" aria-label="mover" title="mantener para mover"><i class="ti ti-arrows-move"></i></button>
+      ${inner}
+      ${caption}
+      <div class="mtile-actions">
+        <button class="mtile-act" data-rboard="${r.id}" title="poner en un tablero"><i class="ti ti-folder"></i></button>
+        <button class="mtile-act" data-rsize="${r.id}" title="cambiar tamaño"><i class="ti ti-aspect-ratio"></i></button>
+        <button class="mtile-act danger" data-rdel="${r.id}" title="borrar"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('') + `</div>`;
+
+  list.querySelectorAll('[data-rsize]').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const r = (S.refs||[]).find(x => x.id === +b.dataset.rsize); if (!r) return;
+    r.tile = ({s:'m', m:'l', l:'s'})[r.tile||'s']; save(); renderRefList();
+  }));
+  list.querySelectorAll('[data-rboard]').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const r = (S.refs||[]).find(x => x.id === +b.dataset.rboard); if (!r) return;
+    const name = prompt('Tablero para esta referencia (vacío = sin tablero):', r.board || (refBoard!=='all'&&refBoard!=='none'?refBoard:''));
+    if (name === null) return;
+    r.board = name.trim(); save(); renderReferencias();
+  }));
+  list.querySelectorAll('[data-rdel]').forEach(b => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const id = +b.dataset.rdel;
+    const r = (S.refs||[]).find(x => x.id === id); if (!r) return;
+    if (!confirm('¿Borrar esta referencia?')) return;
+    S.refs = S.refs.filter(x => x.id !== id); save(); renderReferencias();
+    toast('Referencia borrada', '🗑');
+  }));
+  makeDraggable($('#refsGrid'), {
+    itemSelector: '.mtile',
+    handleSelector: '.mtile-grip',
+    lpHandleSelector: '.mtile-grip',
+    getId: el => el.dataset.rtile,
+    onReorder: (newOrderIds) => { reorderListByVisible(S.refs, newOrderIds); save(); }
+  });
+}
+
+function refDomain(url) {
+  if (!url) return '';
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch(e) { return url.slice(0, 30); }
+}
+
+function addRefLink() {
+  const url = prompt('Pegá el link (Instagram, web, lo que te inspire):');
+  if (!url || !url.trim()) return;
+  const title = prompt('Título o nota (opcional):', '') || '';
+  const ref = {id: uid(), kind:'link', title: title.trim(), photoData: null, sourceUrl: url.trim(), tile:'s', board: (refBoard!=='all'&&refBoard!=='none')?refBoard:'', createdAt: Date.now()};
+  S.refs.unshift(ref);
+  save(); renderReferencias();
+  toast('Link guardado · mandáselo al bot para que traiga la imagen', '🔗');
+}
+
 function renderSemFilter() {
   const el = $('#semFilter');
   let html = '';
@@ -5100,6 +5259,12 @@ async function handlePhotoFile(file) {
         f.photoData = thumbDataUrl; save(); renderFlores(); renderGarden();
         offloadPhotoFile(f, file, () => { renderFlores(); renderGarden(); });
       }
+    } else if (photoContext?.type === 'ref-new') {
+      const title = prompt('Título o nota (opcional):', '') || '';
+      const ref = {id: uid(), kind:'image', title: title.trim(), photoData: thumbDataUrl, sourceUrl:'', tile:'s', board:(refBoard!=='all'&&refBoard!=='none')?refBoard:'', createdAt: Date.now()};
+      S.refs.unshift(ref);
+      save(); toast('Imagen al muro','✦'); renderReferencias();
+      offloadPhotoFile(ref, file, renderReferencias); // reemplaza el thumb por la URL full-res
     } else {
       // Direct add — create new semilla with thumbnail, then upload original
       const title = prompt('Título para la foto:', `foto ${todayStr()}`) || `foto ${todayStr()}`;
@@ -7298,6 +7463,7 @@ function _collectionFor(obj) {
   if (!obj) return null;
   if (S.flores && S.flores.includes(obj)) return 'flores';
   if (S.semillas && S.semillas.includes(obj)) return 'semillas';
+  if (S.refs && S.refs.includes(obj)) return 'refs';
   if (S.brand === obj) return 'brand';
   return null;
 }
