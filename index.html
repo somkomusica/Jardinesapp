@@ -11,7 +11,7 @@
 <title>Jardín — Somko</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.44.0/dist/tabler-icons.min.css">
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.2/firebase-auth-compat.js"></script>
@@ -19,34 +19,44 @@
 <style>
 :root {
   --bg: #FAF8F3; --bg-soft: #F2EFE8;
-  --bg-card: rgba(255,255,255,0.62);
-  --text: #1a1a1a; --text-secondary: #6B6B6B; --text-faint: #A8A39A;
+  --bg-card: #FFFFFF; /* sólido como el prototipo (antes 62% translúcido) */
+  --text: #1a1a1a; --text-secondary: #5E5B53; --text-faint: #8C8678;
+  /* tono claro: grises más oscuros que antes (#6B6B6B/#A8A39A) para legibilidad real al sol */
   --gold: #B8860B; --gold-light: #D4A017; --gold-soft: rgba(184,134,11,0.12);
   --border: rgba(26,26,26,0.10); --border-strong: rgba(26,26,26,0.22);
   --leaf: #7A8B6E; --soil: #5C4A3A;
-  --radius: 7px;
+  --green: #5b7d4f; --green-soft: rgba(91,125,79,.12);   /* verde del prototipo */
+  --indigo: #44688C; --indigo-soft: rgba(68,104,140,.14);  /* índigo flor — aclarado (pedido Somko) */
+  --radius: 12px; /* formas más curvas (prototipo: 12-14px) */
   --font: 'JetBrains Mono', ui-monospace, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #131210; --bg-soft: #1A1815;
-    --bg-card: rgba(255,255,255,0.04);
+    --bg-card: #1E1C18;
     --text: #F0EDE6; --text-secondary: #8A8579; --text-faint: #5A554D;
     --gold-soft: rgba(212,160,23,0.15);
     --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.18);
     --leaf: #8FA67F; --soil: #8C7560;
+    --green: #7fa06f; --green-soft: rgba(127,160,111,.16);
+    --indigo: #5f82a3; --indigo-soft: rgba(95,130,163,.18);
   }
 }
 :root[data-theme="dark"] {
   --bg: #131210; --bg-soft: #1A1815;
-  --bg-card: rgba(255,255,255,0.04);
+  --bg-card: #1E1C18;
   --text: #F0EDE6; --text-secondary: #8A8579; --text-faint: #5A554D;
   --gold-soft: rgba(212,160,23,0.15);
   --border: rgba(255,255,255,0.08); --border-strong: rgba(255,255,255,0.18);
   --leaf: #8FA67F; --soil: #8C7560;
+  --green: #7fa06f; --green-soft: rgba(127,160,111,.16);
+  --indigo: #5f82a3; --indigo-soft: rgba(95,130,163,.18);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { overflow-x: hidden; }
+/* App-feel (prototipo): nada de selección accidental ni rebote de página */
+html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior-y: none; }
+input, textarea, select, [contenteditable="true"] { -webkit-user-select: text; user-select: text; }
 body {
   font-family: var(--font); font-size: 13px;
   background: var(--bg); color: var(--text); line-height: 1.55;
@@ -61,15 +71,23 @@ body {
 .bee:nth-child(4) { top: 26%; animation-duration: 44s; animation-delay: -22s; }
 @keyframes bee-fly { 0%{transform:translateX(-60px) translateY(0);} 50%{transform:translateX(55vw) translateY(14px);} 100%{transform:translateX(110vw) translateY(0);} }
 
-.shell { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; padding: 28px 20px 80px; }
-header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 22px; }
+.shell { position: relative; z-index: 1; max-width: 460px; margin: 0 auto; padding: 0 16px 96px; min-height: 100dvh; }
+header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; position: sticky; top: 0; z-index: 100; background: var(--bg); padding-top: 16px; }
 .brand-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.brand { font-weight: 500; font-size: 15px; letter-spacing: 0.18em; text-transform: uppercase; }
+.brand { font-weight: 600; font-size: 16px; letter-spacing: 0.02em; transition: font-size .25s; }
+header.top.shrunk .brand { font-size: 14px; }
+header.top { transition: padding .25s; }
+header.top.shrunk { padding-top: 8px; }
+/* Frase del día: línea propia DEBAJO de la marca, a lo ancho, discreta; se pliega al scrollear */
+.brand-sub { font-size: 10px; font-style: italic; color: var(--text-faint); line-height: 1.4; margin-top: 3px; width: 100%; overflow: hidden; max-height: 30px; transition: max-height .25s, opacity .2s, margin .25s; }
+header.top.shrunk .brand-sub { max-height: 0; opacity: 0; margin-top: 0; }
 .brand .acc { color: var(--gold); }
 .date-display { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); text-align: right; }
 
 /* Smaller tab hints */
-.tab-hint { font-size: 10px; color: var(--text-faint); margin-bottom: 10px; line-height: 1.4; font-style: italic; }
+.tab-hint { font-size: 11px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.45; font-style: italic; }
+/* Somko conoce su app: fuera los textos explicativos (los <p>); los <div data> como #jardinProgress quedan */
+p.tab-hint { display: none; }
 
 /* Collapsible rows (semillas, flores, projects) */
 .collapsible {
@@ -191,6 +209,161 @@ nav.tabs button .ti { font-size: 13px; }
 nav.tabs button:hover { color: var(--text); }
 nav.tabs button.active { color: var(--text); border-bottom-color: var(--gold); }
 
+/* ===== Barra inferior (modelo Crece) — reemplaza el nav superior ===== */
+nav.tabs { display: none !important; }
+body { padding-bottom: 78px; }
+.bottom-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; margin: 0 auto; max-width: 460px; z-index: 1500;
+  display: flex; align-items: center; justify-content: space-around;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-top: 0.5px solid var(--border);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom)) 8px;
+}
+.bn-btn {
+  background: none; border: none; cursor: pointer; flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  color: var(--text-secondary); font-family: var(--font);
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 0; transition: color .15s;
+  min-height: 48px; /* touch target mínimo (pulgar) */
+}
+.bn-btn .ti { font-size: 21px; }
+.bn-btn:hover { color: var(--text); }
+.bn-btn:active { transform: scale(.85); }
+.bn-btn { transition: color .15s, transform .1s; }
+.bn-btn.active { color: var(--gold); }
+.bn-btn.active .ti { color: var(--gold); }
+.bn-plus { flex: 0 0 auto; }
+.bn-plus button {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--text); color: var(--bg); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: -18px; box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+  transition: transform .12s;
+}
+.bn-plus button:active { transform: scale(0.92); }
+.bn-plus button .ti { font-size: 26px; }
+/* Hoja "Más" */
+.more-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1600; backdrop-filter: blur(2px); }
+.more-backdrop.open { display: block; }
+.more-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; margin: 0 auto; max-width: 460px; z-index: 1700;
+  background: var(--bg); border-top-left-radius: 22px; border-top-right-radius: 22px;
+  padding: 10px 18px calc(22px + env(safe-area-inset-bottom));
+  transform: translateY(110%); transition: transform .34s cubic-bezier(.16,1,.3,1);
+  max-height: 80vh; overflow-y: auto; box-shadow: 0 -8px 30px rgba(0,0,0,0.2);
+}
+.more-sheet.open { transform: translateY(0); }
+.more-handle { width: 38px; height: 4px; border-radius: 4px; background: var(--border-strong); margin: 4px auto 14px; }
+.more-title { font-size: 11px; color: var(--text-faint); font-style: italic; margin: 0 0 14px 2px; }
+.more-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.more-item {
+  background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 14px; cursor: pointer;
+  padding: 16px 8px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--text); font-family: var(--font); font-size: 11px; letter-spacing: 0.02em;
+  transition: border-color .15s, transform .1s; text-align: center;
+}
+.more-item .ti { font-size: 22px; color: var(--gold); }
+.more-item:active { transform: scale(0.96); }
+.more-item.active { border-color: var(--gold); }
+/* Hoja del ＋: 2 destinos */
+.cap-row { display: flex; gap: 10px; padding: 4px 2px 6px; }
+.cap-opt { flex: 1; background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 14px; cursor: pointer; padding: 18px 6px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text); font-family: var(--font); font-size: 12px; letter-spacing: .02em; transition: transform .1s, border-color .15s; }
+.cap-opt .ti { font-size: 26px; color: var(--gold); }
+.cap-opt:active { transform: scale(.95); }
+/* Pasos editables en la captura de una idea */
+.nf-stage { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.nf-stage input { flex: 1; }
+.nf-stage-rm { background: none; border: none; cursor: pointer; color: var(--text-faint); font-size: 15px; padding: 8px; }
+.nf-stage-rm:active { color: #b5462f; transform: scale(.9); }
+#nfStageAdd { margin-top: 2px; }
+/* Desmarcar una hecha desde la Bitácora */
+.bita-undone { background: none; border: none; cursor: pointer; color: var(--text-faint); font-size: 15px; padding: 6px; margin-left: auto; min-height: 32px; }
+.bita-undone:active { color: var(--gold); transform: scale(.9); }
+
+/* ===== Crece (Fase 2): Semilla · Creciendo · Florecida en un lugar ===== */
+#tab-crece { --cr-green: var(--green); --cr-indigo: var(--indigo); --cr-green-soft: var(--green-soft); }
+/* Entrada escalonada de tarjetas (prototipo cardIn) */
+@keyframes cardIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.cr-list > * { animation: cardIn .32s both cubic-bezier(.2,.8,.2,1); }
+.cr-list > *:nth-child(1) { animation-delay: 0s; } .cr-list > *:nth-child(2) { animation-delay: .035s; }
+.cr-list > *:nth-child(3) { animation-delay: .07s; } .cr-list > *:nth-child(4) { animation-delay: .105s; }
+.cr-list > *:nth-child(5) { animation-delay: .14s; } .cr-list > *:nth-child(6) { animation-delay: .175s; }
+.cr-list > *:nth-child(7) { animation-delay: .21s; } .cr-list > *:nth-child(8) { animation-delay: .245s; }
+.cr-list > *:nth-child(n+9) { animation-delay: .28s; }
+/* Vaivén desfasado: cada planta del jardín se mece a su tiempo */
+.cr-garden .cr-gplant:nth-child(2) .cr-gsvg svg { animation-delay: -1.2s; }
+.cr-garden .cr-gplant:nth-child(3) .cr-gsvg svg { animation-delay: -2.4s; }
+.cr-garden .cr-gplant:nth-child(4) .cr-gsvg svg { animation-delay: -0.7s; }
+.cr-garden .cr-gplant:nth-child(5) .cr-gsvg svg { animation-delay: -1.9s; }
+.cr-garden .cr-gplant:nth-child(6) .cr-gsvg svg { animation-delay: -3.1s; }
+.cr-garden .cr-gplant:nth-child(n+7) .cr-gsvg svg { animation-delay: -2.0s; }
+.cr-stages { display:flex; gap:6px; margin-bottom:12px; }
+.cr-pill { flex:1; border:.5px solid var(--border); background:var(--bg-card); border-radius:13px; padding:10px 4px 9px; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:var(--text-secondary); transition:transform .12s; font-family:var(--font); }
+.cr-pill:active { transform:scale(.96); }
+.cr-pill .ico { font-size:19px; }
+.cr-pill .nm { font-size:9.5px; letter-spacing:.04em; text-transform:uppercase; }
+.cr-pill .ct { font-size:9.5px; color:var(--text-faint); }
+.cr-pill.on { color:#fff; border-color:transparent; box-shadow:0 4px 12px rgba(0,0,0,.14); }
+.cr-pill.on[data-b="semilla"] { background:var(--gold); }
+.cr-pill.on[data-b="creciendo"] { background:var(--cr-green); }
+.cr-pill.on[data-b="flor"] { background:var(--cr-indigo); }
+.cr-pill.on .ct { color:rgba(255,255,255,.82); }
+.cr-lens { display:flex; gap:6px; align-items:center; margin-bottom:12px; }
+.cr-lens .lab { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+.cr-lens button { border:.5px solid var(--border); background:none; border-radius:999px; padding:5px 12px; font-family:var(--font); font-size:10.5px; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:5px; }
+.cr-lens button.on { background:var(--text); color:var(--bg); border-color:var(--text); }
+.cr-lens button .ti { font-size:12px; }
+.cr-hint { font-size:9.5px; color:var(--text-faint); text-align:center; font-style:italic; margin-bottom:10px; }
+.cr-list { display:flex; flex-direction:column; gap:9px; }
+.cr-card { background:var(--bg-card); border:.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; gap:11px; align-items:flex-start; cursor:pointer; transition:transform .08s, box-shadow .15s; }
+.cr-card:active { transform:scale(.985); box-shadow:0 2px 10px rgba(0,0,0,.08); }
+.cr-dot { width:9px; height:9px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+.cr-dot.semilla { background:var(--gold); } .cr-dot.creciendo { background:var(--cr-green); } .cr-dot.flor { background:var(--cr-indigo); }
+.cr-body { flex:1; min-width:0; }
+.cr-title { font-size:13.5px; line-height:1.35; margin-bottom:6px; }
+.cr-rail { display:flex; align-items:center; gap:3px; margin-bottom:7px; }
+.cr-seg { height:4px; border-radius:2px; flex:1; background:var(--bg-soft); }
+.cr-seg.done { background:var(--cr-green); }
+.cr-stage { font-size:10px; color:var(--cr-green); display:inline-flex; align-items:center; gap:5px; margin-bottom:6px; background:var(--cr-green-soft); border-radius:7px; padding:4px 8px; }
+.cr-stage .ti { font-size:13px; }
+.cr-seedhint { font-size:10px; color:var(--gold); display:flex; align-items:center; gap:5px; margin-bottom:6px; }
+.cr-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.cr-tag { font-size:9.5px; background:var(--bg-soft); color:var(--text-secondary); border-radius:999px; padding:2px 8px; display:inline-flex; align-items:center; gap:4px; }
+.cr-tag .ti { font-size:11px; color:var(--cr-green); }
+.cr-tag.harvest { color:var(--cr-indigo); } .cr-tag.harvest .ti { color:var(--cr-indigo); }
+.cr-empty { text-align:center; color:var(--text-faint); font-size:11px; padding:40px 20px; font-style:italic; }
+.cr-card.cr-sel, .cr-gplant.cr-sel { box-shadow: 0 0 0 2px var(--gold); border-radius: 14px; }
+.cr-backchip { background:none; border:.5px solid var(--border); border-radius:999px; padding:5px 12px; font-family:var(--font); font-size:11px; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:4px; margin-bottom:10px; }
+.cr-backchip:active { transform:scale(.95); }
+.cr-folder .cr-title .ti { margin-right:4px; }
+.select-bar button.danger { color:#ff8a7a; }
+/* Creciendo = jardín vivo (Fase 3): plantas SVG que crecen con el progreso */
+.cr-garden { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; align-items:end; padding:16px 8px 22px; background:linear-gradient(to bottom, transparent 28%, var(--cr-green-soft)); border-radius:18px; }
+.cr-gplant { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:6px 2px 4px; border-radius:12px; transition:transform .12s; }
+.cr-gplant:active { transform:scale(.93); }
+.cr-gsvg svg { width:56px; height:76px; transform-origin:bottom center; animation:cr-sway 4.6s ease-in-out infinite; }
+@keyframes cr-sway { 0%,100%{transform:rotate(-1.6deg);} 50%{transform:rotate(1.6deg);} }
+.cr-gname { font-size:10px; text-align:center; line-height:1.2; max-width:98px; overflow:hidden; text-overflow:ellipsis; }
+.cr-gprog { font-size:8.5px; color:var(--cr-green); text-align:center; }
+/* Detalle a pantalla completa (Fase 4): reusa #plantDetail real */
+.cr-detail { position:fixed; top:0; bottom:0; left:0; right:0; margin:0 auto; max-width:460px; z-index:1800; background:var(--bg); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .3s cubic-bezier(.16,1,.3,1); }
+.cr-detail.on { transform:translateX(0); }
+.cr-detail-top { display:flex; align-items:center; gap:12px; padding:calc(14px + env(safe-area-inset-top)) 14px 10px; flex-shrink:0; border-bottom:.5px solid var(--border); }
+.cr-back { background:none; border:none; cursor:pointer; color:var(--text); font-family:var(--font); font-size:13px; display:inline-flex; align-items:center; gap:4px; padding:6px 4px; }
+.cr-back .ti { font-size:18px; }
+.cr-dchip { margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-size:10px; letter-spacing:.06em; text-transform:uppercase; padding:5px 12px; border-radius:999px; color:#fff; }
+.cr-dchip.creciendo { background:var(--leaf); } .cr-dchip.flor { background:#2C4A63; }
+.cr-dchip .ti { font-size:13px; }
+.cr-detail-body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:14px 16px calc(28px + env(safe-area-inset-bottom)); }
+/* Gestos (Fase 5): swipe horizontal sin romper el scroll vertical */
+.cr-card, .cr-gplant { touch-action: pan-y; }
+.cr-acts button { width:100%; background:none; border:none; text-align:left; font-family:var(--font); font-size:14px; color:var(--text); padding:14px 20px; display:flex; align-items:center; gap:13px; cursor:pointer; }
+.cr-acts button .ti { font-size:18px; color:var(--text-secondary); width:22px; }
+.cr-acts button.danger { color:#b5462f; } .cr-acts button.danger .ti { color:#b5462f; }
+.cr-acts button:active { background:var(--bg-soft); }
+
 section.tab { display: none; animation: fade .25s ease-out; }
 .project-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--gold); }
 .project-bar .ti { font-size: 15px; opacity: .8; }
@@ -202,7 +375,7 @@ section.tab { display: none; animation: fade .25s ease-out; }
 .agenda-add .icon-only { padding: 6px 10px; }
 .agenda-item { display: flex; align-items: center; gap: 8px; padding: 8px 4px; border-bottom: 0.5px solid var(--border); }
 .agenda-item.is-today { background: var(--gold-soft); border-radius: 8px; padding: 8px; border-bottom: none; }
-.agenda-check { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 18px; padding: 0; flex-shrink: 0; }
+.agenda-check { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 19px; padding: 0; flex-shrink: 0; }
 .agenda-check:hover { color: var(--gold); }
 .agenda-main { flex: 1; min-width: 0; }
 .agenda-text { font-size: 13px; line-height: 1.35; }
@@ -215,7 +388,7 @@ section.tab { display: none; animation: fade .25s ease-out; }
 .agenda-date { font-size: 10px; color: var(--text-faint); display: inline-flex; align-items: center; gap: 3px; }
 .agenda-date.overdue { color: #c44; font-weight: 600; }
 .agenda-date.duetoday { color: var(--gold); font-weight: 600; }
-.agenda-today, .agenda-del { background: none; border: none; cursor: pointer; color: var(--text-faint); padding: 4px; font-size: 14px; flex-shrink: 0; }
+.agenda-today, .agenda-del { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 4px; font-size: 15px; flex-shrink: 0; }
 .agenda-today.on { color: var(--gold); }
 .agenda-today:hover, .agenda-del:hover { color: var(--gold); }
 .dark .agenda-prio.prio-alta { background: rgba(200,60,60,.25); color: #e88; }
@@ -224,9 +397,14 @@ section.tab { display: none; animation: fade .25s ease-out; }
 .tarea-item.podio { background: var(--gold-soft); padding: 8px; border-bottom: none; margin-bottom: 2px; }
 .tarea-medal { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
 .tarea-num { font-size: 11px; color: var(--text-faint); flex-shrink: 0; width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
-.tarea-item .dnd-grip { background: none; border: none; color: var(--text-faint); cursor: grab; padding: 4px; flex-shrink: 0; touch-action: none; font-size: 14px; }
+.tarea-item .dnd-grip { background: none; border: none; color: var(--text-secondary); cursor: grab; padding: 4px; flex-shrink: 0; touch-action: none; font-size: 15px; }
 .tarea-item .dnd-grip:hover { color: var(--gold); }
 .tareas-done-note { font-size: 11px; color: var(--text-faint); padding: 8px 4px 0; }
+/* Progreso del día: barra fina dorada arriba de las tareas */
+.day-progress { display: flex; align-items: center; gap: 8px; margin: 2px 0 10px; }
+.day-progress .dp-track { flex: 1; height: 3px; border-radius: 2px; background: var(--border); overflow: hidden; }
+.day-progress .dp-fill { height: 100%; border-radius: 2px; background: var(--gold); transition: width 0.2s ease; }
+.day-progress .dp-label { font-size: 10px; letter-spacing: 0.1em; color: var(--text-secondary); white-space: nowrap; }
 .tareas-toggle { display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; padding: 7px; background: none; border: 0.5px dashed var(--border-strong); border-radius: 8px; color: var(--text-secondary); font-size: 11px; letter-spacing: 0.04em; cursor: pointer; transition: all .15s; }
 .tareas-toggle:hover { border-color: var(--gold); color: var(--gold); }
 .bita-hecha { display: flex; align-items: center; gap: 7px; font-size: 13px; padding: 5px 0; color: var(--text); }
@@ -244,6 +422,9 @@ section.tab { display: none; animation: fade .25s ease-out; }
 .stage-templates button { font-size: 11px; padding: 4px 9px; border-radius: 14px; border: 0.5px solid var(--border-strong); background: var(--bg-card); color: var(--text); cursor: pointer; }
 .stage-templates button:hover { border-color: var(--gold); color: var(--gold); }
 #stageEditorList { max-height: 42vh; overflow-y: auto; }
+.pd-edit-stages { background:none; border:none; cursor:pointer; color:var(--text-secondary); font-family:var(--font); font-size:10px; letter-spacing:.1em; text-transform:uppercase; display:inline-flex; align-items:center; gap:5px; padding:2px 0 8px; }
+.pd-edit-stages:hover { color:var(--gold); }
+.pd-edit-stages .ti { font-size:13px; color:var(--gold); }
 .stage-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
 .stage-row .dnd-grip { background: none; border: none; color: var(--text-faint); cursor: grab; padding: 4px; flex-shrink: 0; touch-action: none; font-size: 14px; }
 .stage-row .st-num { font-size: 11px; color: var(--text-faint); width: 16px; text-align: center; flex-shrink: 0; font-variant-numeric: tabular-nums; }
@@ -304,8 +485,10 @@ h3.sub-title .ti { color: var(--gold); }
 input[type="text"], input[type="number"], input[type="url"], textarea, select {
   width: 100%; background: transparent;
   border: 0.5px solid var(--border); border-radius: 6px;
-  padding: 9px 11px; font-family: var(--font); font-size: 13px;
+  padding: 9px 12px; font-family: var(--font); font-size: 16px;
+  /* 16px en campos: evita el zoom automático del navegador al enfocar */
   color: var(--text); outline: none; transition: border-color .15s;
+  min-height: 44px; border-radius: 12px;
 }
 input:focus, textarea:focus, select:focus { border-color: var(--gold); }
 textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
@@ -313,7 +496,8 @@ textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
 input.flat, textarea.flat { border: none; padding: 6px 0; }
 input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0 var(--gold); }
 
-.btn { background: transparent; border: 0.5px solid var(--border-strong); border-radius: 6px; padding: 8px 14px; font-family: var(--font); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text); cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 999px; padding: 8px 14px; font-family: var(--font); font-size: 11px; letter-spacing: 0.02em; color: var(--text); cursor: pointer; transition: border-color .15s, color .15s, transform .1s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:active { transform: scale(.95); }
 .btn:hover { border-color: var(--gold); color: var(--gold); }
 .btn.gold { background: var(--gold); color: #fff; border-color: var(--gold); }
 .btn.gold:hover { background: var(--gold-light); border-color: var(--gold-light); color: #fff; }
@@ -429,7 +613,8 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 /* SEMILLERO */
 .sem-toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
 .sem-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-.sem-filter button { background: transparent; border: 0.5px solid var(--border); font-family: var(--font); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 5px 10px; border-radius: 14px; color: var(--text-secondary); cursor: pointer; }
+.sem-filter button { background: transparent; border: 0.5px solid var(--border); font-family: var(--font); font-size: 10.5px; letter-spacing: 0.02em; padding: 5px 12px; border-radius: 999px; color: var(--text-secondary); cursor: pointer; transition: transform .1s; }
+.sem-filter button:active { transform: scale(.93); }
 .sem-filter button.active { background: var(--text); color: var(--bg); border-color: var(--text); }
 .sem-filter .group-pill.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 
@@ -444,8 +629,24 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .sem-card .sem-thumb { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 4px; border: 0.5px solid var(--border); }
 .sem-card .sem-group-tag { font-size: 9px; padding: 2px 6px; background: var(--gold); color: #fff; border-radius: 8px; letter-spacing: 0.06em; }
 /* Mosaico (collage de fotos) */
-.mosaic { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 72px; grid-auto-flow: dense; gap: 6px; margin-top: 14px; }
-.mtile { position: relative; border-radius: 8px; overflow: hidden; border: 0.5px solid var(--border); background: var(--bg-soft); }
+/* ===== Muro (Referencias) — ADN prototipo: minimal, aire, cascada ===== */
+.ref-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin: 4px 0 12px; }
+.ref-title { font-size: 16px; font-weight: 600; letter-spacing: .02em; }
+.ref-title .acc { color: var(--gold); }
+.ref-sub { font-size: 10px; color: var(--text-faint); font-style: italic; margin-top: 2px; }
+.ref-actions { display: flex; gap: 7px; flex-shrink: 0; }
+.hdr-icon.gold-ic { background: var(--gold); border-color: var(--gold); color: #fff; }
+.ref-search { display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: .5px solid var(--border); border-radius: 12px; padding: 2px 13px; margin-bottom: 12px; }
+.ref-search .ti { font-size: 15px; color: var(--text-faint); }
+.ref-search input { border: none !important; background: none; min-height: 38px !important; padding: 6px 0 !important; flex: 1; }
+/* borde con borde: sin marcos ni aire — un campo continuo de ideas visuales (pedido Somko) */
+.mosaic { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 72px; grid-auto-flow: dense; gap: 0; margin: 8px -16px 0; }
+.mtile { position: relative; border-radius: 0; overflow: hidden; border: none; background: var(--bg-soft); animation: cardIn .3s both cubic-bezier(.2,.8,.2,1); }
+.mosaic .mtile:nth-child(1) { animation-delay: 0s; } .mosaic .mtile:nth-child(2) { animation-delay: .03s; }
+.mosaic .mtile:nth-child(3) { animation-delay: .06s; } .mosaic .mtile:nth-child(4) { animation-delay: .09s; }
+.mosaic .mtile:nth-child(5) { animation-delay: .12s; } .mosaic .mtile:nth-child(6) { animation-delay: .15s; }
+.mosaic .mtile:nth-child(7) { animation-delay: .18s; } .mosaic .mtile:nth-child(8) { animation-delay: .21s; }
+.mosaic .mtile:nth-child(n+9) { animation-delay: .24s; }
 .mtile.tile-s { grid-column: span 1; grid-row: span 1; }
 .mtile.tile-m { grid-column: span 2; grid-row: span 2; }
 .mtile.tile-l { grid-column: span 4; grid-row: span 3; }
@@ -477,7 +678,7 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .sem-check.on { color: var(--gold); }
 .collapsible.sem-sel { background: var(--gold-soft); border-radius: 8px; }
 /* Barra de selección (Seleccionar / Agrupar / Mover a) — colores sólidos, legibles en cualquier tema */
-.select-bar { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #24242c; color: #f4f2ec; border: 1px solid var(--gold); border-radius: 12px; padding: 9px 14px; display: flex; align-items: center; gap: 8px; z-index: 9000; box-shadow: 0 8px 24px rgba(0,0,0,.45); flex-wrap: wrap; max-width: 94vw; justify-content: center; }
+.select-bar { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #24242c; color: #f4f2ec; border: 1px solid var(--gold); border-radius: 12px; padding: 9px 14px; display: flex; align-items: center; gap: 8px; z-index: 9000; box-shadow: 0 8px 24px rgba(0,0,0,.45); flex-wrap: wrap; max-width: 94vw; justify-content: center; }
 .select-bar .sb-count { background: var(--gold); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
 .select-bar .sb-hint { font-size: 11.5px; color: #c9c5bb; }
 .select-bar button { background: rgba(255,255,255,.07); border: 0.5px solid rgba(255,255,255,.18); color: #f4f2ec; cursor: pointer; font-size: 12.5px; display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 8px; }
@@ -566,9 +767,13 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .theme-options button.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 
 footer.foot { margin-top: 30px; padding-top: 16px; border-top: 0.5px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; align-items: center; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); }
+/* El pie (versión · exportar · importar · nube) solo se ve en Ajustes — en el resto contamina */
+footer.foot { display: none; }
+body:has(#tab-ajustes.active) footer.foot { display: flex; }
 footer.foot .acts { display: flex; gap: 6px; flex-wrap: wrap; }
 
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 12px 18px; border-radius: 24px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 1000; max-width: 90vw; display: flex; align-items: center; gap: 8px; }
+.toast { position: fixed; bottom: 94px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1c1c22; color: #f4f2ec; padding: 10px 16px; border-radius: 11px; font-size: 11.5px; letter-spacing: 0.02em; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 1900; max-width: 90vw; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.toast #toastIcon { color: var(--gold-light); }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 .row-flex { display: flex; gap: 8px; align-items: center; }
@@ -839,7 +1044,17 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 }
 
 /* BÚSQUEDA GLOBAL */
-.global-search-wrap { position: relative; margin-top: 12px; }
+.global-search-wrap { position: relative; margin-top: 0; display: none; }
+.global-search-wrap.open { display: block; margin-top: 12px; }
+.hdr-right { display: flex; align-items: center; gap: 10px; }
+.hdr-icon { width: 34px; height: 34px; border-radius: 999px; border: .5px solid var(--border); background: var(--bg-card); cursor: pointer; color: var(--text-secondary); font-size: 16px; padding: 0; display: inline-flex; align-items: center; justify-content: center; transition: transform .1s, color .15s; }
+.hdr-icon:active { transform: scale(.9); }
+.hdr-icon:hover { color: var(--gold); }
+.hdr-icon:active { transform: scale(.88); }
+.hdr-icon.on { color: var(--gold); }
+body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -> cabecera más limpia */
+#tab-crece { padding-top: 2px; }
+.cr-list { gap: 11px; }
 .global-search {
   display: flex; align-items: center; gap: 8px;
   background: var(--bg-card); border: 0.5px solid var(--border);
@@ -1470,9 +1685,13 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 
 <header class="top">
   <div class="brand-row">
-    <div class="brand">Jar<span class="acc">dín</span></div>
-    <div class="date-display" id="dateDisplay">—</div>
+    <div class="brand">Jardín<span class="acc">.</span></div>
+    <div class="hdr-right">
+      <div class="date-display" id="dateDisplay">—</div>
+      <button id="searchToggle" class="hdr-icon" title="buscar" aria-label="buscar"><i class="ti ti-search"></i></button>
+    </div>
   </div>
+  <div class="brand-sub" id="brandQuote"></div>
   <div class="global-search-wrap" id="globalSearchWrap">
     <div class="global-search">
       <i class="ti ti-search"></i>
@@ -1481,13 +1700,16 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     </div>
     <div class="search-results" id="searchResults"></div>
   </div>
-  <div class="project-bar"><i class="ti ti-folders"></i><select id="globalProjectSel" aria-label="Cantero activo"></select>
+  <div class="project-bar" style="display:none"><i class="ti ti-folders"></i><select id="globalProjectSel" aria-label="Cantero activo"></select>
     <button id="globalProjEdit" class="gpb-btn" title="editar etapas del cantero"><i class="ti ti-list-check"></i></button>
     <button id="globalProjNew" class="gpb-btn" title="nuevo cantero"><i class="ti ti-plus"></i></button>
   </div>
 </header>
 
 <nav class="tabs" id="tabs"></nav>
+
+<!-- CRECE (Fase 2): un lugar = Semilla · Creciendo · Florecida -->
+<section class="tab" id="tab-crece"></section>
 
 <!-- HOY -->
 <section class="tab" id="tab-hoy">
@@ -1642,9 +1864,10 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
     <p class="tab-hint">captura rápida · texto · foto · audio · link · agregalos en cualquier momento · sembrá para crear flor</p>
     <div class="sem-toolbar" style="margin-top:14px;">
       <button class="btn gold" id="semNew"><i class="ti ti-plus"></i> Nueva semilla</button>
-      <button class="btn ghost" id="groupNew"><i class="ti ti-folder-plus"></i> Nuevo grupo</button>
-      <button class="btn ghost" id="semSelectBtn"><i class="ti ti-checkbox"></i> Seleccionar</button>
-      <button class="btn ghost" id="semViewToggle" title="cambiar vista"><i class="ti ti-layout-grid"></i> Mosaico</button>
+      <!-- Captura pura (pedido Somko): grupo/seleccionar/mosaico fuera de la vista; ganchos JS intactos -->
+      <button class="btn ghost" id="groupNew" style="display:none"><i class="ti ti-folder-plus"></i> Nuevo grupo</button>
+      <button class="btn ghost" id="semSelectBtn" style="display:none"><i class="ti ti-checkbox"></i> Seleccionar</button>
+      <button class="btn ghost" id="semViewToggle" style="display:none" title="cambiar vista"><i class="ti ti-layout-grid"></i> Mosaico</button>
       <div class="spacer"></div>
       <input type="text" id="semSearch" placeholder="buscar..." style="max-width:200px;">
     </div>
@@ -1656,19 +1879,20 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 
 <!-- REFERENCIAS -->
 <section class="tab" id="tab-referencias">
-  <div class="card">
-    <h2 class="section-title"><i class="ti ti-layout-grid"></i> Referencias</h2>
-    <p class="tab-hint">tu muro visual · lo que te inspira pero no es un proyecto · pegá una imagen o un link · arrastrá para acomodar · agrupá a tu manera</p>
-    <div class="sem-toolbar" style="margin-top:14px;">
-      <button class="btn gold" id="refAddImg"><i class="ti ti-photo-plus"></i> Imagen</button>
-      <button class="btn ghost" id="refAddLink"><i class="ti ti-link"></i> Link</button>
-      <button class="btn ghost" id="refNewBoard"><i class="ti ti-folder-plus"></i> Nuevo tablero</button>
-      <div class="spacer"></div>
-      <input type="text" id="refSearch" placeholder="buscar..." style="max-width:200px;">
+  <div class="ref-head">
+    <div>
+      <div class="ref-title">Muro<span class="acc">.</span></div>
+      <div class="ref-sub">todo lo que te gusta, junto · une cosas</div>
     </div>
-    <div class="sem-filter" id="refBoards"></div>
-    <div id="refsList"></div>
+    <div class="ref-actions">
+      <button class="hdr-icon gold-ic" id="refAddImg" title="agregar imagen" aria-label="agregar imagen"><i class="ti ti-photo-plus"></i></button>
+      <button class="hdr-icon" id="refAddLink" title="agregar link" aria-label="agregar link"><i class="ti ti-link"></i></button>
+      <button class="hdr-icon" id="refNewBoard" title="nuevo tablero" aria-label="nuevo tablero"><i class="ti ti-folder-plus"></i></button>
+      <button class="hdr-icon" id="refShuffle" title="mezclar el muro" aria-label="mezclar"><i class="ti ti-arrows-shuffle"></i></button>
+    </div>
   </div>
+  <div class="sem-filter" id="refBoards"></div>
+  <div id="refsList"></div>
 </section>
 
 <!-- JARDÍN -->
@@ -2004,6 +2228,11 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
       <div id="configTabsList"></div>
     </div>
     <div class="config-section">
+      <h3>Barra de inicio — las 3 principales</h3>
+      <p style="font-size:11px;color:var(--text-secondary);margin-bottom:10px;">Elegí qué 3 secciones aparecen abajo (el ＋ y "Más" son fijos). El resto vive en "Más".</p>
+      <div id="bottomNavConfig"></div>
+    </div>
+    <div class="config-section">
       <h3>Widgets de Hoy</h3>
       <div id="configWidgetsList"></div>
     </div>
@@ -2049,7 +2278,8 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
 
 <footer class="foot">
   <div>
-    <div>Jardín · v4 · datos locales</div>
+    <div id="versionLine" style="cursor:pointer;" title="ver historial de versiones">Jardín · v<span id="appVersion">3.3.1</span> · <span style="color:var(--gold);">ver cambios</span></div>
+    <div id="versionLog" style="display:none;text-align:left;margin:8px auto 0;max-width:320px;font-size:9px;line-height:1.55;color:var(--text-faint);"></div>
     <div id="storageIndicator" style="margin-top:4px;">
       <span id="storageTxt" style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);">— MB / 5 MB</span>
       <div class="storage-bar-wrap"><div class="storage-bar-fill" id="storageBar"></div></div>
@@ -2072,6 +2302,26 @@ audio { filter: grayscale(1); width: 100%; height: 32px; }
   <span class="undo-label" id="undoLabel">eliminado</span>
   <button class="undo-btn" id="undoBtn">Deshacer</button>
 </div>
+
+<!-- ===== Barra inferior (modelo Crece) ===== -->
+<nav class="bottom-nav" id="bottomNav"></nav>
+<div class="more-backdrop" id="moreBackdrop"></div>
+<div class="more-sheet" id="moreSheet">
+  <div class="more-handle"></div>
+  <div class="more-title">Más</div>
+  <div class="more-grid" id="moreGrid"></div>
+</div>
+<!-- Detalle a pantalla completa (Fase 4): aloja el #plantDetail real -->
+<div class="cr-detail" id="crDetail">
+  <div class="cr-detail-top">
+    <button class="cr-back" id="crDetailBack"><i class="ti ti-chevron-left"></i> Jardín</button>
+    <span class="cr-dchip" id="crDetailChip"></span>
+  </div>
+  <div class="cr-detail-body" id="crDetailHost"></div>
+</div>
+<!-- Hoja de acciones (Fase 5): mantener presionado en una tarjeta -->
+<div class="more-backdrop" id="crSheetBackdrop"></div>
+<div class="more-sheet" id="crSheet"></div>
 
 <!-- MODO RIEGO — Fullscreen focus -->
 <div class="riego-fullscreen" id="riegoFullscreen">
@@ -2209,9 +2459,13 @@ const YT_STAGES = [
   {id:'canciones',label:'Canciones'},{id:'portada',label:'Portada'},
   {id:'armado',label:'Armado'},{id:'publicado',label:'Publicado'}
 ];
+const KOOL_STAGES = [
+  {id:'recibido',label:'Recibido'},{id:'trabajando',label:'Trabajando'},
+  {id:'entregado',label:'Entregado'},{id:'cobrado',label:'Cobrado'}
+];
 const DEFAULT_PROJECTS = [
   {id:1, name:"Somko", type:"Música", kind:"musica", description:"", socialContent:"", links:[], files:[], trackingLog:[], stages: DEFAULT_STAGES.map(s=>({...s}))},
-  {id:2, name:"YouTube IA", type:"Canal", kind:"youtube", description:"", socialContent:"", links:[], files:[], trackingLog:[], stages: YT_STAGES.map(s=>({...s}))}
+  {id:2, name:"Koolmena", type:"Koolmena", kind:"master", description:"", socialContent:"", links:[], files:[], trackingLog:[], stages: KOOL_STAGES.map(s=>({...s}))}
 ];
 
 const HABITS_CONFIG = [
@@ -2226,7 +2480,7 @@ const HABITS_CONFIG = [
 const STAGES = DEFAULT_STAGES.map(s=>s.id);
 const STAGE_LABELS = Object.fromEntries(DEFAULT_STAGES.map(s=>[s.id,s.label]));
 function projectStagesById(projId){ const ps=(typeof S!=='undefined'&&S.projects)?S.projects:[]; const p=ps.find(x=>x.id===projId); return (p&&Array.isArray(p.stages)&&p.stages.length)?p.stages:DEFAULT_STAGES; }
-function stagesOf(f){ return projectStagesById(f&&f.projectId); }
+function stagesOf(f){ if (f && Array.isArray(f.stages) && f.stages.length) return f.stages; return projectStagesById(f&&f.projectId); }
 function isComplete(f){ const st=stagesOf(f); return st.length>0 && st.every(s=>f[s.id]); }
 function stagesDone(f){ return stagesOf(f).filter(s=>f[s.id]).length; }
 function florStageById(f, stageId){ return stagesOf(f).find(s => s.id === stageId) || null; }
@@ -2243,6 +2497,7 @@ function setStageDone(f, stageId, done){
 }
 
 const TABS_META = {
+  crece:      {label:"Jardín",     icon:"ti-plant-2"},
   hoy:        {label:"Hoy",        icon:"ti-sun"},
   semillero:  {label:"Semillero",  icon:"ti-seedling"},
   jardin:     {label:"Jardín",     icon:"ti-plant-2"},
@@ -2250,7 +2505,6 @@ const TABS_META = {
   referencias:{label:"Referencias", icon:"ti-layout-grid"},
   diario:     {label:"Diario",     icon:"ti-notebook"},
   marca:      {label:"Marca",      icon:"ti-stack"},
-  servicios:  {label:"Servicios",  icon:"ti-briefcase"},
   conciertos: {label:"Conciertos", icon:"ti-microphone-2"},
   estadisticas:{label:"Estadísticas", icon:"ti-chart-line"},
   ajustes:    {label:"Ajustes",    icon:"ti-settings"},
@@ -2264,13 +2518,46 @@ const HOY_WIDGETS_META = {
 
 const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 
+// ===== Versión de la app (mostrada en Ajustes) =====
+// Cada cambio registra una nueva versión. La primera de arriba es la actual.
+const VERSION_LOG = [
+  {v:'3.3.26', d:'2026-06-10', t:'ADN único: semilla y planta llevan EXACTAMENTE lo mismo — Nombre · Etapas · Letra · Notas · Redes · Foto portada · Audio referencia · Links · Archivos. Descripción se fue de las dos. La captura nace con ese molde y el viejo "Texto" de tus semillas pasó a Notas (nada se pierde). Además: el tono CLARO es ahora el default real (auto/oscuro siguen en Ajustes) y la frase del día bajó a su lugar — línea propia DEBAJO de Jardín, chiquita, sin apretar la barra.'},
+  {v:'3.3.25', d:'2026-06-10', t:'Frase del día bajo "Jardín·": cada día una distinta (Rick Rubin, James Clear y las tuyas), en itálica discreta. Se pliega sola al scrollear para no ocupar.'},
+  {v:'3.3.24', d:'2026-06-10', t:'Abrir una semilla ahora es FOCO total: se ve solo esa semilla con un botón "‹ Semillero" para volver. Desaparecen el buscador, "Nueva semilla", los filtros y las demás tarjetas mientras está abierta (también durante la captura). Y se abre una a la vez — antes podían quedar varias desplegadas.'},
+  {v:'3.3.23', d:'2026-06-10', t:'El pie de página (Jardín · versión · ver cambios · Exportar · Importar · nube) ya no aparece debajo de cada pantalla — solo se ve en Ajustes. Menos ruido visual en el uso diario.'},
+  {v:'3.3.22', d:'2026-06-10', t:'Vuelven TODOS los íconos (lupa, puntos de arrastrar, círculo de completar, ✕): al fijar la versión de la librería de íconos la ruta quedó mal apuntada y se cayeron — corregido. Además: esos controles ahora usan un gris más visible en tono claro; quitado el "Deshacer" al completar tarea (queda la flechita ↩ en la Bitácora por si acaso); y el Muro perdió su buscador propio — con la lupa de arriba alcanza.'},
+  {v:'3.3.21', d:'2026-06-10', t:'Completar con red de seguridad. Completás igual que siempre (círculo → "Completar tarea"), pero ahora: (1) al completar aparece "Deshacer" por 10 segundos — si fue por error, un toque y vuelve a pendientes (y si era un paso de planta, la etapa también se revierte; si había florecido, des-florece); (2) en la Bitácora, cada tarea de "hechas hoy" tiene una flechita ↩ para desmarcarla más tarde, con la misma reversión completa.'},
+  {v:'3.3.20', d:'2026-06-10', t:'UNA SOLA LISTA en Hoy. Cada planta en crecimiento genera sola la tarea de su próximo paso ("Volcán · Grabación") y convive con tus tareas libres en el mismo orden de prioridad — vos o el socio las suben y bajan igual. Completar la tarea de un paso avanza la etapa REAL (si era la última: florece y va al archivo, con celebración). Al avanzar aparece sola la tarea del paso siguiente. Borrarla = "hoy no" (la planta queda intacta). Desapareció el bloque aparte "Próximos pasos · de tus plantas" — todo vive en Tareas. Las semillas NO generan tareas: el tintero es captura; entran al flujo cuando las sembrás.'},
+  {v:'3.3.19', d:'2026-06-10', t:'La captura quedó PURA, como tu flujo: una idea nueva = foto · texto · audio · link · PASOS para terminarla (lista editable, ej. Loop · Arrangement · Grabación · Mix). Fuera "Proceso", fuera "Grupo", fuera "Nuevo grupo / Seleccionar / Mosaico" del Semillero. Al sembrar, la planta nace con LOS PASOS QUE LE PUSISTE al capturarla y te deja en Crece → Creciendo (ya no te tiraba a la vista vieja). El Semillero es un tintero: capturás y listo.'},
+  {v:'3.3.18', d:'2026-06-10', t:'Índigo más claro (las flores ya no se ven opacas). Fuera TODOS los textos explicativos de las secciones — solo títulos, vos sabés usar tu app. El ＋ ahora pregunta solo 2 destinos: Semillero o Referencias. La semilla nace con el ADN de una planta: elegís su Proceso al capturarla (con sus etapas editables) y al sembrarla va a ESE proceso, no al activo. El Muro quedó borde con borde: sin marcos ni espacios, un campo continuo de ideas visuales.'},
+  {v:'3.3.17', d:'2026-06-10', t:'Tono claro más legible (grises con más contraste, pistas de cada sección más grandes) y el Muro de Referencias rediseñado al ADN del prototipo: cabecera "Muro." con punto dorado y botones redondos (imagen dorado · link · tablero · mezclar), búsqueda integrada discreta, mosaico con más aire y entrada en cascada, chips de tableros en minúsculas. Fuera la última sección con look antiguo.'},
+  {v:'3.3.16', d:'2026-06-10', t:'La app ahora se ve y se siente como el prototipo: tarjetas blancas sólidas y formas más curvas en toda la app; marca "Jardín." con punto dorado que se encoge al scrollear; barra inferior con efecto vidrio y dorado en lo activo; hoja "Más" con resorte suave; avisos como píldora oscura discreta; botones sin MAYÚSCULAS gritadas; verde e índigo del prototipo en Crece; las tarjetas entran en cascada y las plantas se mecen cada una a su tiempo; vibración sutil al navegar; y ya no se selecciona texto sin querer al tocar.'},
+  {v:'3.3.15', d:'2026-06-10', t:'Pase de salud y velocidad: (1) arreglado un fallo invisible que apilaba "oyentes" duplicados tras cada sync — cada letra tipeada en Marca podía guardar varias veces; (2) la subida a la nube ahora espera 1.2 s de calma en vez de subir todo en cada tecla (al cerrar la app sube al instante); (3) Hoy se pinta primero y el resto de las pantallas un instante después (arranque más rápido); (4) botones de la barra inferior y campos de texto más grandes (dedo y sin zoom del teclado); (5) barra fina de progreso del día sobre las tareas; (6) píldora "sin conexión" cuando no hay internet; (7) íconos fijados a una versión estable.'},
+  {v:'3.3.14', d:'2026-06-10', t:'Mantener presionado ya NO abre un menú redundante: ahora entra en SELECCIÓN MÚLTIPLE para Agrupar (crea una carpeta) o Borrar varias a la vez. Completar/Renombrar salieron de ahí (son edición interna, dentro de la planta). Las carpetas se ven en Jardín y entrás/salís de ellas.'},
+  {v:'3.3.13', d:'2026-06-10', t:'Arreglado: al completar todas las etapas de una planta (sobre todo después de editar sus etapas o agregarle foto/audio) la pantalla quedaba en blanco. Ahora la ficha se cierra sola y volvés a Jardín con la planta ya florecida.'},
+  {v:'3.3.12', d:'2026-06-10', t:'Etapas PROPIAS de cada planta: el camino (Loop·Arr·Grab·Mix, o el que sea) ahora es interno y editable desde la ficha de cada planta ("Editar etapas de esta planta"); cada nueva nace copiando el del cantero. Y se quitó la barra de cantero de arriba (queda Somko, sin mostrarse).'},
+  {v:'3.3.11', d:'2026-06-10', t:'App-shell de teléfono: toda la app en una columna angosta centrada, cabecera pegada arriba y barra/hojas ajustadas a la columna. Apunta a verse y sentirse como el prototipo en el celular.'},
+  {v:'3.3.10', d:'2026-06-10', t:'Pase de minimalismo (1): la búsqueda se colapsa en un ícono (no la barra grande siempre visible); en Jardín se oculta la barra de cantero (ahí no se filtra) para una cabecera más limpia; más aire entre tarjetas.'},
+  {v:'3.3.9', d:'2026-06-10', t:'Se quitó "Servicios" de la navegación (sus datos quedan guardados, solo no aparece como sección).'},
+  {v:'3.3.8', d:'2026-06-10', t:'Canteros: "YouTube IA" se reconvierte en "Koolmena" (mastering: Recibido·Trabajando·Entregado·Cobrado) y se borra su contenido. El selector de perfil queda Somko / Koolmena, separando tu música de los servicios externos. (Fase 7.)'},
+  {v:'3.3.7', d:'2026-06-10', t:'Muro de Referencias: botón "Mezclar" que reorganiza el collage al azar (sin perder nada). (Fase 6.)'},
+  {v:'3.3.6', d:'2026-06-10', t:'Gestos en Jardín: deslizá una planta a la derecha para avanzar su etapa (florece al completar la última); deslizá una semilla para sembrarla; mantené presionado para acciones rápidas (avanzar, abrir, renombrar, borrar). El tap sigue abriendo. (Fase 5.)'},
+  {v:'3.3.5', d:'2026-06-10', t:'Detalle a PANTALLA COMPLETA: tocar una planta abre su ficha entera sin salir de Jardín (etapas reales del cantero, letra con acordes, foto, audio, links, notas, redes). Arreglado el progreso: usa el nº REAL de etapas del cantero (antes asumía 4). (Fase 4.)'},
+  {v:'3.3.4', d:'2026-06-10', t:'Barra de inicio: Hoy · Jardín · ＋ · Referencias · Más (Jardín abre la página Semilla/Creciendo/Florecida, ya hay cómo volver; Marca pasó a Más). Las 3 principales de la barra ahora son editables desde Ajustes.'},
+  {v:'3.3.3', d:'2026-06-10', t:'"Creciendo" se ve como un jardín vivo: cada planta crece en pantalla según su progreso (brote → hojas → capullo → flor). (Fase 3 de la reconstrucción.)'},
+  {v:'3.3.2', d:'2026-06-10', t:'Pantalla "Crece": un solo lugar con Semilla · Creciendo · Florecida (contadores reales) y orden Progreso / A-Z. Reúne Semillero, Jardín y Flores. (Fase 2 de la reconstrucción.)'},
+  {v:'3.3.1', d:'2026-06-10', t:'Punto de partida de la reconstrucción "Crece": barra inferior nueva (Hoy · Marca · ＋ · Referencias · Más) + sistema de versiones visible.'},
+];
+const APP_VERSION = VERSION_LOG[0].v;
+
 const DEFAULT_CONFIG = {
-  tabOrder: ['hoy','semillero','referencias','jardin','flores','diario','marca','servicios','conciertos','estadisticas','ajustes'],
-  tabVisible: {hoy:true, semillero:true, referencias:true, jardin:true, flores:true, diario:true, marca:true, servicios:true, conciertos:true, estadisticas:true, ajustes:true},
+  tabOrder: ['crece','hoy','semillero','referencias','jardin','flores','diario','marca','conciertos','estadisticas','ajustes'],
+  tabVisible: {crece:true, hoy:true, semillero:true, referencias:true, jardin:true, flores:true, diario:true, marca:true, conciertos:true, estadisticas:true, ajustes:true},
+  bottomNav: ['hoy','crece','referencias'],  // las 3 principales de la barra (editable). El resto va en "Más".
   hoyWidgets: {agenda:true, bitacora:true, utilidades:true},
   hoyOrder: ['agenda','bitacora','utilidades'],
   hoyCollapsed: {agenda:false, bitacora:false},
-  theme: 'auto',
+  theme: 'light', // default: tono claro (decisión Somko); auto/oscuro siguen en Ajustes
 };
 
 const defaults = {
@@ -2289,6 +2576,7 @@ const defaults = {
   bitacora: [], bita_florecio:'', bita_regue:'', bita_pode:'', bitaDate:'',
   gratitud: ['','',''], gratDate:'',
   closedDate: '', nextPlan: null,
+  stepSkips: [], // pasos de plantas saltados de Tareas ("hoy no")
   dailyLog: [], riegoSessions: [],
   activeProjectId: 1,
   brand: {logoData:'', bio:'', photos:[], social:{spotify:{url:'',summary:''}, instagram:{url:'',summary:''}, youtube:{url:'',summary:''}}, presskit:'', gallery:''},
@@ -2387,6 +2675,11 @@ function migrate(state) {
   DEFAULT_CONFIG.tabOrder.forEach(t => { if (!state.config.tabOrder.includes(t)) state.config.tabOrder.push(t); });
   // Ensure new tabs are visible by default
   Object.keys(DEFAULT_CONFIG.tabVisible).forEach(t => { if (!(t in state.config.tabVisible)) state.config.tabVisible[t] = true; });
+  // Servicios eliminado 2026-06-10 (pedido Somko): se saca de la navegación (los datos services/expenses quedan en su lugar).
+  state.config.tabOrder = (state.config.tabOrder||[]).filter(t => t !== 'servicios');
+  delete state.config.tabVisible.servicios;
+  state.config.bottomNav = (state.config.bottomNav||[]).filter(t => t !== 'servicios');
+  if (!Array.isArray(state.config.bottomNav) || state.config.bottomNav.length !== 3) state.config.bottomNav = DEFAULT_CONFIG.bottomNav.slice();
   // Drop legacy widget keys (habits, intention, missions, frase are now inside bitacora)
   ['habits','intention','missions','frase'].forEach(k => { if (k in state.config.hoyWidgets) delete state.config.hoyWidgets[k]; });
   Object.keys(DEFAULT_CONFIG.hoyWidgets).forEach(k => { if (!(k in state.config.hoyWidgets)) state.config.hoyWidgets[k] = true; });
@@ -2428,11 +2721,7 @@ function migrate(state) {
   // Renombrar el álbum por defecto a "Somko" (una vez) y marcar tipo música
   const _p1 = state.projects.find(p => p.id === 1);
   if (_p1) { if (_p1.name === 'SENTIR') _p1.name = 'Somko'; if (!_p1.kind) _p1.kind = 'musica'; }
-  // Asegurar proyecto YouTube IA (playlists IA, etapas propias)
-  if (!state.projects.some(p => p.kind === 'youtube')) {
-    const _newId = Math.max(0, ...state.projects.map(p => p.id)) + 1;
-    state.projects.push({id:_newId, name:'YouTube IA', type:'Canal', kind:'youtube', description:'', socialContent:'', links:[], files:[], trackingLog:[], stages: YT_STAGES.map(s=>({...s}))});
-  }
+  // (YouTube IA eliminado 2026-06-10: ese cantero ahora es Koolmena — ver _koolmenaV1, más abajo)
   // Canteros del ecosistema (Imágenes / Masters / Mostrarme) — aditivo, una sola vez, sin tocar los existentes
   if (!state.config._canterosV1) {
     const have = new Set((state.projects||[]).map(p => (p.name||'').toLowerCase()));
@@ -2442,8 +2731,32 @@ function migrate(state) {
       {name:'Mostrarme',type:'Presencia',kind:'mostrar',stages:[{id:'idea',label:'Idea'},{id:'grabar',label:'Grabar'},{id:'publicado',label:'Publicado'}]},
     ];
     let _nid = Math.max(0, ...state.projects.map(p => p.id)) + 1;
-    seed.forEach(s => { if (!have.has(s.name.toLowerCase())) state.projects.push({id:_nid++, name:s.name, type:s.type, kind:s.kind, description:'', socialContent:'', links:[], files:[], trackingLog:[], stages:s.stages}); });
+    const _haveMaster = (state.projects||[]).some(p => p.kind === 'master'); // Koolmena ya cubre mastering
+    seed.forEach(s => {
+      if (s.kind === 'master' && _haveMaster) return;
+      if (!have.has(s.name.toLowerCase())) state.projects.push({id:_nid++, name:s.name, type:s.type, kind:s.kind, description:'', socialContent:'', links:[], files:[], trackingLog:[], stages:s.stages});
+    });
     state.config._canterosV1 = true;
+  }
+  // YouTube IA -> Koolmena (mastering). Decisión de Somko 2026-06-10: reconvertir el cantero y BORRAR su contenido. Una sola vez.
+  if (!state.config._koolmenaV1) {
+    const _yt = (state.projects||[]).find(p => p.kind === 'youtube' || (p.name||'').toLowerCase() === 'youtube ia');
+    if (_yt) {
+      state.flores   = (state.flores||[]).filter(f => f.projectId !== _yt.id);
+      state.semillas = (state.semillas||[]).filter(s => s.projectId !== _yt.id);
+      state.tasks    = (state.tasks||[]).filter(t => t.projectId !== _yt.id);
+      _yt.name = 'Koolmena'; _yt.type = 'Koolmena'; _yt.kind = 'master';
+      _yt.stages = KOOL_STAGES.map(s => ({...s}));
+      _yt.description = ''; _yt.socialContent = '';
+    }
+    state.config._koolmenaV1 = true;
+  }
+  // Etapas PROPIAS de cada planta (decisión Somko 2026-06-10): cada flor lleva su propio camino.
+  // Se copia el del cantero como punto de partida; ids preservados (no se pierde progreso). Una sola vez.
+  if (!state.config._plantStagesV1) {
+    const _ps = (pid) => { const p=(state.projects||[]).find(x=>x.id===pid); return (p&&Array.isArray(p.stages)&&p.stages.length)?p.stages:DEFAULT_STAGES; };
+    (state.flores||[]).forEach(fl => { if (fl && !fl.isPage && (!Array.isArray(fl.stages)||!fl.stages.length)) fl.stages = _ps(fl.projectId).map(s=>({id:s.id,label:s.label})); });
+    state.config._plantStagesV1 = true;
   }
   // Semillas con proyecto (default: Somko) para poder filtrar por proyecto
   (state.semillas||[]).forEach(s => { if (!('projectId' in s)) s.projectId = 1; if (!('parentId' in s)) s.parentId = null; if (!('deadline' in s)) s.deadline = ''; });
@@ -2489,6 +2802,16 @@ function migrate(state) {
     if (!('priority' in f)) f.priority = 0;
     if (!('deadline' in f)) f.deadline = '';
     if (!('parentId' in f)) f.parentId = null;
+  });
+  // ADN único semilla=planta (idempotente, corre en cada carga: cubre también lo que capture el bot)
+  (state.semillas||[]).forEach(s => {
+    if (typeof s.lyrics !== 'string') s.lyrics = '';
+    if (typeof s.notes !== 'string') s.notes = '';
+    if (typeof s.socialContent !== 'string') s.socialContent = '';
+    if (s.text && !s.notes) { s.notes = s.text; s.text = ''; } // el viejo "Texto" vive ahora en Notas
+    if (!Array.isArray(s.stages)) s.stages = [];
+    if (!Array.isArray(s.links)) s.links = s.link ? [{name:'link', url:s.link}] : [];
+    if (!Array.isArray(s.files)) s.files = [];
   });
   // Project types — ensure valid
   (state.projects||[]).forEach(p => {
@@ -2738,6 +3061,8 @@ function setGreeting() { setDateDisplay(); }
 
 // ========================= TABS / THEME / WIDGETS =========================
 function applyTheme() {
+  // Migración suave: quien quedó en 'auto' (el default viejo) pasa al claro, el nuevo default.
+  if (S.config.theme === 'auto' && !S.config._themeChosen) { S.config.theme = 'light'; }
   const t = S.config.theme;
   if (t === 'auto') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', t);
@@ -2754,11 +3079,17 @@ function renderTabs() {
   });
 }
 function switchTab(key) {
+  try { navigator.vibrate && navigator.vibrate(6); } catch(e) {}
   $$('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === key));
   $$('section.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-'+key));
   try { localStorage.setItem('jardin-lastTab', key); } catch(e){}
+  if (typeof updateBottomNav === 'function') updateBottomNav(key);
+  if (typeof closeMore === 'function') closeMore();
   window.scrollTo({top:0});
   if (typeof stopUtilAudio === 'function') stopUtilAudio(); // Utilidades vive en HOY: al cambiar de pestaña, apaga el mic
+  document.body.classList.toggle('on-crece', key === 'crece');
+  if (key !== 'crece' && typeof crSelecting !== 'undefined' && crSelecting) { crSelecting=false; crSelected=new Set(); const _csb=document.getElementById('crSelBar'); if(_csb) _csb.remove(); }
+  if (key === 'crece') renderCrece();
   if (key === 'hoy') { renderAgenda(); renderAfinador(); if (dashOpen) buildDashboard(document.getElementById('statsDashboard')); }
   if (key === 'semillero') renderSemillero();
   if (key === 'referencias') renderReferencias();
@@ -2770,6 +3101,442 @@ function switchTab(key) {
   if (key === 'servicios') { renderMonthFilter(); initDateInputs(); }
   if (key === 'estadisticas') renderEstadisticas();
 }
+
+/* ===== Barra inferior (editable): [p1] [p2] [＋] [p3] [Más] ===== */
+const FUSED = ['semillero','jardin','flores']; // internos: viven dentro de "Jardín" (la página Crece). No se muestran como tabs.
+function bottomTabs(){ const bn = (S.config && Array.isArray(S.config.bottomNav) && S.config.bottomNav.length===3) ? S.config.bottomNav : ['hoy','crece','referencias']; return bn.filter(k => TABS_META[k]); }
+function moreTabs(){ const bn = bottomTabs(); return Object.keys(TABS_META).filter(k => !bn.includes(k) && !FUSED.includes(k)); }
+
+function renderBottomBar(){
+  const nav = document.getElementById('bottomNav'); if (!nav) return;
+  const bn = bottomTabs();
+  const tab = k => { const m = TABS_META[k] || {label:k, icon:'ti-point'}; return `<button class="bn-btn" data-bn="${k}"><i class="ti ${m.icon}"></i><span>${m.label}</span></button>`; };
+  nav.innerHTML = tab(bn[0]) + tab(bn[1])
+    + `<div class="bn-plus"><button id="bnCapture" title="Capturar" aria-label="Capturar"><i class="ti ti-plus"></i></button></div>`
+    + tab(bn[2])
+    + `<button class="bn-btn" id="bnMore"><i class="ti ti-dots"></i><span>Más</span></button>`;
+  nav.querySelectorAll('.bn-btn[data-bn]').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.bn)));
+  document.getElementById('bnCapture').addEventListener('click', captureNew);
+  document.getElementById('bnMore').addEventListener('click', () => {
+    const open = document.getElementById('moreSheet')?.classList.contains('open');
+    if (open) closeMore(); else openMore();
+  });
+  const cur = document.querySelector('section.tab.active')?.id?.replace('tab-','') || '';
+  updateBottomNav(cur);
+}
+
+function updateBottomNav(key) {
+  document.querySelectorAll('#bottomNav .bn-btn[data-bn]').forEach(b => b.classList.toggle('active', b.dataset.bn === key));
+  const more = document.getElementById('bnMore');
+  if (more) more.classList.toggle('active', !bottomTabs().includes(key)); // "Más" activo cuando no estás en una principal
+}
+
+// Editor de "las 3 principales" (Ajustes)
+function renderBottomNavConfig(){
+  const host = document.getElementById('bottomNavConfig'); if (!host) return;
+  const cands = Object.keys(TABS_META).filter(k => !FUSED.includes(k));
+  const bn = bottomTabs();
+  const labels = ['1 · izquierda','2 · izquierda','3 · derecha'];
+  host.innerHTML = bn.map((cur,i) => `<div class="config-item"><div><div class="config-name">${labels[i]}</div></div>
+    <select class="flat" data-bnslot="${i}">${cands.map(k => `<option value="${k}" ${k===cur?'selected':''}>${TABS_META[k].label}</option>`).join('')}</select></div>`).join('');
+  host.querySelectorAll('[data-bnslot]').forEach(sel => sel.addEventListener('change', () => {
+    const i = +sel.dataset.bnslot, v = sel.value, arr = bottomTabs().slice();
+    const j = arr.indexOf(v); if (j >= 0 && j !== i) arr[j] = arr[i]; // sin duplicados: intercambia
+    arr[i] = v; S.config.bottomNav = arr; save(); renderBottomBar(); renderBottomNavConfig();
+  }));
+}
+
+function renderMoreSheet() {
+  const grid = document.getElementById('moreGrid');
+  if (!grid) return;
+  grid.innerHTML = moreTabs()
+    .filter(k => TABS_META[k] && S.config.tabVisible[k])
+    .map(k => `<button class="more-item" data-more="${k}"><i class="ti ${TABS_META[k].icon}"></i><span>${TABS_META[k].label}</span></button>`)
+    .join('');
+  grid.querySelectorAll('.more-item').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.more));
+  });
+}
+
+function openMore() {
+  renderMoreSheet();
+  document.getElementById('moreBackdrop')?.classList.add('open');
+  document.getElementById('moreSheet')?.classList.add('open');
+}
+function closeMore() {
+  document.getElementById('moreBackdrop')?.classList.remove('open');
+  document.getElementById('moreSheet')?.classList.remove('open');
+}
+
+// ＋ central = hoja con 2 destinos: Semillero (semilla = planta sin rellenar, con su proceso) o Referencias (muro)
+function captureSeed() {
+  switchTab('semillero');
+  semCurrentParent = null;
+  semFormOpen = true;
+  semFormDraft = {title:'', lyrics:'', notes:'', socialContent:'', link:'', photoData:null, audioData:null, audioSec:0, files:[], groupId:null, projectId:S.activeProjectId, parentId:null};
+  renderSemillero();
+  setTimeout(() => document.getElementById('nfTitle')?.focus(), 50);
+}
+function captureNew() {
+  let bd = document.getElementById('capBackdrop'), sh = document.getElementById('capSheet');
+  if (!sh) {
+    bd = document.createElement('div'); bd.id = 'capBackdrop'; bd.className = 'more-backdrop';
+    sh = document.createElement('div'); sh.id = 'capSheet'; sh.className = 'more-sheet';
+    sh.innerHTML = `<div class="more-handle"></div>
+      <div class="cap-row">
+        <button class="cap-opt" id="capSeed"><i class="ti ti-seeding"></i><span>Semillero</span></button>
+        <button class="cap-opt" id="capRef"><i class="ti ti-layout-grid"></i><span>Referencias</span></button>
+      </div>`;
+    document.body.appendChild(bd); document.body.appendChild(sh);
+    const close = () => { bd.classList.remove('open'); sh.classList.remove('open'); };
+    bd.addEventListener('click', close);
+    sh.querySelector('#capSeed').addEventListener('click', () => { close(); try{navigator.vibrate&&navigator.vibrate(8)}catch(e){} captureSeed(); });
+    sh.querySelector('#capRef').addEventListener('click', () => {
+      close(); try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}
+      switchTab('referencias');
+      photoContext = {type:'ref-new'};
+      setTimeout(() => document.getElementById('photoInput')?.click(), 150);
+    });
+  }
+  bd.classList.add('open'); sh.classList.add('open');
+}
+
+// La barra es dinámica: sus botones los cablea renderBottomBar(). Solo el backdrop es estático.
+document.getElementById('moreBackdrop')?.addEventListener('click', closeMore);
+
+// ===== Versión visible (pie de Ajustes) =====
+(function initVersion(){
+  const vEl = document.getElementById('appVersion');
+  if (vEl) vEl.textContent = APP_VERSION;
+  const log = document.getElementById('versionLog');
+  if (log) log.innerHTML = VERSION_LOG.map(e =>
+    `<div style="margin-bottom:6px;"><b style="color:var(--text-secondary);">v${e.v}</b> · ${e.d}<br>${escapeHTML(e.t)}</div>`).join('');
+  const line = document.getElementById('versionLine');
+  if (line && log) line.addEventListener('click', () => {
+    log.style.display = (log.style.display === 'none' || !log.style.display) ? 'block' : 'none';
+  });
+})();
+
+/* ===== CRECE (Fase 2) — un lugar: Semilla · Creciendo · Florecida =====
+   Lee datos reales (S.semillas, S.flores, S.projects). Etapas por cantero vía stagesOf/isComplete/florNextStage.
+   Tocar enruta al detalle existente (el detalle a pantalla completa propio llega en Fase 4). */
+let crBucket = 'creciendo', crSort = 'progress';
+let crParent = null, crSelecting = false, crSelKind = null, crSelected = new Set();
+function crSeeds()   { return (S.semillas || []).filter(s => !s.isPage && (s.parentId??null)===crParent); }
+function crGrowing() { return (S.flores  || []).filter(f => !f.isPage && !isComplete(f) && (f.parentId??null)===crParent); }
+function crFlowers() { return (S.flores  || []).filter(f => !f.isPage &&  isComplete(f) && (f.parentId??null)===crParent); }
+function crFoldersOf(kind){ const arr = kind==='seed'?S.semillas:S.flores; return (arr||[]).filter(x=>x.isPage && (x.parentId??null)===crParent); }
+function crParentOf(id){ const arr=[...(S.flores||[]),...(S.semillas||[])]; const p=arr.find(x=>x.id===id); return p ? (p.parentId??null) : null; }
+function crFolderCard(kind, fp){
+  const cnt = (kind==='seed'?S.semillas:S.flores).filter(x=>(x.parentId??null)===fp.id).length;
+  return `<div class="cr-card cr-folder" data-crfolder="${fp.id}">
+    <span class="cr-dot" style="background:var(--text-faint)"></span>
+    <div class="cr-body"><div class="cr-title"><i class="ti ti-folder" style="color:var(--gold)"></i>${escapeHTML(fp.title||'Carpeta')}</div>
+      <div class="cr-meta"><span class="cr-tag">${cnt} dentro</span></div></div>
+    <i class="ti ti-chevron-right" style="color:var(--text-faint);align-self:center;"></i>
+  </div>`;
+}
+// ---- Selección múltiple (mantener presionado): agrupar / borrar ----
+function crEnterSelect(kind,id){ crSelecting=true; crSelKind=kind; crSelected=new Set([id]); crVibe(15); renderCrece(); }
+function crExitSel(){ crSelecting=false; crSelected=new Set(); renderCrece(); }
+function crToggleSel(id){ if(crSelected.has(id)) crSelected.delete(id); else crSelected.add(id); if(crSelected.size===0){ crExitSel(); return; } renderCrece(); }
+function crDeleteSel(){
+  if(!crSelected.size) return;
+  if(!confirm(`Borrar ${crSelected.size} ${crSelKind==='seed'?'semilla(s)':'planta(s)'}? (también lo que tengan adentro)`)) return;
+  const ids=crSelected;
+  if(crSelKind==='seed') S.semillas=S.semillas.filter(x=>!ids.has(x.id) && !ids.has(x.parentId));
+  else S.flores=S.flores.filter(x=>!ids.has(x.id) && !ids.has(x.parentId));
+  save(); crSelecting=false; crSelected=new Set(); renderCrece(); toast('Borrado','🗑');
+}
+function crGroupSel(){
+  if(!crSelected.size) return;
+  const name=prompt('Nombre del grupo:'); if(name===null) return;
+  const pageId=uid(); const ids=crSelected;
+  if(crSelKind==='seed'){
+    S.semillas.unshift({ id:pageId, createdAt:Date.now(), date:todayStr(), title:(name.trim()||'Grupo'), text:'', link:'', photoData:null, audioData:null, audioSec:0, groupId:null, projectId:S.activeProjectId, parentId:crParent, isPage:true });
+    S.semillas.forEach(x=>{ if(ids.has(x.id)) x.parentId=pageId; });
+  } else {
+    S.flores.unshift({ id:pageId, title:(name.trim()||'Grupo'), projectId:S.activeProjectId, parentId:crParent, isPage:true, key:'',chords:'',lyrics:'',notes:'',socialContent:'',description:'',links:[],files:[],photoData:null,audioData:null,audioSec:0,priority:0,deadline:'' });
+    S.flores.forEach(x=>{ if(ids.has(x.id)) x.parentId=pageId; });
+  }
+  save(); crSelecting=false; crSelected=new Set(); renderCrece(); toast(`Agrupadas en "${name.trim()||'Grupo'}"`,'📁');
+}
+function renderCrSelBar(){
+  let bar=document.getElementById('crSelBar');
+  if(!crSelecting){ if(bar) bar.remove(); return; }
+  if(!bar){ bar=document.createElement('div'); bar.id='crSelBar'; bar.className='select-bar'; document.body.appendChild(bar); }
+  const n=crSelected.size;
+  bar.innerHTML=`<span class="sb-count">${n}</span><span class="sb-hint">seleccionadas</span>`+
+    `<button id="crSelGroup"${n<1?' disabled':''}><i class="ti ti-folder-plus"></i> Agrupar</button>`+
+    `<button id="crSelDel" class="danger"${n<1?' disabled':''}><i class="ti ti-trash"></i> Borrar</button>`+
+    `<button id="crSelCancel" title="salir"><i class="ti ti-x"></i></button>`;
+  bar.querySelector('#crSelGroup').onclick=crGroupSel;
+  bar.querySelector('#crSelDel').onclick=crDeleteSel;
+  bar.querySelector('#crSelCancel').onclick=crExitSel;
+}
+function crProjName(f){ const p = (S.projects || []).find(x => x.id === f.projectId); return p ? p.name : '—'; }
+function crSortPlants(arr){
+  const a = arr.slice();
+  if (crSort === 'az') a.sort((x,y) => (x.title||'').localeCompare(y.title||''));
+  else a.sort((x,y) => {
+    const fx = stagesDone(x)/Math.max(stagesOf(x).length,1), fy = stagesDone(y)/Math.max(stagesOf(y).length,1);
+    return (fy - fx) || (y.id - x.id);
+  });
+  return a;
+}
+function crSeedCard(s){
+  const tags = (s.photoData?'<span class="cr-tag"><i class="ti ti-photo"></i>foto</span>':'')
+    + (s.audioData?'<span class="cr-tag"><i class="ti ti-microphone"></i>audio</span>':'')
+    + (s.link?'<span class="cr-tag"><i class="ti ti-link"></i>link</span>':'');
+  return `<div class="cr-card" data-crseed="${s.id}">
+    <span class="cr-dot semilla"></span>
+    <div class="cr-body">
+      <div class="cr-title">${escapeHTML(s.title || '(sin título)')}</div>
+      <div class="cr-seedhint"><i class="ti ti-seeding"></i> semilla · sin sembrar</div>
+      ${tags?`<div class="cr-meta">${tags}</div>`:''}
+    </div>
+    <i class="ti ti-chevron-right" style="color:var(--text-faint);align-self:center;"></i>
+  </div>`;
+}
+function crPlantCard(f){
+  const stages = stagesOf(f), n = stages.length, d = stages.filter(st => f[st.id]).length;
+  const next = florNextStage(f), flor = isComplete(f);
+  const rail = `<div class="cr-rail">${stages.map(st => `<span class="cr-seg ${f[st.id]?'done':''}"></span>`).join('')}</div>`;
+  const stageLine = (!flor && next) ? `<div class="cr-stage"><i class="ti ti-arrow-badge-right"></i>${escapeHTML(next.label)} · ${d}/${n}</div>` : '';
+  const dateTag = (flor && f.harvestedAt) ? `<span class="cr-tag harvest"><i class="ti ti-check"></i>cosechada</span>` : '';
+  return `<div class="cr-card" data-crplant="${f.id}">
+    <span class="cr-dot ${flor?'flor':'creciendo'}"></span>
+    <div class="cr-body">
+      <div class="cr-title">${escapeHTML(f.title || '(sin título)')}</div>
+      ${flor ? '' : rail}
+      ${stageLine}
+      <div class="cr-meta"><span class="cr-tag"><i class="ti ti-folders"></i>${escapeHTML(crProjName(f))}</span>${dateTag}</div>
+    </div>
+    <i class="ti ti-chevron-right" style="color:var(--text-faint);align-self:center;"></i>
+  </div>`;
+}
+function crGardenPlant(f){
+  const st = stagesOf(f), n = st.length, d = st.filter(s => f[s.id]).length;
+  const pct = Math.round(d / Math.max(n,1) * 100);
+  const next = florNextStage(f);
+  return `<div class="cr-gplant" data-crplant="${f.id}">
+    <div class="cr-gsvg">${plantSVG(pct)}</div>
+    <div class="cr-gname">${escapeHTML(f.title || '(sin título)')}</div>
+    <div class="cr-gprog">${next ? escapeHTML(next.label) : ''} · ${d}/${n}</div>
+  </div>`;
+}
+function crVibe(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} }
+function crOpenSeed(id){ switchTab('semillero'); }
+function crAdvancePlant(id){
+  const f=(S.flores||[]).find(x=>x.id===id); if(!f) return;
+  const next=florNextStage(f); if(!next) return;
+  setStageDone(f, next.id, true); save();
+  if(isComplete(f)){ crVibe([60,40,100]); toast(`Cosecha — ${f.title} floreció · ahora en Flores`,'✦'); }
+  else { crVibe(12); toast(`Etapa lista · ${next.label}`,'✓'); }
+  renderCrece();
+}
+function crSow(id){ const before=(S.semillas||[]).length; sembrarSemilla(id); if((S.semillas||[]).length<before){ crBucket='creciendo'; switchTab('crece'); } }
+function crRename(kind,id){ const arr=kind==='seed'?S.semillas:S.flores; const o=(arr||[]).find(x=>x.id===id); if(!o) return; const v=prompt('Nuevo nombre:', o.title||''); if(v!==null){ o.title=v.trim(); save(); renderCrece(); } }
+function crDelete(kind,id){ const o=((kind==='seed'?S.semillas:S.flores)||[]).find(x=>x.id===id); if(!o) return; if(!confirm(`Borrar "${o.title||''}"?`)) return; if(kind==='seed') S.semillas=S.semillas.filter(x=>x.id!==id); else S.flores=S.flores.filter(x=>x.id!==id); save(); renderCrece(); }
+function crCloseSheet(){ document.getElementById('crSheetBackdrop')?.classList.remove('open'); document.getElementById('crSheet')?.classList.remove('open'); }
+function crActionSheet(kind,id){
+  const sheet=document.getElementById('crSheet'); if(!sheet) return;
+  let title='', rows='';
+  if(kind==='seed'){
+    const s=(S.semillas||[]).find(x=>x.id===id); if(!s) return; title=s.title||'semilla';
+    rows=`<button data-a="sow"><i class="ti ti-plant-2"></i> Sembrar como planta</button>
+      <button data-a="rename"><i class="ti ti-pencil"></i> Renombrar</button>
+      <button data-a="del" class="danger"><i class="ti ti-trash"></i> Borrar</button>`;
+  } else {
+    const fp=(S.flores||[]).find(x=>x.id===id); if(!fp) return; title=fp.title||'planta';
+    const next=florNextStage(fp);
+    rows=(next?`<button data-a="adv"><i class="ti ti-circle-check"></i> Completar: ${escapeHTML(next.label)}</button>`:'')
+      +`<button data-a="open"><i class="ti ti-arrows-diagonal"></i> Abrir</button>
+      <button data-a="rename"><i class="ti ti-pencil"></i> Renombrar</button>
+      <button data-a="del" class="danger"><i class="ti ti-trash"></i> Borrar</button>`;
+  }
+  sheet.innerHTML=`<div class="more-handle"></div><div class="more-title">${escapeHTML(title)}</div><div class="cr-acts">${rows}</div>`;
+  sheet.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',()=>{ const a=b.dataset.a; crCloseSheet();
+    if(a==='sow') crSow(id);
+    else if(a==='adv') crAdvancePlant(id);
+    else if(a==='open') openCreceDetail(id);
+    else if(a==='rename') crRename(kind,id);
+    else if(a==='del') crDelete(kind,id);
+  }));
+  const bd=document.getElementById('crSheetBackdrop'); if(bd){ bd.onclick=crCloseSheet; bd.classList.add('open'); }
+  sheet.classList.add('open');
+}
+// Gestos en una tarjeta/planta: tap=abrir · deslizar derecha=avanzar/sembrar · mantener=acciones
+function crWireGestures(el, kind, id){
+  let startX=0,startY=0,dx=0,dragging=false,moved=false,lpFired=false,lpTimer=null;
+  const onDown=(x,y,e)=>{ startX=x;startY=y;dragging=true;moved=false;lpFired=false;el.style.transition='none';
+    if(e&&e.pointerId!=null){ try{el.setPointerCapture(e.pointerId);}catch(_){} }
+    lpTimer=setTimeout(()=>{ if(!moved){ lpFired=true;dragging=false;el.style.transform='';crEnterSelect(kind,id); } },480); };
+  const onMove=(x,y)=>{ if(!dragging) return; dx=x-startX; const dy=y-startY;
+    if(Math.abs(dx)>6||Math.abs(dy)>6){ moved=true; clearTimeout(lpTimer); }
+    if(Math.abs(dy)>Math.abs(dx)) return;            // gesto vertical = scroll, no interferir
+    if(dx<0) dx=dx*0.25; el.style.transform=`translateX(${dx}px)`; };
+  const onUp=()=>{ clearTimeout(lpTimer); if(!dragging){ return; } dragging=false; el.style.transition='transform .2s';
+    if(dx>90){ el.style.transform='translateX(110%)'; setTimeout(()=>{ kind==='seed'?crSow(id):crAdvancePlant(id); },140); }
+    else { el.style.transform=''; if(!moved&&!lpFired){ kind==='seed'?crOpenSeed(id):openCreceDetail(id); } } dx=0; };
+  el.addEventListener('pointerdown', e=>onDown(e.clientX,e.clientY,e));
+  el.addEventListener('pointermove', e=>onMove(e.clientX,e.clientY));
+  el.addEventListener('pointerup', onUp);
+  el.addEventListener('pointercancel', ()=>{ clearTimeout(lpTimer); el.style.transition='transform .2s'; el.style.transform=''; dragging=false; });
+}
+function crSetChip(f){
+  const chip=document.getElementById('crDetailChip'); if(!chip) return;
+  const flor=isComplete(f);
+  chip.className='cr-dchip '+(flor?'flor':'creciendo');
+  chip.innerHTML=`<i class="ti ${flor?'ti-flower':'ti-plant'}"></i>${flor?'Florecida':'Creciendo'}`;
+}
+let crDetailFlorId = null, crDetailWasComplete = false, crDetailObserver = null;
+// Solo cablea el cerrar (Cerrar / Eliminar). La detección de cosecha/vacío la hace el observador.
+function crWireDetailExtras(f){
+  const cb=document.getElementById('plantClose'); if(cb) cb.addEventListener('click', closeCreceDetail);
+  const db=document.getElementById('plantDel');   if(db) db.addEventListener('click', ()=>setTimeout(closeCreceDetail,0));
+}
+function openCreceDetail(id){
+  const f=(S.flores||[]).find(x=>x.id===id); if(!f) return;
+  selectedPlantId=id; crDetailFlorId=id; crDetailWasComplete=isComplete(f);
+  const host=document.getElementById('crDetailHost'), pd=document.getElementById('plantDetail');
+  if(host && pd && pd.parentElement!==host){ pd._home=pd.parentElement; host.appendChild(pd); } // reubica el detalle REAL
+  renderPlantDetail();           // tu motor de edición real (letra/acordes/foto/audio/links/etapas)
+  crSetChip(f); crWireDetailExtras(f);
+  const back=document.getElementById('crDetailBack'); if(back) back.onclick=closeCreceDetail;
+  document.getElementById('crDetail').classList.add('on');
+  // Observador: ante CUALQUIER redibujo de la ficha, re-aplica ganchos; cierra si se cosechó o quedó vacía.
+  if(host){
+    if(!crDetailObserver){
+      crDetailObserver = new MutationObserver(()=>{
+        const ov=document.getElementById('crDetail'); if(!ov || !ov.classList.contains('on')) return;
+        const cf=(S.flores||[]).find(x=>x.id===crDetailFlorId);
+        const pdn=document.getElementById('plantDetail');
+        if(!cf){ closeCreceDetail(); return; }                               // se borró
+        if(!crDetailWasComplete && isComplete(cf)){ closeCreceDetail(); return; } // cosechó recién -> volver a Crece
+        if(!pdn || !pdn.querySelector('[data-pstage]')){ closeCreceDetail(); return; } // quedó vacía (Cerrar / selectedPlantId=null)
+        crWireDetailExtras(cf); crSetChip(cf);                              // re-aplica ganchos tras el redibujo
+      });
+    }
+    crDetailObserver.observe(host, {childList:true, subtree:true});
+  }
+}
+function closeCreceDetail(){
+  const ov=document.getElementById('crDetail');
+  if(!ov || !ov.classList.contains('on')) return;     // idempotente: si ya está cerrado, nada
+  if(crDetailObserver) crDetailObserver.disconnect();
+  ov.classList.remove('on');
+  const pd=document.getElementById('plantDetail');
+  if(pd && pd._home){ pd._home.appendChild(pd); pd.innerHTML=''; } // devuelve el detalle a Jardín
+  selectedPlantId=null; crDetailFlorId=null;
+  renderCrece();
+}
+function renderCrece(){
+  const sec = document.getElementById('tab-crece'); if (!sec) return;
+  const nSeed = crSeeds().length, nGrow = crGrowing().length, nFlor = crFlowers().length;
+  const pills = `<div class="cr-stages">
+    <button class="cr-pill ${crBucket==='semilla'?'on':''}" data-b="semilla"><span class="ico"><i class="ti ti-seeding"></i></span><span class="nm">Semilla</span><span class="ct">${nSeed}</span></button>
+    <button class="cr-pill ${crBucket==='creciendo'?'on':''}" data-b="creciendo"><span class="ico"><i class="ti ti-plant"></i></span><span class="nm">Creciendo</span><span class="ct">${nGrow}</span></button>
+    <button class="cr-pill ${crBucket==='flor'?'on':''}" data-b="flor"><span class="ico"><i class="ti ti-flower"></i></span><span class="nm">Florecida</span><span class="ct">${nFlor}</span></button>
+  </div>`;
+  const lens = crBucket==='semilla' ? '' : `<div class="cr-lens"><span class="lab">Orden</span>
+    <button data-s="progress" class="${crSort==='progress'?'on':''}"><i class="ti ti-chart-bar"></i>Progreso</button>
+    <button data-s="az" class="${crSort==='az'?'on':''}"><i class="ti ti-sort-ascending-letters"></i>A-Z</button></div>`;
+  let listHtml = '', hint = '';
+  const kind = crBucket==='semilla' ? 'seed' : 'plant';
+  const folderCards = crFoldersOf(kind).map(fp => crFolderCard(kind, fp)).join('');
+  const backChip = crParent!=null ? `<button class="cr-backchip" id="crBack"><i class="ti ti-chevron-left"></i> volver</button>` : '';
+  if (crBucket==='semilla'){
+    const arr = crSeeds();
+    hint = 'tu bandeja';
+    listHtml = (folderCards + arr.map(crSeedCard).join('')) || '<div class="cr-empty">sin semillas · capturá con el ＋</div>';
+  } else if (crBucket==='creciendo'){
+    const arr = crSortPlants(crGrowing());
+    hint = 'tu jardín vivo';
+    const garden = arr.length ? `<div class="cr-garden">${arr.map(crGardenPlant).join('')}</div>` : '';
+    listHtml = (folderCards + garden) || '<div class="cr-empty">nada creciendo todavía</div>';
+  } else {
+    const arr = crSortPlants(crFlowers());
+    hint = 'tus flores cosechadas';
+    listHtml = (folderCards + arr.map(crPlantCard).join('')) || '<div class="cr-empty">todavía no floreció nada</div>';
+  }
+  const selNote = crSelecting ? ' · tocá para seleccionar' : ' · mantené presionado para seleccionar';
+  sec.innerHTML = pills + lens + backChip + (hint?`<div class="cr-hint">${hint}${selNote}</div>`:'') + `<div class="cr-list">${listHtml}</div>`;
+  sec.querySelectorAll('.cr-pill').forEach(b => b.addEventListener('click', () => { crSelecting=false; crSelected=new Set(); crParent=null; crBucket = b.dataset.b; renderCrece(); }));
+  sec.querySelectorAll('.cr-lens button').forEach(b => b.addEventListener('click', () => { crSort = b.dataset.s; renderCrece(); }));
+  const _bk = sec.querySelector('#crBack'); if(_bk) _bk.addEventListener('click', () => { crParent = crParentOf(crParent); renderCrece(); });
+  sec.querySelectorAll('[data-crfolder]').forEach(c => { const fid=+c.dataset.crfolder;
+    if(crSelecting && crSelected.has(fid)) c.classList.add('cr-sel');
+    c.addEventListener('click', () => { if(crSelecting) crToggleSel(fid); else { crParent=fid; renderCrece(); } });
+  });
+  sec.querySelectorAll('[data-crseed]').forEach(c => { const id=+c.dataset.crseed;
+    if(crSelecting){ if(crSelected.has(id)) c.classList.add('cr-sel'); c.addEventListener('click', () => crToggleSel(id)); }
+    else crWireGestures(c, 'seed', id);
+  });
+  sec.querySelectorAll('[data-crplant]').forEach(c => { const id=+c.dataset.crplant;
+    if(crSelecting){ if(crSelected.has(id)) c.classList.add('cr-sel'); c.addEventListener('click', () => crToggleSel(id)); }
+    else crWireGestures(c, 'plant', id);
+  });
+  renderCrSelBar();
+}
+// ícono de búsqueda: abre/cierra la barra (minimalismo)
+document.getElementById('searchToggle')?.addEventListener('click', () => {
+  const w = document.getElementById('globalSearchWrap'); if (!w) return;
+  const open = w.classList.toggle('open');
+  document.getElementById('searchToggle')?.classList.toggle('on', open);
+  if (open) setTimeout(() => document.getElementById('globalSearchInput')?.focus(), 60);
+  else { const i = document.getElementById('globalSearchInput'); if (i) { i.value=''; } if (typeof closeSearchResults==='function') closeSearchResults(); }
+});
+// volver a Crece desde el título (es la pantalla principal)
+(function(){ const b = document.querySelector('header.top .brand'); if (b){ b.style.cursor='pointer'; b.title='Ir a Crece'; b.addEventListener('click', () => switchTab('crece')); } })();
+// Frase del día bajo la marca — una distinta cada día, estable durante el día
+const FRASES_DIA = [
+  'Vives mejor en estado de asombro constante. — Rick Rubin',
+  'No eres la fuente de la obra, eres la antena. Tu trabajo es estar despierto. — Rick Rubin',
+  'La obra se revela mientras la haces. No tienes que verla entera para empezar. — Rick Rubin',
+  'Escuchar es más que oír. Antes de crear, escucha. — Rick Rubin',
+  'La paciencia es dejar que las cosas pasen a su propio ritmo. — Rick Rubin',
+  'Haz la obra para ti. Si es honesta, encontrará a quien tenga que encontrar. — Rick Rubin',
+  'La duda es parte del proceso, no una señal para detenerte. — Rick Rubin',
+  'Nada en el universo es fijo. Lo que hoy te traba, mañana fluye. — Rick Rubin',
+  'Empieza donde sea. El primer paso no tiene que ser el correcto, solo tiene que existir. — Rick Rubin',
+  'La consciencia es la semilla. Todo lo demás crece de prestar atención. — Rick Rubin',
+  'Cuando dudes, vuelve a la pregunta: ¿para quién es esto, y por qué empecé?',
+  'El propósito no se siente todos los días. Por eso se elige, no se espera.',
+  'Solo tienes que estar para cuando la obra hable.',
+  'Estás exactamente donde tienes que estar para dar el siguiente paso.',
+  'La claridad no llega antes de actuar; llega mientras actúas.',
+  'Lo que cultivas en silencio hoy, florece donde nadie lo vio crecer.',
+  'No estás atrasado. Estás en tu tiempo, regando tus propias semillas.',
+  'El mundo no necesita que seas perfecto. Necesita que seas honesto. — Rick Rubin',
+  'Estás compitiendo con la persona que fuiste ayer, no con nadie más. — James Clear',
+  'Pregúntate qué haría hoy la persona que quieres ser, y hazlo. — James Clear',
+  'Quien tiene un porqué soporta casi cualquier cómo. — Viktor Frankl',
+  'No falles dos veces seguidas. — James Clear',
+  'Solo tienes que aparecer. Aunque sea mal, aparece. — Julia Cameron',
+  'La pereza que sientes justo antes de lo importante tiene nombre: es la Resistencia. — Steven Pressfield',
+  'No persigas la meta, confirma quién eres.',
+  'Toma la guitarra y toca un acorde. Lo demás viene solo.',
+  'El progreso pequeño y visible es el combustible. — Teresa Amabile',
+  'Empezar es el único obstáculo; lo demás es inercia.',
+  'Tener todo el día es la trampa. Ponle bordes y se vuelve tuyo.',
+];
+function renderBrandQuote() {
+  const el = document.getElementById('brandQuote'); if (!el) return;
+  const d = todayStr(); let h = 0;
+  for (let i = 0; i < d.length; i++) h = (h * 31 + d.charCodeAt(i)) >>> 0;
+  el.textContent = FRASES_DIA[h % FRASES_DIA.length];
+}
+renderBrandQuote();
+// Header elástico (prototipo): se encoge al scrollear, vuelve arriba
+(function(){
+  const hd = document.querySelector('header.top'); if (!hd) return;
+  let t = null;
+  window.addEventListener('scroll', () => {
+    if (t) return;
+    t = requestAnimationFrame(() => { hd.classList.toggle('shrunk', window.scrollY > 18); t = null; });
+  }, {passive: true});
+})();
 
 function renderEstadisticas() {
   // Top metrics
@@ -3489,26 +4256,23 @@ function renderPlantDetail() {
   const f = S.flores.find(x => x.id === selectedPlantId);
   if (!f) { el.innerHTML = ''; selectedPlantId = null; return; }
   const ds = stagesDone(f);
-  const pct = Math.round((ds/4)*100);
+  const n = stagesOf(f).length || 1;   // nº REAL de etapas del cantero (arregla el bug ÷4)
+  const pct = Math.round((ds/n)*100);
   el.innerHTML = `
     <div class="plant-detail">
       <div class="head">
         <input type="text" class="title" data-pf="title" value="${escapeHTML(f.title||'')}" style="border:none;font-weight:500;font-size:14px;color:var(--gold);background:transparent;padding:0;flex:1;">
-        <div class="pct">${ds}/4 · ${pct}%</div>
+        <div class="pct">${ds}/${n} · ${pct}%</div>
       </div>
       <div class="stages">
         ${stagesOf(f).map(s => `<div class="stage ${f[s.id]?'done':''}" data-pstage="${s.id}">${s.label}</div>`).join('')}
       </div>
+      <button class="pd-edit-stages" id="pdEditStages"><i class="ti ti-list-check"></i> Editar etapas de esta planta</button>
       <div class="flor-progress-bar" style="margin:8px 0;"><div style="width:${pct}%"></div></div>
 
       <div class="pd-section">
         <label>Letra con acordes</label>
         <textarea data-pf="lyrics" rows="6" placeholder="la letra... [Am] [F] sobre las sílabas">${escapeHTML(f.lyrics||'')}</textarea>
-      </div>
-
-      <div class="pd-section">
-        <label>Descripción</label>
-        <textarea data-pf="description" rows="2" placeholder="qué cuenta esta obra, su origen...">${escapeHTML(f.description||'')}</textarea>
       </div>
 
       <div class="pd-section">
@@ -3593,6 +4357,7 @@ function renderPlantDetail() {
       renderFlores();
     }
   }));
+  const _pdES = el.querySelector('#pdEditStages'); if (_pdES) _pdES.addEventListener('click', () => openPlantStageEditor(f.id));
   // Field bindings
   el.querySelectorAll('[data-pf]').forEach(inp => {
     inp.addEventListener('input', e => {
@@ -3729,18 +4494,27 @@ const STAGE_TEMPLATES = {
 };
 function genStageId(){ return 'st' + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
 let stageDraft = [];          // [{_k, id, label}]  id=null si es etapa nueva (preserva progreso al renombrar/reordenar)
-let stageEditorProjId = null;
+let stageEditorProjId = null, stageEditorPlantId = null;
 let _stageRowSeq = 0;
 function stageDraftFrom(stages){ return (stages||[]).map(s => ({_k:'k'+(_stageRowSeq++), id:s.id, label:s.label})); }
 function openStageEditor(projId){
   const p = (S.projects||[]).find(x => x.id === projId); if (!p) return;
-  stageEditorProjId = projId;
+  stageEditorProjId = projId; stageEditorPlantId = null;
   stageDraft = stageDraftFrom((p.stages && p.stages.length) ? p.stages : STAGE_TEMPLATES.simple);
   const t = $('#stageEditorTitle'); if (t) t.textContent = 'Etapas · ' + p.name;
   renderStageEditorList();
   $('#stageEditorModal').classList.add('open');
 }
 function closeStageEditor(){ $('#stageEditorModal').classList.remove('open'); }
+// Editor de etapas de UNA planta (propias de cada una)
+function openPlantStageEditor(florId){
+  const f = (S.flores||[]).find(x => x.id === florId); if (!f) return;
+  stageEditorPlantId = florId; stageEditorProjId = null;
+  stageDraft = stageDraftFrom((f.stages && f.stages.length) ? f.stages : stagesOf(f));
+  const t = $('#stageEditorTitle'); if (t) t.textContent = 'Etapas · ' + (f.title || '');
+  renderStageEditorList();
+  $('#stageEditorModal').classList.add('open');
+}
 function renderStageEditorList(){
   const host = $('#stageEditorList'); if (!host) return;
   if (!stageDraft.length) { host.innerHTML = '<div class="empty">sin etapas · agregá una o elegí una plantilla</div>'; return; }
@@ -3772,9 +4546,18 @@ $$('#stageEditorModal .stage-templates button').forEach(b => b.addEventListener(
 document.getElementById('stageEditorCancel')?.addEventListener('click', closeStageEditor);
 document.getElementById('stageEditorModal')?.addEventListener('click', e => { if (e.target.id === 'stageEditorModal') closeStageEditor(); });
 document.getElementById('stageEditorSave')?.addEventListener('click', () => {
-  const p = (S.projects||[]).find(x => x.id === stageEditorProjId); if (!p) { closeStageEditor(); return; }
   const finalStages = stageDraft.map(s => ({ id: s.id || genStageId(), label: (s.label||'').trim() })).filter(s => s.label);
   if (!finalStages.length) { toast('Dejá al menos una etapa', '!'); return; }
+  if (stageEditorPlantId != null) {                 // etapas propias de la planta
+    const f = (S.flores||[]).find(x => x.id === stageEditorPlantId);
+    if (f) { f.stages = finalStages; save(); }
+    closeStageEditor();
+    if (typeof renderPlantDetail === 'function' && selectedPlantId === stageEditorPlantId) renderPlantDetail();
+    renderGarden?.(); renderCrece?.(); renderFlores?.();
+    toast('Etapas guardadas', '✓');
+    return;
+  }
+  const p = (S.projects||[]).find(x => x.id === stageEditorProjId); if (!p) { closeStageEditor(); return; }
   p.stages = finalStages;
   if (typeof selectedPlantId !== 'undefined') selectedPlantId = null;
   save();
@@ -4196,7 +4979,6 @@ function florCardHTML(f) {
           <div><label><i class="ti ti-jar"></i> Frasco</label><select data-ff="jarId"><option value="">— sin frasco —</option>${(S.jars||[]).map(j => `<option value="${j.id}" ${j.id===f.jarId?'selected':''}>${j.emoji||'🍯'} ${escapeHTML(j.name)}</option>`).join('')}</select></div>
         </div>
         <div><label>Letra con acordes</label><textarea data-ff="lyrics" rows="10" placeholder="la letra... pon acordes entre [Am] [F] sobre las sílabas">${escapeHTML(f.lyrics||'')}</textarea></div>
-        <div style="margin-top:10px;"><label>Descripción</label><textarea data-ff="description" rows="2" placeholder="qué cuenta esta obra, su origen...">${escapeHTML(f.description||'')}</textarea></div>
         <div style="margin-top:10px;"><label>Notas de interpretación / producción</label><textarea data-ff="notes" rows="3">${escapeHTML(f.notes||'')}</textarea></div>
         <div style="margin-top:10px;"><label>Contenido redes sociales</label><textarea data-ff="socialContent" rows="3" placeholder="copy para teaser, caption para reel...">${escapeHTML(f.socialContent||'')}</textarea></div>
 
@@ -4439,7 +5221,7 @@ $('#florNew').addEventListener('click', () => {
   // If currently filtering by a specific jar, assign new flor to it
   const jarId = (typeof florJarFilter === 'number') ? florJarFilter : null;
   // Creating a flor here means an archive entry — mark complete by default
-  S.flores.unshift({id, title:'Nueva flor', projectId:projId, parentId:florCurrentParent, jarId, emoji:'', key:'', chords:'', lyrics:'', notes:'', socialContent:'', description:'', links:[], files:[], photoData:null, audioData:null, audioSec:0, priority:0, loop:true, arrangement:true, recording:true, mix:true, deadline:''});
+  S.flores.unshift({id, title:'Nueva flor', projectId:projId, stages: projectStagesById(projId).map(s=>({id:s.id,label:s.label})), parentId:florCurrentParent, jarId, emoji:'', key:'', chords:'', lyrics:'', notes:'', socialContent:'', description:'', links:[], files:[], photoData:null, audioData:null, audioSec:0, priority:0, loop:true, arrangement:true, recording:true, mix:true, deadline:''});
   openFlorId = id; save(); renderFlores(); renderGarden();
   // Focus on the title input
   setTimeout(() => {
@@ -4459,7 +5241,7 @@ let semDetailOpen = null;
 let semFormOpen = false;
 let semFormDraft = null;
 
-let semView = localStorage.getItem('semView') || 'list';
+let semView = 'list'; // vista fija: el semillero es un tintero de ideas, sin modos
 let semCurrentParent = null;          // página actual (null = raíz) para anidación Notion
 let semSelecting = false;             // modo selección múltiple
 let semSelected = new Set();          // ids seleccionados
@@ -4467,6 +5249,13 @@ let semMoveMode = false;              // selector de carpeta destino
 function semChildCount(id) { return (S.semillas || []).filter(s => s.parentId === id && (s.projectId||1) === S.activeProjectId).length; }
 function semPathTo(id) { const path = []; let cur = (S.semillas || []).find(s => s.id === id); let guard = 0; while (cur && guard++ < 50) { path.unshift(cur); cur = cur.parentId ? (S.semillas || []).find(s => s.id === cur.parentId) : null; } return path; }
 function renderSemillero() {
+  // Con una semilla abierta (o capturando), la barra de "Nueva semilla / buscar" y los filtros
+  // no pintan nada — solo la semilla. Vuelven al cerrar.
+  const chrome = document.querySelector('#tab-semillero .sem-toolbar');
+  const filtros = document.getElementById('semFilter');
+  const enFoco = !!(semFormOpen || Object.keys(S.openSemillas || {}).length);
+  if (chrome) chrome.style.display = enFoco ? 'none' : 'flex';
+  if (filtros) filtros.style.display = enFoco ? 'none' : 'flex';
   renderSemFilter();
   renderSemForm();
   const tg = $('#semViewToggle');
@@ -4482,7 +5271,7 @@ function renderSemMosaic(list) {
   let items = (S.semillas || []).filter(s => (s.projectId||1) === S.activeProjectId).filter(semMatchesFilter).filter(s => s.photoData);
   if (semSearchTerm) {
     const t = semSearchTerm.toLowerCase();
-    items = items.filter(i => (i.title || '').toLowerCase().includes(t) || (i.text || '').toLowerCase().includes(t));
+    items = items.filter(i => (i.title || '').toLowerCase().includes(t) || (i.lyrics || '').toLowerCase().includes(t) || (i.notes || '').toLowerCase().includes(t));
   }
   if (!items.length) { list.innerHTML = '<div class="empty">sin fotos — mándale imágenes al bot o agrégalas como semilla</div>'; return; }
   list.innerHTML = `<div class="mosaic" id="mosaicGrid">` + items.map(s => `
@@ -4552,10 +5341,17 @@ function renderReferencias() {
     if (name && name.trim()) { refBoard = name.trim(); toast(`Tablero "${name.trim()}" · arrastrá referencias acá con el botón de carpeta`, '📂'); renderReferencias(); }
   };
   if (search && !search._wired) { search._wired = true; search.addEventListener('input', e => { refSearchTerm = e.target.value; renderRefList(); }); }
+  const bShuf = $('#refShuffle'); if (bShuf) bShuf.onclick = shuffleRefs;
   renderRefBoards();
   renderRefList();
 }
 
+function shuffleRefs(){
+  const a = S.refs || [];
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  save(); renderReferencias();
+  toast('Muro mezclado', '🔀'); if (navigator.vibrate) navigator.vibrate(12);
+}
 function renderRefList() {
   const list = $('#refsList'); if (!list) return;
   let items = (S.refs||[]).filter(refMatchesBoard);
@@ -4761,12 +5557,16 @@ function renderSemList() {
   let items = (S.semillas||[]).filter(i => (i.projectId||1) === S.activeProjectId).filter(semMatchesFilter);
   if (searching) {
     const term = semSearchTerm.toLowerCase();
-    items = items.filter(i => (i.title||'').toLowerCase().includes(term) || (i.text||'').toLowerCase().includes(term));
+    items = items.filter(i => (i.title||'').toLowerCase().includes(term) || (i.lyrics||'').toLowerCase().includes(term) || (i.notes||'').toLowerCase().includes(term));
   } else {
     items = items.filter(i => (i.parentId ?? null) === semCurrentParent); // anidación: nivel actual
   }
+  // FOCO: con una semilla abierta se ve SOLO esa semilla + "volver" (sin barra, filtros ni hermanas)
+  const focusId = Object.keys(S.openSemillas || {}).map(Number).find(id => items.some(i => i.id === id));
+  if (focusId) items = items.filter(i => i.id === focusId);
   let crumb = '';
-  if (!searching && semCurrentParent !== null) {
+  if (focusId) crumb = `<button class="cr-backchip" id="semFocusBack"><i class="ti ti-chevron-left"></i> Semillero</button>`;
+  if (!searching && semCurrentParent !== null && !focusId) {
     const path = semPathTo(semCurrentParent);
     crumb = `<div class="sem-breadcrumb"><button data-semnav="root" title="raíz"><i class="ti ti-home"></i></button>` +
       path.map(p => `<span class="bc-sep">›</span><button data-semnav="${p.id}">${escapeHTML(p.title||'sin título')}</button>`).join('') + `</div>`;
@@ -4780,7 +5580,7 @@ function renderSemList() {
     const sel = semSelected.has(i.id);
     const kids = semChildCount(i.id);
     const types = [];
-    if (i.text) types.push(`<i class="ti ti-align-left"></i>`);
+    if (i.lyrics || i.notes) types.push(`<i class="ti ti-align-left"></i>`);
     if (i.photoData) types.push(`<i class="ti ti-photo"></i>`);
     if (i.audioData) types.push(`<i class="ti ti-microphone"></i>`);
     if (i.link) types.push(`<i class="ti ti-link"></i>`);
@@ -4803,6 +5603,8 @@ function renderSemList() {
       </div>`;
   }).join('');
   wireSemNav(list);
+  const fb = list.querySelector('#semFocusBack');
+  if (fb) fb.addEventListener('click', () => { S.openSemillas = {}; semDetailOpen = null; save(); renderSemillero(); });
   list.querySelectorAll('[data-sementer]').forEach(b => b.addEventListener('click', (e) => {
     e.stopPropagation(); if (semSelecting) return;
     semCurrentParent = +b.dataset.sementer; renderSemList();
@@ -4813,9 +5615,9 @@ function renderSemList() {
       if (e.target.closest('.dnd-grip') || e.target.closest('[data-sementer]') || e.target.closest('[data-semsel]')) return;
       const id = +h.dataset.semToggle;
       if (semSelecting) { toggleSemSelect(id); return; }
-      if (S.openSemillas[id]) delete S.openSemillas[id];
-      else { S.openSemillas[id] = true; semDetailOpen = id; }
-      save(); renderSemList();
+      if (S.openSemillas[id]) { delete S.openSemillas[id]; semDetailOpen = null; }
+      else { S.openSemillas = {}; S.openSemillas[id] = true; semDetailOpen = id; } // foco: una a la vez
+      save(); renderSemillero();
     });
     attachLongPress(h, () => {
       const id = +h.dataset.semToggle;
@@ -4834,19 +5636,38 @@ function renderSemList() {
 
 function renderSemBodyInline(id, container) {
   const s = S.semillas.find(x => x.id === id); if (!s) return;
-  const groupOpts = ['<option value="">— sin grupo —</option>'].concat(
-    S.semillaGroups.map(g => `<option value="${g.id}" ${g.id===s.groupId?'selected':''}>${escapeHTML(g.name)}</option>`)
-  ).join('');
+  // ADN único semilla=planta: Nombre · Etapas · Letra · Notas · Redes · Foto portada · Audio referencia · Links · Archivos
+  if (!Array.isArray(s.stages)) s.stages = [];
+  if (!Array.isArray(s.links)) s.links = s.link ? [{name:'link', url:s.link}] : [];
+  if (!Array.isArray(s.files)) s.files = [];
   container.innerHTML = `
-    <input type="text" class="sem-title-input" data-sf="title" value="${escapeHTML(s.title||'')}" placeholder="título...">
+    <input type="text" class="sem-title-input" data-sf="title" value="${escapeHTML(s.title||'')}" placeholder="nombre...">
 
     <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-align-left"></i> Texto</label>
-      <textarea data-sf="text" rows="3" placeholder="escribe pensamientos, fragmentos, ideas...">${escapeHTML(s.text||'')}</textarea>
+      <label class="slot-label"><i class="ti ti-route"></i> Etapas</label>
+      <div id="semStg-${id}">
+        ${s.stages.map((st,i)=>`<div class="nf-stage"><input type="text" value="${escapeHTML(st)}" data-semstg="${i}" placeholder="paso..."><button class="nf-stage-rm" data-semstgrm="${i}" aria-label="quitar"><i class="ti ti-x"></i></button></div>`).join('')}
+      </div>
+      <button class="btn ghost tiny" data-act="stgAdd"><i class="ti ti-plus"></i> Etapa</button>
+    </div>
+
+    <div class="sem-slot">
+      <label class="slot-label"><i class="ti ti-music"></i> Letra con acordes</label>
+      <textarea data-sf="lyrics" rows="4" placeholder="la letra... [Am] [F] sobre las sílabas">${escapeHTML(s.lyrics||'')}</textarea>
+    </div>
+
+    <div class="sem-slot">
+      <label class="slot-label"><i class="ti ti-tool"></i> Notas</label>
+      <textarea data-sf="notes" rows="3" placeholder="ideas, pendientes, producción...">${escapeHTML(s.notes||'')}</textarea>
+    </div>
+
+    <div class="sem-slot">
+      <label class="slot-label"><i class="ti ti-speakerphone"></i> Contenido redes sociales</label>
+      <textarea data-sf="socialContent" rows="2" placeholder="copy para teaser, caption para reel...">${escapeHTML(s.socialContent||'')}</textarea>
     </div>
 
     <div class="sem-slot ${s.photoData?'':'empty'}">
-      <label class="slot-label"><i class="ti ti-photo"></i> Foto</label>
+      <label class="slot-label"><i class="ti ti-photo"></i> Foto portada</label>
       ${s.photoData ? `
         <img class="preview-img" src="${s.photoData}" alt="">
         <div class="slot-actions">
@@ -4864,7 +5685,7 @@ function renderSemBodyInline(id, container) {
     </div>
 
     <div class="sem-slot ${s.audioData?'':'empty'}">
-      <label class="slot-label"><i class="ti ti-microphone"></i> Audio</label>
+      <label class="slot-label"><i class="ti ti-microphone"></i> Audio referencia</label>
       ${s.audioData ? `
         <audio controls src="${s.audioData}"></audio>
         <div class="slot-actions">
@@ -4886,14 +5707,15 @@ function renderSemBodyInline(id, container) {
     </div>
 
     <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-link"></i> Link</label>
-      <input type="url" data-sf="link" value="${escapeHTML(s.link||'')}" placeholder="https://...">
-      ${s.link?`<div class="slot-actions"><button class="btn ghost tiny" data-act="linkOpen"><i class="ti ti-external-link"></i> Abrir</button></div>`:''}
+      <label class="slot-label"><i class="ti ti-link"></i> Links</label>
+      <div class="kvlist" data-list="semLinks-${id}">${renderKvList(s.links)}</div>
+      <button class="btn ghost tiny" data-additem="semLinks-${id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar link</button>
     </div>
 
     <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-folder"></i> Grupo</label>
-      <select data-sf="groupId">${groupOpts}</select>
+      <label class="slot-label"><i class="ti ti-paperclip"></i> Archivos</label>
+      <div class="kvlist" data-list="semFiles-${id}">${renderKvList(s.files)}</div>
+      <button class="btn ghost tiny" data-additem="semFiles-${id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar archivo</button>
     </div>
 
     <div class="actions" style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap;">
@@ -4901,19 +5723,17 @@ function renderSemBodyInline(id, container) {
       <button class="btn gold tiny" data-act="sembrar"><i class="ti ti-plant"></i> Sembrar como planta</button>
     </div>
   `;
-  // Bind text/title/link/group
+  // Bind campos de texto (guarda al tipear; re-render solo al salir del título)
   container.querySelectorAll('[data-sf]').forEach(inp => {
-    inp.addEventListener('input', e => {
-      const f = inp.dataset.sf;
-      if (f === 'groupId') s[f] = e.target.value?+e.target.value:null;
-      else s[f] = e.target.value;
-      save(); // solo guarda; NO re-renderiza (si no, se pierde el foco al escribir)
-    });
-    inp.addEventListener('change', () => {
-      const f = inp.dataset.sf;
-      if (f === 'title' || f === 'groupId') renderSemList();
-    });
+    inp.addEventListener('input', e => { s[inp.dataset.sf] = e.target.value; save(); });
+    inp.addEventListener('change', () => { if (inp.dataset.sf === 'title') renderSemList(); });
   });
+  // Etapas (mismas filas editables que en la captura)
+  container.querySelectorAll('[data-semstg]').forEach(inp => inp.addEventListener('input', e => { s.stages[+inp.dataset.semstg] = e.target.value; save(); }));
+  container.querySelectorAll('[data-semstgrm]').forEach(b => b.addEventListener('click', () => { s.stages.splice(+b.dataset.semstgrm, 1); save(); renderSemList(); }));
+  // Links y Archivos (mismo mecanismo que la planta)
+  bindKvList(container, `semLinks-${id}`, () => s.links, () => renderSemList());
+  bindKvList(container, `semFiles-${id}`, () => s.files, () => renderSemList());
   // Bind actions
   container.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {
     const a = b.dataset.act;
@@ -4923,7 +5743,7 @@ function renderSemBodyInline(id, container) {
     if (a === 'audioRec') toggleRecording({type:'semilla', id:s.id, statusId:'semStatus-'+s.id, timeId:'semTime-'+s.id, btnId:'semRec-'+s.id});
     if (a === 'audioRm') { s.audioData = null; s.audioSec = 0; save(); renderSemList(); }
     if (a === 'audioDl') { downloadFromUrl(s.audioData, (s.title||'voz').replace(/[^\w\-]/g,'_')+'.webm'); }
-    if (a === 'linkOpen') { if (s.link) window.open(s.link, '_blank'); }
+    if (a === 'stgAdd') { s.stages.push(''); save(); renderSemList(); }
     if (a === 'sembrar') sembrarSemilla(s.id);
     if (a === 'del') {
       const removed = s;
@@ -5070,28 +5890,32 @@ function renderSemDetail() {
 
 function sembrarSemilla(semId) {
   const s = S.semillas.find(x => x.id === semId); if (!s) return;
-  const p = activeProject();
+  // ADN de la semilla: si nació con un proceso elegido, se siembra AHÍ (no en el cantero activo)
+  const p = (S.projects||[]).find(x => x.id === s.projectId) || activeProject();
   if (!confirm(`Sembrar "${s.title}" como planta en "${p.name}"? (la semilla pasa al Jardín)`)) return;
   // Traspaso FIEL semilla→planta: todo lo de la semilla va a la planta, sin duplicar ni inventar.
   // Las etapas NO se hardcodean: la planta toma las del cantero activo (todas incompletas).
   const newPlanta = {
     id: uid(),
     title: s.title || 'planta sembrada',
-    projectId: S.activeProjectId,
+    projectId: p.id,
     parentId: null,
     emoji: '',
     key: '', chords: '',
-    lyrics: '',
-    notes: '',
-    socialContent: '',
-    description: s.text || '',
-    links: s.link ? [{ name: 'fuente', url: s.link }] : [],
-    files: [],
+    lyrics: s.lyrics || '',
+    notes: s.notes || s.text || '',
+    socialContent: s.socialContent || '',
+    description: '',
+    links: (Array.isArray(s.links) && s.links.length) ? s.links.slice() : (s.link ? [{ name: 'fuente', url: s.link }] : []),
+    files: Array.isArray(s.files) ? s.files.slice() : [],
     photoData: s.photoData || null,
     audioData: s.audioData || null,
     audioSec: s.audioSec || 0,
     priority: 0,
     deadline: s.deadline || '',
+    stages: (Array.isArray(s.stages) && s.stages.length)
+      ? s.stages.map((lbl, i) => ({id: 'st' + i + '_' + uid(), label: lbl}))   // los pasos que la idea trajo de nacimiento
+      : ((p.stages && p.stages.length) ? p.stages : DEFAULT_STAGES).map(st => ({id:st.id, label:st.label})),
   };
   S.flores.unshift(newPlanta);
   S.semillas = S.semillas.filter(x => x.id !== semId); // la semilla se traslada (no queda copia redundante)
@@ -5099,30 +5923,47 @@ function sembrarSemilla(semId) {
   save();
   toast(`Sembrada · ${newPlanta.title}`,'✦');
   if (navigator.vibrate) navigator.vibrate([60,40,100]);
-  switchTab('jardin');
-  setTimeout(() => renderJardin(), 100);
+  // El seguimiento vive en Crece (bucket Creciendo) — no en la vista vieja "Jardín"
+  if (typeof crBucket !== 'undefined') crBucket = 'creciendo';
+  switchTab('crece');
 }
 
-// SEMILLA FORM (new entry) — 4 slots, all optional
+// Pasos por defecto de una idea nueva (ej: Loop · Arrangement · Grabación · Mix), editables en la captura
+function _draftStages() {
+  const p = typeof activeProject === 'function' ? activeProject() : null;
+  const src = (p && p.stages && p.stages.length) ? p.stages : (typeof DEFAULT_STAGES !== 'undefined' ? DEFAULT_STAGES : []);
+  const labels = src.map(st => st.label).filter(Boolean);
+  return labels.length ? labels.slice() : ['Loop','Arrangement','Grabación','Mix'];
+}
+// SEMILLA FORM (new entry) — captura pura: foto · texto · audio · link · pasos
 function renderSemForm() {
   const el = $('#semFormWrap');
   if (!semFormOpen) { el.innerHTML = ''; return; }
   const d = semFormDraft;
-  const groupOpts = ['<option value="">— sin grupo —</option>'].concat(
-    S.semillaGroups.map(g => `<option value="${g.id}" ${g.id===d.groupId?'selected':''}>${escapeHTML(g.name)}</option>`)
-  ).join('');
+  // Captura pura: una idea = foto · texto · audio · link · PASOS para terminarla. Nada más.
+  if (!Array.isArray(d.stages)) d.stages = _draftStages();
   el.innerHTML = `
     <div class="sem-form-wrap">
       <div class="label">Nueva semilla</div>
-      <input type="text" class="sem-title-input" id="nfTitle" value="${escapeHTML(d.title||'')}" placeholder="título (opcional, se autocompleta)...">
+      <input type="text" class="sem-title-input" id="nfTitle" value="${escapeHTML(d.title||'')}" placeholder="nombre (opcional, se autocompleta)...">
 
       <div class="sem-slot">
-        <label class="slot-label"><i class="ti ti-align-left"></i> Texto</label>
-        <textarea id="nfText" rows="3" placeholder="idea, fragmento, observación...">${escapeHTML(d.text||'')}</textarea>
+        <label class="slot-label"><i class="ti ti-music"></i> Letra con acordes</label>
+        <textarea id="nfLyrics" rows="3" placeholder="la letra... [Am] [F] sobre las sílabas">${escapeHTML(d.lyrics||'')}</textarea>
+      </div>
+
+      <div class="sem-slot">
+        <label class="slot-label"><i class="ti ti-tool"></i> Notas</label>
+        <textarea id="nfNotes" rows="2" placeholder="ideas, pendientes, producción...">${escapeHTML(d.notes||'')}</textarea>
+      </div>
+
+      <div class="sem-slot">
+        <label class="slot-label"><i class="ti ti-speakerphone"></i> Contenido redes sociales</label>
+        <textarea id="nfSocial" rows="2" placeholder="copy para teaser, caption para reel...">${escapeHTML(d.socialContent||'')}</textarea>
       </div>
 
       <div class="sem-slot ${d.photoData?'':'empty'}">
-        <label class="slot-label"><i class="ti ti-photo"></i> Foto</label>
+        <label class="slot-label"><i class="ti ti-photo"></i> Foto portada</label>
         ${d.photoData ? `
           <img class="preview-img" src="${d.photoData}" alt="">
           <div class="slot-actions">
@@ -5138,7 +5979,7 @@ function renderSemForm() {
       </div>
 
       <div class="sem-slot ${d.audioData?'':'empty'}">
-        <label class="slot-label"><i class="ti ti-microphone"></i> Audio</label>
+        <label class="slot-label"><i class="ti ti-microphone"></i> Audio referencia</label>
         ${d.audioData ? `
           <audio controls src="${d.audioData}"></audio>
           <div class="slot-actions">
@@ -5163,8 +6004,11 @@ function renderSemForm() {
       </div>
 
       <div class="sem-slot">
-        <label class="slot-label"><i class="ti ti-folder"></i> Grupo</label>
-        <select id="nfGroup">${groupOpts}</select>
+        <label class="slot-label"><i class="ti ti-route"></i> Pasos para terminarla</label>
+        <div id="nfStages">
+          ${d.stages.map((st,i)=>`<div class="nf-stage"><input type="text" value="${escapeHTML(st)}" data-stg="${i}" placeholder="paso..."><button class="nf-stage-rm" data-stgrm="${i}" aria-label="quitar paso"><i class="ti ti-x"></i></button></div>`).join('')}
+        </div>
+        <button class="btn ghost tiny" id="nfStageAdd"><i class="ti ti-plus"></i> Paso</button>
       </div>
 
       <div class="actions">
@@ -5174,16 +6018,23 @@ function renderSemForm() {
     </div>
   `;
   $('#nfTitle').addEventListener('input', e => { d.title = e.target.value; });
-  $('#nfText').addEventListener('input', e => { d.text = e.target.value; });
+  $('#nfLyrics').addEventListener('input', e => { d.lyrics = e.target.value; });
+  $('#nfNotes').addEventListener('input', e => { d.notes = e.target.value; });
+  $('#nfSocial').addEventListener('input', e => { d.socialContent = e.target.value; });
   $('#nfLink').addEventListener('input', e => { d.link = e.target.value; });
-  $('#nfGroup').addEventListener('change', e => { d.groupId = e.target.value?+e.target.value:null; });
+  $$('#nfStages [data-stg]').forEach(inp => inp.addEventListener('input', e => { d.stages[+inp.dataset.stg] = e.target.value; }));
+  $$('#nfStages [data-stgrm]').forEach(b => b.addEventListener('click', () => { d.stages.splice(+b.dataset.stgrm, 1); renderSemForm(); }));
+  $('#nfStageAdd')?.addEventListener('click', () => {
+    d.stages.push(''); renderSemForm();
+    setTimeout(() => { const ins = $$('#nfStages [data-stg]'); ins[ins.length-1]?.focus(); }, 30);
+  });
   $('#nfPhotoUp')?.addEventListener('click', () => { photoContext={type:'form'}; $('#photoInput').click(); });
   $('#nfPhotoCam')?.addEventListener('click', () => { photoContext={type:'form'}; $('#photoCamera').click(); });
   $('#nfPhotoRm')?.addEventListener('click', () => { d.photoData = null; renderSemForm(); });
   $('#nfAudioRec')?.addEventListener('click', () => toggleRecording({type:'form', statusId:'nfVoiceStatus', timeId:'nfVoiceTime', btnId:'nfAudioRec'}));
   $('#nfAudioRm')?.addEventListener('click', () => { d.audioData=null; d.audioSec=0; renderSemForm(); });
   $('#nfCancel').addEventListener('click', () => {
-    if ((d.text||d.title||d.link||d.photoData||d.audioData) && !confirm('Descartar esta semilla?')) return;
+    if ((d.lyrics||d.notes||d.socialContent||d.title||d.link||d.photoData||d.audioData) && !confirm('Descartar esta semilla?')) return;
     semFormOpen = false; semFormDraft = null;
     if (isRecording) stopRecording();
     renderSemillero();
@@ -5193,8 +6044,12 @@ function renderSemForm() {
 
 function saveNewSemilla() {
   const d = semFormDraft; if (!d) return;
-  if (!d.title && !d.text && !d.link && !d.photoData && !d.audioData) { toast('Pon al menos un título o contenido'); return; }
-  if (!d.title) d.title = (d.text||'').slice(0,60) || (d.photoData?'foto':d.audioData?'audio':d.link?'link':'semilla');
+  if (!d.title && !d.lyrics && !d.notes && !d.socialContent && !d.link && !d.photoData && !d.audioData) { toast('Pon al menos un nombre o contenido'); return; }
+  d.stages = (Array.isArray(d.stages) ? d.stages : []).map(s => String(s).trim()).filter(Boolean);
+  // ADN completo desde el nacimiento
+  d.links = d.link ? [{name:'link', url:d.link}] : [];
+  d.files = Array.isArray(d.files) ? d.files : [];
+  if (!d.title) d.title = (d.lyrics||d.notes||'').slice(0,60) || (d.photoData?'foto':d.audioData?'audio':d.link?'link':'semilla');
   d.id = uid(); d.createdAt = Date.now(); d.date = todayStr();
   // Capture pending uploads, then strip non-serializable fields before persist
   const pendingPhoto = d._photoFile;
@@ -5211,7 +6066,7 @@ function saveNewSemilla() {
 
 $('#semNew').addEventListener('click', () => {
   semFormOpen = true;
-  semFormDraft = {title:'', text:'', link:'', photoData:null, audioData:null, audioSec:0, groupId: semFilter.startsWith('group:')?+semFilter.split(':')[1]:null, projectId: S.activeProjectId, parentId: semCurrentParent};
+  semFormDraft = {title:'', lyrics:'', notes:'', socialContent:'', link:'', photoData:null, audioData:null, audioSec:0, files:[], groupId: semFilter.startsWith('group:')?+semFilter.split(':')[1]:null, projectId: S.activeProjectId, parentId: semCurrentParent};
   renderSemillero();
   setTimeout(() => $('#nfTitle')?.focus(), 50);
 });
@@ -6139,9 +6994,10 @@ document.getElementById('walletMonthReset').addEventListener('click', () => {
 function renderConfig() {
   updateBotUserIdDisplay();
   $$('#themeOptions button').forEach(b => b.classList.toggle('active', b.dataset.theme === S.config.theme));
+  renderBottomNavConfig();
   const tabsEl = $('#configTabsList');
   tabsEl.innerHTML = S.config.tabOrder.map((key, idx) => {
-    if (!TABS_META[key]) return '';
+    if (!TABS_META[key] || FUSED.includes(key)) return '';
     const visible = !!S.config.tabVisible[key];
     return `
       <div class="config-item">
@@ -6188,7 +7044,7 @@ function moveTab(key, dir) {
 }
 $('#themeOptions').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
-  S.config.theme = b.dataset.theme; save(); applyTheme(); renderConfig();
+  S.config.theme = b.dataset.theme; S.config._themeChosen = true; save(); applyTheme(); renderConfig();
 });
 $('#resetBtn').addEventListener('click', () => {
   if (!confirm('Borrar TODOS los datos? Esta acción no se puede deshacer.')) return;
@@ -6448,6 +7304,21 @@ function tareasHechasHoy() {
   const today = todayStr();
   return (S.tasks || []).filter(t => t.done && t.doneDate === today);
 }
+// Desmarcar una tarea hecha (completada por error): vuelve a pendientes y revierte la etapa si era de planta
+function undoTaskDone(id) {
+  const t = (S.tasks || []).find(x => String(x.id) === String(id) && x.done); if (!t) return;
+  if (t.florId && t.stageId) {
+    const f = (S.flores || []).find(x => String(x.id) === String(t.florId));
+    if (f) {
+      const wasComplete = isComplete(f);
+      setStageDone(f, t.stageId, false); // revierte la etapa y borra este registro hecho
+      if (wasComplete && f.harvestedAt === todayStr()) delete f.harvestedAt; // des-florece si floreció hoy por esto
+    } else { t.done = false; t.doneDate = null; }
+  } else { t.done = false; t.doneDate = null; }
+  save(); renderAgenda();
+  if (typeof renderCrece === 'function' && document.getElementById('tab-crece')?.classList.contains('active')) renderCrece();
+  toast('De vuelta a pendientes', '↩');
+}
 function renderBitaTareasHechas() {
   const host = document.getElementById('bitaTareasHechas');
   const sec = document.getElementById('bitaHechasSection');
@@ -6457,20 +7328,56 @@ function renderBitaTareasHechas() {
   sec.style.display = '';
   host.innerHTML = hechas.map(t => {
     const proj = (S.projects || []).find(p => p.id === t.projectId);
-    return `<div class="bita-hecha"><i class="ti ti-circle-check"></i> <span>${escapeHTML(t.text)}</span>${proj ? `<span class="agenda-proj">${escapeHTML(proj.name)}</span>` : ''}</div>`;
+    return `<div class="bita-hecha"><i class="ti ti-circle-check"></i> <span>${escapeHTML(t.text)}</span>${proj ? `<span class="agenda-proj">${escapeHTML(proj.name)}</span>` : ''}<button class="bita-undone" data-undone="${t.id}" title="desmarcar — vuelve a pendientes"><i class="ti ti-arrow-back-up"></i></button></div>`;
   }).join('');
+  host.querySelectorAll('[data-undone]').forEach(b => b.addEventListener('click', () => undoTaskDone(b.dataset.undone)));
+}
+// ===== UNA SOLA LISTA: los pasos de cada planta se materializan como TAREAS reales =====
+// Cada planta en crecimiento genera (una vez) la tarea de su próximo paso. Conviven con las
+// tareas libres en el MISMO orden de prioridad (vos o el socio las suben/bajan). Borrar la
+// tarea de un paso = "hoy no" (skip), no toca la planta. Completarla avanza la etapa real.
+function syncStepTasks() {
+  if (!Array.isArray(S.tasks)) S.tasks = [];
+  if (!Array.isArray(S.stepSkips)) S.stepSkips = [];
+  let changed = false;
+  const vivas = new Set();
+  (S.flores || []).forEach(f => {
+    if (isFlorPage(f) || isComplete(f)) return;
+    const ns = florNextStage(f); if (!ns) return;
+    vivas.add(String(f.id));
+    const key = f.id + ':' + ns.id;
+    if (S.stepSkips.includes(key)) return;
+    const text = (f.title || 'planta') + ' · ' + ns.label;
+    const t = S.tasks.find(x => x.auto && String(x.florId) === String(f.id) && !x.done);
+    if (t) {
+      // la planta avanzó por otro lado → la tarea se actualiza al paso vigente, sin perder su lugar
+      if (String(t.stageId) !== String(ns.id) || t.text !== text) { t.stageId = ns.id; t.text = text; t.projectId = f.projectId; changed = true; }
+    } else if (!S.tasks.some(x => x.auto && String(x.florId) === String(f.id) && String(x.stageId) === String(ns.id) && x.done)) {
+      S.tasks.unshift({ id: uid() + Math.floor(Math.random()*97), text, auto: true, florId: f.id, stageId: ns.id, projectId: f.projectId, done: false, createdAt: Date.now() });
+      changed = true;
+    }
+  });
+  // pasos pendientes de plantas que ya no existen o ya florecieron → fuera (sin tocar las hechas: son historia)
+  const n0 = S.tasks.length;
+  S.tasks = S.tasks.filter(t => !(t.auto && !t.done && !vivas.has(String(t.florId))));
+  if (S.tasks.length !== n0) changed = true;
+  if (changed) save();
 }
 function renderAgenda() {
   const el = document.getElementById('agendaList');
+  syncStepTasks();
   renderBitaTareasHechas();
-  renderPlantSteps();
   if (!el) return;
   const today = todayStr();
   const pend = (S.tasks || []).filter(t => !t.done); // sin re-ordenar: el array = importancia
   const doneToday = (S.tasks || []).filter(t => t.done && t.doneDate === today).length;
   const doneNote = doneToday ? `<div class="tareas-done-note">✓ ${doneToday} hecha${doneToday>1?'s':''} hoy</div>` : '';
+  // Barra de progreso del día: hechas hoy / (hechas hoy + pendientes)
+  const totalDia = doneToday + pend.length;
+  const pct = totalDia ? Math.round((doneToday / totalDia) * 100) : 0;
+  const progressBar = totalDia ? `<div class="day-progress"><div class="dp-track"><div class="dp-fill" style="width:${pct}%"></div></div><span class="dp-label">${doneToday}/${totalDia}</span></div>` : '';
   if (!pend.length) {
-    el.innerHTML = '<div class="empty">sin tareas · agregá una o pedile al socio que te arme el día</div>' + doneNote;
+    el.innerHTML = progressBar + '<div class="empty">' + (doneToday ? 'día completo · todo regado 🌱' : 'sin tareas · agregá una o pedile al socio que te arme el día') + '</div>' + doneNote;
     return;
   }
   const collapsed = !tareasExpanded && pend.length > TAREAS_PODIO;
@@ -6487,7 +7394,7 @@ function renderAgenda() {
       <button class="agenda-check${confirming ? ' armed' : ''}" data-taskcheck="${t.id}" title="${confirming ? 'cancelar' : 'completar'}"><i class="ti ti-${confirming ? 'circle-check' : 'circle'}"></i></button>
       ${rank}
       <div class="agenda-main">
-        <div class="agenda-text">${escapeHTML(t.text)}</div>
+        <div class="agenda-text">${t.auto ? '<i class="ti ti-plant-2" style="color:var(--green);font-size:13px;margin-right:5px;"></i>' : ''}${escapeHTML(t.text)}</div>
         ${hasMeta ? `<div class="agenda-meta">
           ${proj ? `<span class="agenda-proj">${escapeHTML(proj.name)}</span>` : ''}
           ${t.deadline ? `<span class="agenda-date ${overdue ? 'overdue' : dueToday ? 'duetoday' : ''}"><i class="ti ti-calendar"></i> ${fmtDate(t.deadline)}</span>` : ''}
@@ -6505,7 +7412,7 @@ function renderAgenda() {
       : `<button class="tareas-toggle" data-tareas-toggle><i class="ti ti-chevron-up"></i> ver menos</button>`;
   }
   html += doneNote;
-  el.innerHTML = html;
+  el.innerHTML = progressBar + html;
   const tg = el.querySelector('[data-tareas-toggle]');
   if (tg) tg.addEventListener('click', () => { tareasExpanded = !tareasExpanded; renderAgenda(); });
   el.querySelectorAll('[data-taskcheck]').forEach(b => b.addEventListener('click', () => {
@@ -6515,15 +7422,40 @@ function renderAgenda() {
   }));
   el.querySelectorAll('[data-taskdone]').forEach(b => b.addEventListener('click', () => {
     const t = (S.tasks || []).find(x => String(x.id) === b.dataset.taskdone); if (!t) return;
-    t.done = true; t.doneDate = todayStr(); taskConfirmId = null; save(); renderAgenda(); toast('Tarea completada', '✓');
+    taskConfirmId = null;
+    let floreció = false;
+    if (t.auto && t.florId && t.stageId) {
+      // completar la tarea = completar la etapa REAL de la planta
+      const f = (S.flores || []).find(x => String(x.id) === String(t.florId));
+      if (f) {
+        const was = isComplete(f);
+        setStageDone(f, t.stageId, true); // crea el registro "hecha hoy" y limpia la pendiente
+        if (!was && isComplete(f)) { floreció = true; if (navigator.vibrate) navigator.vibrate([60,40,100]); }
+      }
+      S.tasks = (S.tasks || []).filter(x => x !== t); // la pendiente se va; el registro hecho quedó
+    } else {
+      t.done = true; t.doneDate = todayStr();
+    }
+    save(); renderAgenda();
+    if (typeof renderCrece === 'function' && document.getElementById('tab-crece')?.classList.contains('active')) renderCrece();
+    // Si completaste por error: Bitácora → "hechas hoy" → ↩ desmarca (revierte la etapa también)
+    toast(floreció ? '🌸 Floreció · al archivo' : 'Tarea completada', floreció ? '✦' : '✓');
   }));
   el.querySelectorAll('[data-taskdel]').forEach(b => b.addEventListener('click', () => {
     const id = b.dataset.taskdel;
     const idx = (S.tasks || []).findIndex(x => String(x.id) === id);
     if (idx < 0) return;
     const removed = S.tasks[idx];
+    if (removed.auto && removed.florId && removed.stageId) {
+      // borrar el paso de una planta = "hoy no" — la planta queda intacta, el paso no vuelve a la lista
+      S.stepSkips = Array.isArray(S.stepSkips) ? S.stepSkips : [];
+      S.stepSkips.push(removed.florId + ':' + removed.stageId);
+    }
     S.tasks.splice(idx, 1); save(); renderAgenda();
-    showUndoToast('Tarea borrada', () => { S.tasks.splice(idx, 0, removed); save(); renderAgenda(); });
+    showUndoToast('Tarea borrada', () => {
+      if (removed.auto && removed.florId && removed.stageId) S.stepSkips = (S.stepSkips||[]).filter(k => k !== removed.florId + ':' + removed.stageId);
+      S.tasks.splice(idx, 0, removed); save(); renderAgenda();
+    });
   }));
   // Arrastrar para reordenar = fijar importancia (reordena el array completo respetando las hechas)
   makeDraggable(el, {
@@ -6562,7 +7494,9 @@ function buildPlantSteps() {
   return steps;
 }
 function renderPlantSteps() {
-  const host = document.getElementById('plantStepsWrap'); if (!host) return;
+  // Widget retirado (v3.3.20): los pasos viven DENTRO de Tareas (syncStepTasks) — una sola lista.
+  const host = document.getElementById('plantStepsWrap'); if (host) host.innerHTML = '';
+  return;
   const steps = buildPlantSteps();
   if (!steps.length) { host.innerHTML = ''; return; }
   const PODIO = 3;
@@ -6710,10 +7644,10 @@ function gatherSearchHits(term) {
   const match = v => typeof v === 'string' && v.toLowerCase().includes(t);
 
   // Semillero
-  const semHits = (S.semillas||[]).filter(s => match(s.title) || match(s.text) || match(s.link)).slice(0, 8)
+  const semHits = (S.semillas||[]).filter(s => match(s.title) || match(s.lyrics) || match(s.notes) || match(s.link)).slice(0, 8)
     .map(s => ({ icon: s.photoData ? 'ti-photo' : (s.audioData?'ti-microphone':(s.link?'ti-link':'ti-align-left')),
       title: s.title || 'sin título',
-      preview: _snippet(s.text || s.link || '', term),
+      preview: _snippet(s.lyrics || s.notes || s.link || '', term),
       meta: s.date || '',
       payload: { type: 'semilla', id: s.id } }));
   if (semHits.length) groups.push({ label: 'Semillero', icon: 'ti-seedling', items: semHits });
@@ -7103,7 +8037,7 @@ function bitaNotifCheck() {
 setInterval(bitaNotifCheck, 30000);
 
 function init() {
-  applyTheme(); renderTabs(); renderGlobalProjectSel();
+  applyTheme(); renderTabs(); renderBottomBar(); renderGlobalProjectSel();
   const firstVisible = S.config.tabOrder.find(t => S.config.tabVisible[t]);
   const savedTab = localStorage.getItem('jardin-lastTab');
   const startTab = (savedTab && S.config.tabVisible[savedTab] && TABS_META[savedTab]) ? savedTab : firstVisible;
@@ -7112,22 +8046,38 @@ function init() {
   applyHoyWidgets();
   applyHoyOrder(); applyHoyCollapsed();
   dailyCheck(); setDateDisplay();
+  if (typeof renderBrandQuote === 'function') renderBrandQuote(); // frase nueva al cambiar el día
   renderQuote(); renderMantra();
   renderHabits(); renderStreak();
   renderAlbumStat();
   renderBitaHistory();
-  renderDiario(); renderHeatmap();
-  renderJardin(); renderDeadlines();
-  renderFlores();
   populateRiegoTargets(); renderRiegoTime();
-  initDateInputs();
-  renderLinks(); renderServices(); renderExpenses(); renderWallet();
-  renderConciertos();
   renderStatsDashboard();
-  renderSemillero();
-  bindBrand(); renderBrand();
-  bindMisionesDnd();
-  bindHoyDnd();
+  // Render diferido: las secciones que NO son la pantalla activa se pintan
+  // un instante después (switchTab ya re-renderiza la sección al entrar).
+  // Así el primer pintado (Hoy) no espera a los otros 10 tabs.
+  const _deferred = () => {
+    renderDiario(); renderHeatmap();
+    renderJardin(); renderDeadlines();
+    renderFlores();
+    initDateInputs();
+    renderLinks(); renderServices(); renderExpenses(); renderWallet();
+    renderConciertos();
+    renderSemillero();
+    renderBrand();
+  };
+  if ('requestIdleCallback' in window) requestIdleCallback(_deferred, {timeout: 800});
+  else setTimeout(_deferred, 50);
+  // Los bind* atan listeners a elementos ESTÁTICOS: deben correr UNA sola vez.
+  // init() se re-ejecuta en cada sync remoto y cambio de día — sin este guard,
+  // los listeners se apilaban (N saves por keystroke en Marca tras N syncs).
+  if (!init._bound) {
+    bindBrand();
+    bindMisionesDnd();
+    bindHoyDnd();
+    init._bound = true;
+  }
+  // renderBrand() corre en el bloque diferido de arriba
   checkStorageUsage();
   applyMissionLock();
   renderNotifBanner();
@@ -7294,10 +8244,25 @@ async function authSignOut() {
 }
 
 const originalSave = window.save;
+// Debounce: localStorage se escribe SIEMPRE al instante (originalSave);
+// la subida a Firebase (estado completo) espera 1.2 s de calma para no
+// subir todo el estado en cada keystroke. flush al ocultar la app.
+let _fbSaveTimer = null, _fbDirty = false;
+function _flushFirebaseSave() {
+  if (!_fbDirty) return;
+  clearTimeout(_fbSaveTimer); _fbSaveTimer = null; _fbDirty = false;
+  if (firebaseReady && userId) saveToFirebase();
+}
 window.save = function() {
   originalSave();
-  if (firebaseReady && userId) saveToFirebase();
+  if (!(firebaseReady && userId)) return;
+  _fbDirty = true;
+  clearTimeout(_fbSaveTimer);
+  _fbSaveTimer = setTimeout(_flushFirebaseSave, 1200);
 };
+// Al salir de la app (cerrar PWA, cambiar de app) sube lo pendiente ya.
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') _flushFirebaseSave(); });
+window.addEventListener('pagehide', _flushFirebaseSave);
 
 // ========== INDEXEDDB BINARY QUEUE (offline-safe) ==========
 const IDB_NAME = 'jardin-binary';
@@ -7403,6 +8368,22 @@ async function processUploadQueue() {
 
 // Listen for connectivity / Firebase ready to drain queue
 window.addEventListener('online', () => { processUploadQueue(); });
+
+// ---- Indicador de modo offline (píldora discreta bajo la cabecera) ----
+(function offlineIndicator() {
+  const pill = document.createElement('div');
+  pill.id = 'offlinePill';
+  pill.innerHTML = '<i class="ti ti-cloud-off"></i> sin conexión — guardando local';
+  pill.style.cssText = 'position:fixed;top:calc(env(safe-area-inset-top) + 52px);left:50%;transform:translateX(-50%);z-index:1400;background:var(--bg-soft);border:0.5px solid var(--border);border-radius:20px;padding:5px 14px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-secondary);align-items:center;gap:6px;transition:opacity .2s ease;display:none;';
+  document.body.appendChild(pill);
+  function refresh() {
+    const off = !navigator.onLine;
+    pill.style.display = off ? 'flex' : 'none';
+  }
+  window.addEventListener('online', refresh);
+  window.addEventListener('offline', refresh);
+  refresh();
+})();
 
 // Rehydrate local blob previews from IndexedDB into S (so they show in UI even before upload)
 async function rehydrateLocalBlobs() {
