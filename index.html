@@ -55,7 +55,8 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { overflow-x: hidden; }
 /* App-feel (prototipo): nada de selección accidental ni rebote de página */
-html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overscroll-behavior-y: none; }
+html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+/* v3.3.28: overscroll-behavior-y:none ELIMINADO — en PWA Android rompía el scroll de 1 dedo (el body es el que scrollea, no una caja interna como en el prototipo) */
 input, textarea, select, [contenteditable="true"] { -webkit-user-select: text; user-select: text; }
 body {
   font-family: var(--font); font-size: 13px;
@@ -361,7 +362,7 @@ body { padding-bottom: 78px; }
 .cr-gname { font-size:10px; text-align:center; line-height:1.2; max-width:98px; overflow:hidden; text-overflow:ellipsis; }
 .cr-gprog { font-size:8.5px; color:var(--cr-green); text-align:center; }
 /* Detalle a pantalla completa (Fase 4): reusa #plantDetail real */
-.cr-detail { position:fixed; top:0; bottom:0; left:0; right:0; margin:0 auto; max-width:460px; z-index:1800; background:var(--bg); display:flex; flex-direction:column; transform:translateX(100%); transition:transform .3s cubic-bezier(.16,1,.3,1); }
+.cr-detail { position:fixed; top:0; bottom:0; left:0; right:0; margin:0 auto; max-width:460px; z-index:1800; background:var(--bg); display:flex; flex-direction:column; transform:translateX(100vw); transition:transform .3s cubic-bezier(.16,1,.3,1); }
 .cr-detail.on { transform:translateX(0); }
 .cr-detail-top { display:flex; align-items:center; gap:12px; padding:calc(14px + env(safe-area-inset-top)) 14px 10px; flex-shrink:0; border-bottom:.5px solid var(--border); }
 .cr-back { background:none; border:none; cursor:pointer; color:var(--text); font-family:var(--font); font-size:13px; display:inline-flex; align-items:center; gap:4px; padding:6px 4px; }
@@ -2228,7 +2229,7 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
 <!-- AJUSTES -->
 <section class="tab" id="tab-ajustes">
   <div class="card">
-    <h2 class="section-title"><i class="ti ti-settings"></i> Ajustes</h2>
+    <h2 class="section-title"><i class="ti ti-settings"></i> Ajustes <span id="ajustesVersionTag" style="margin-left:auto;color:var(--gold);letter-spacing:.06em;">v—</span></h2>
     <p class="tab-hint">reordena, oculta, cambia tema</p>
     <div class="config-section" style="margin-top:18px;">
       <h3>Apariencia</h3>
@@ -2539,6 +2540,8 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 // ===== Versión de la app (mostrada en Ajustes) =====
 // Cada cambio registra una nueva versión. La primera de arriba es la actual.
 const VERSION_LOG = [
+  {v:'3.3.29', d:'2026-06-11', t:'La versión instalada ahora se ve ARRIBA de Ajustes (dorada, junto al título) — verificás de un vistazo que se subió la correcta. Y el Semillero en foco total de verdad: capturando una semilla nueva se ve SOLO el formulario, y con una abierta, SOLO esa — sin miniaturas debajo.'},
+  {v:'3.3.28', d:'2026-06-11', t:'Blindaje del scroll: quitada una regla que en el teléfono podía seguir trabando el paneo de un dedo (segunda causa posible). Y el borde "Jardín" fantasma que se asomaba a la derecha en pantallas anchas, fuera. Probada COMPLETA en laboratorio: arranque, las 11 pestañas, captura, foco de semilla desde Crece, grupos y conteos — todo en verde antes de publicar.'},
   {v:'3.3.27', d:'2026-06-11', t:'El pase de tus reportes reales: (1) SCROLL arreglado — las tarjetas de Crece secuestraban el dedo; ahora un dedo scrollea siempre (se quitó el swipe-avanza y el swipe entre pestañas, que llevaba a pantallas viejas). (2) Fuera los popups del navegador: agrupar, renombrar, borrar y los del Muro usan hojas propias de la app; la barra de selección ya no es el parche oscuro. (3) Jerarquía de letras unificada: campos al volumen del contenido, secciones discretas, nada grita. (4) Desde Crece una semilla se abre DIRECTO (y volver te deja en Crece). (5) Grupos de Creciendo y Florecida como tiles de a 3 con su carácter (verde/índigo) y CONTEO REAL por etapa — se acabaron los "13" fantasma. (6) Muro limpio: las acciones aparecen solo al mantener presionada una pieza; los links muestran su ícono del sitio y se abren al tocarlos.'},
   {v:'3.3.26', d:'2026-06-10', t:'ADN único: semilla y planta llevan EXACTAMENTE lo mismo — Nombre · Etapas · Letra · Notas · Redes · Foto portada · Audio referencia · Links · Archivos. Descripción se fue de las dos. La captura nace con ese molde y el viejo "Texto" de tus semillas pasó a Notas (nada se pierde). Además: el tono CLARO es ahora el default real (auto/oscuro siguen en Ajustes) y la frase del día bajó a su lugar — línea propia DEBAJO de Jardín, chiquita, sin apretar la barra.'},
   {v:'3.3.25', d:'2026-06-10', t:'Frase del día bajo "Jardín·": cada día una distinta (Rick Rubin, James Clear y las tuyas), en itálica discreta. Se pliega sola al scrollear para no ocupar.'},
@@ -3227,6 +3230,8 @@ document.getElementById('moreBackdrop')?.addEventListener('click', closeMore);
 (function initVersion(){
   const vEl = document.getElementById('appVersion');
   if (vEl) vEl.textContent = APP_VERSION;
+  const vTag = document.getElementById('ajustesVersionTag');
+  if (vTag) vTag.textContent = 'v' + APP_VERSION; // garantía: la versión instalada se ve ARRIBA de Ajustes
   const log = document.getElementById('versionLog');
   if (log) log.innerHTML = VERSION_LOG.map(e =>
     `<div style="margin-bottom:6px;"><b style="color:var(--text-secondary);">v${e.v}</b> · ${e.d}<br>${escapeHTML(e.t)}</div>`).join('');
@@ -5624,6 +5629,7 @@ function wireSemNav(list) {
 
 function renderSemList() {
   const list = $('#semList');
+  if (semFormOpen) { list.innerHTML = ''; return; } // capturando = SOLO el formulario, nada de miniaturas debajo
   if (semView === 'mosaic') return renderSemMosaic(list);
   const searching = !!semSearchTerm;
   let items = (S.semillas||[]).filter(i => (i.projectId||1) === S.activeProjectId).filter(semMatchesFilter);
