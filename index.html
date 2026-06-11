@@ -83,6 +83,10 @@ header.top.shrunk { padding-top: 8px; }
 .brand-sub { font-size: 10px; font-style: italic; color: var(--text-faint); line-height: 1.4; margin-top: 3px; width: 100%; overflow: hidden; max-height: 30px; transition: max-height .25s, opacity .2s, margin .25s; }
 header.top.shrunk .brand-sub { max-height: 0; opacity: 0; margin-top: 0; }
 .brand .acc { color: var(--gold); }
+/* v3.3.30: logo Somko en el encabezado (usa el logo subido en Marca) */
+.brand img.brand-logo { height: 22px; display: block; transition: height .25s; }
+header.top.shrunk .brand img.brand-logo { height: 17px; }
+[data-theme="dark"] .brand img.brand-logo { filter: invert(1); } /* logo negro → blanco en oscuro */
 .date-display { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); text-align: right; }
 
 /* Smaller tab hints */
@@ -1704,7 +1708,7 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
 
 <header class="top">
   <div class="brand-row">
-    <div class="brand">Jardín<span class="acc">.</span></div>
+    <div class="brand" id="brandHome">Jardín<span class="acc">.</span></div>
     <div class="hdr-right">
       <div class="date-display" id="dateDisplay">—</div>
       <button id="searchToggle" class="hdr-icon" title="buscar" aria-label="buscar"><i class="ti ti-search"></i></button>
@@ -2540,7 +2544,7 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 // ===== Versión de la app (mostrada en Ajustes) =====
 // Cada cambio registra una nueva versión. La primera de arriba es la actual.
 const VERSION_LOG = [
-  {v:'3.3.30', d:'2026-06-11', t:'Sync sano: (1) arreglado el bug que dejaba la app SIN nube, bot ni reseteo diario si la última pestaña abierta era Ajustes; (2) eliminado el ping-pong infinito de sincronización entre teléfono y computadora (la app ya no re-sube el estado al aplicar cambios remotos ni cada 60 s sin cambios); (3) el merge de la nube ya no mezcla días en el Diario ni resucita cosas borradas en el otro dispositivo; (4) fin de las tareas repetidas en Hoy: si una planta tenía más de una tarea automática pendiente (huérfanas de merges viejos) sobreviven solo una, y las tareas manuales que repiten exactamente el título de una planta con paso automático pendiente se retiran solas.'},
+  {v:'3.3.30', d:'2026-06-11', t:'Sync sano: (1) arreglado el bug que dejaba la app SIN nube, bot ni reseteo diario si la última pestaña abierta era Ajustes; (2) eliminado el ping-pong infinito de sincronización entre teléfono y computadora (la app ya no re-sube el estado al aplicar cambios remotos ni cada 60 s sin cambios); (3) el merge de la nube ya no mezcla días en el Diario ni resucita cosas borradas en el otro dispositivo; (4) fin de las tareas repetidas en Hoy: si una planta tenía más de una tarea automática pendiente (huérfanas de merges viejos) sobreviven solo una, y las tareas manuales que repiten exactamente el título de una planta con paso automático pendiente se retiran solas; (5) el Semillero viejo se retiró como pantalla: una semilla se abre DIRECTO a su información (sin fila de minimizar/maximizar encima) y guardar, descartar, borrar o volver te dejan siempre en Jardín.'},
   {v:'3.3.29', d:'2026-06-11', t:'La versión instalada ahora se ve ARRIBA de Ajustes (dorada, junto al título) — verificás de un vistazo que se subió la correcta. Y el Semillero en foco total de verdad: capturando una semilla nueva se ve SOLO el formulario, y con una abierta, SOLO esa — sin miniaturas debajo.'},
   {v:'3.3.28', d:'2026-06-11', t:'Blindaje del scroll: quitada una regla que en el teléfono podía seguir trabando el paneo de un dedo (segunda causa posible). Y el borde "Jardín" fantasma que se asomaba a la derecha en pantallas anchas, fuera. Probada COMPLETA en laboratorio: arranque, las 11 pestañas, captura, foco de semilla desde Crece, grupos y conteos — todo en verde antes de publicar.'},
   {v:'3.3.27', d:'2026-06-11', t:'El pase de tus reportes reales: (1) SCROLL arreglado — las tarjetas de Crece secuestraban el dedo; ahora un dedo scrollea siempre (se quitó el swipe-avanza y el swipe entre pestañas, que llevaba a pantallas viejas). (2) Fuera los popups del navegador: agrupar, renombrar, borrar y los del Muro usan hojas propias de la app; la barra de selección ya no es el parche oscuro. (3) Jerarquía de letras unificada: campos al volumen del contenido, secciones discretas, nada grita. (4) Desde Crece una semilla se abre DIRECTO (y volver te deja en Crece). (5) Grupos de Creciendo y Florecida como tiles de a 3 con su carácter (verde/índigo) y CONTEO REAL por etapa — se acabaron los "13" fantasma. (6) Muro limpio: las acciones aparecen solo al mantener presionada una pieza; los links muestran su ícono del sitio y se abren al tocarlos.'},
@@ -2648,7 +2652,7 @@ function deadlineBadge(dateStr) {
 // Wallet month filter: "YYYY-MM" or null = all
 let walletMonthFilter = todayStr().slice(0, 7); // default = current month
 
-async function fileToCompressedDataUrl(file, maxDim=800, quality=0.7) {
+async function fileToCompressedDataUrl(file, maxDim=800, quality=0.7, format='image/jpeg') {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = e => {
@@ -2659,7 +2663,7 @@ async function fileToCompressedDataUrl(file, maxDim=800, quality=0.7) {
         if (w > maxDim || h > maxDim) { const r = Math.min(maxDim/w, maxDim/h); w = Math.round(w*r); h = Math.round(h*r); }
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+        resolve(canvas.toDataURL(format, quality));
       };
       img.onerror = reject; img.src = e.target.result;
     };
@@ -3078,6 +3082,15 @@ function dailyCheck() {
   if (_dayChanged) save(); // FIX v3.3.30: sin cambios de día no hay nada que guardar ni subir
 }
 
+// ========================= BRAND HEADER (logo Somko) =========================
+// v3.3.30: si hay logo subido en Marca, el encabezado lo muestra en lugar de "Jardín."
+function renderBrandHeader() {
+  const el = document.getElementById('brandHome'); if (!el) return;
+  const logo = S.brand && S.brand.logoData;
+  if (logo) el.innerHTML = `<img class="brand-logo" src="${String(logo).replace(/"/g,'&quot;')}" alt="Somko">`;
+  else el.innerHTML = 'Jardín<span class="acc">.</span>';
+}
+
 // ========================= DATE DISPLAY =========================
 function setDateDisplay() {
   const date = new Date().toLocaleDateString('es-CL', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
@@ -3415,7 +3428,7 @@ function crVibe(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){
 let semFocusFrom = null; // de dónde se abrió la semilla (para volver coherente)
 function crOpenSeed(id){
   // Directo a LA semilla (antes: te dejaba en la lista del semillero y había que tocar de nuevo)
-  const s=(S.semillas||[]).find(x=>x.id===id); if(!s){ switchTab('semillero'); return; }
+  const s=(S.semillas||[]).find(x=>x.id===id); if(!s){ renderCrece(); return; } // v3.3.30: sin semilla no hay viaje — te quedás en Jardín
   semCurrentParent = (s.parentId ?? null);
   S.openSemillas = {}; S.openSemillas[id] = true; semDetailOpen = id; semFocusFrom = 'crece';
   switchTab('semillero');
@@ -5648,7 +5661,7 @@ function renderSemList() {
   const focusId = Object.keys(S.openSemillas || {}).map(Number).find(id => items.some(i => i.id === id));
   if (focusId) items = items.filter(i => i.id === focusId);
   let crumb = '';
-  if (focusId) crumb = `<button class="cr-backchip" id="semFocusBack"><i class="ti ti-chevron-left"></i> Semillero</button>`;
+  if (focusId) crumb = `<button class="cr-backchip" id="semFocusBack"><i class="ti ti-chevron-left"></i> Jardín</button>`;
   if (!searching && semCurrentParent !== null && !focusId) {
     const path = semPathTo(semCurrentParent);
     crumb = `<div class="sem-breadcrumb"><button data-semnav="root" title="raíz"><i class="ti ti-home"></i></button>` +
@@ -5660,6 +5673,12 @@ function renderSemList() {
   }
   list.innerHTML = crumb + items.map(i => {
     const isOpen = !!S.openSemillas[i.id];
+    // v3.3.30 (pedido Somko): en FOCO la fila de la semilla (grip · botón −/+ ·
+    // título · fecha) sobra — se muestra SOLO la página de información. La capa
+    // de minimizar/maximizar se retiró: una semilla está abierta o no existe en pantalla.
+    if (focusId && i.id === focusId) {
+      return `<div class="collapsible open" data-sem-item="${i.id}"><div class="collapsible-body" id="semBody-${i.id}"></div></div>`;
+    }
     const sel = semSelected.has(i.id);
     const kids = semChildCount(i.id);
     const types = [];
@@ -5689,8 +5708,11 @@ function renderSemList() {
   const fb = list.querySelector('#semFocusBack');
   if (fb) fb.addEventListener('click', () => {
     S.openSemillas = {}; semDetailOpen = null; save();
-    if (semFocusFrom === 'crece') { semFocusFrom = null; switchTab('crece'); return; } // volver a donde estabas
-    renderSemillero();
+    // v3.3.30: la lista del Semillero se retiró como destino — Crece es la casa
+    // de las semillas. Volver desde una semilla SIEMPRE te deja en Jardín.
+    semFocusFrom = null;
+    if (typeof crBucket !== 'undefined') crBucket = 'semilla';
+    switchTab('crece');
   });
   list.querySelectorAll('[data-sementer]').forEach(b => b.addEventListener('click', (e) => {
     e.stopPropagation(); if (semSelecting) return;
@@ -5838,11 +5860,15 @@ function renderSemBodyInline(id, container) {
       const wasOpen = !!S.openSemillas[s.id];
       S.semillas = S.semillas.filter(x => x.id !== s.id);
       delete S.openSemillas[s.id];
-      renderSemList();
+      // v3.3.30: eliminar la semilla abierta te devuelve a Jardín (no a la lista vieja)
+      semFocusFrom = null;
+      if (typeof crBucket !== 'undefined') crBucket = 'semilla';
+      switchTab('crece');
       showUndoToast(`"${removed.title || 'semilla'}" eliminada`, () => {
         S.semillas.splice(removedIdx, 0, removed);
         if (wasOpen) S.openSemillas[removed.id] = true;
-        renderSemList();
+        if (typeof renderCrece === 'function') renderCrece();
+        renderSemillero();
       });
     }
   }));
@@ -6124,7 +6150,9 @@ function renderSemForm() {
     if ((d.lyrics||d.notes||d.socialContent||d.title||d.link||d.photoData||d.audioData) && !confirm('Descartar esta semilla?')) return;
     semFormOpen = false; semFormDraft = null;
     if (isRecording) stopRecording();
-    renderSemillero();
+    // v3.3.30: descartar la captura también te devuelve a Jardín, no a la lista vieja
+    if (typeof crBucket !== 'undefined') crBucket = 'semilla';
+    switchTab('crece');
   });
   $('#nfSave').addEventListener('click', () => saveNewSemilla());
 }
@@ -6145,10 +6173,14 @@ function saveNewSemilla() {
   S.semillas.unshift(d); save();
   semFormOpen = false; semFormDraft = null;
   toast('Semilla guardada','✦');
-  renderSemillero();
+  // v3.3.30: al guardar volvés a Jardín (Crece), donde viven las semillas —
+  // la lista vieja del Semillero ya no es un destino.
+  if (typeof crBucket !== 'undefined') crBucket = 'semilla';
+  switchTab('crece');
   // Background upload originals to Firebase Storage
-  if (pendingPhoto) offloadPhotoFile(d, pendingPhoto, renderSemillero);
-  if (pendingAudio) offloadAudio(d, pendingAudio, renderSemillero);
+  const _refrescar = () => { renderSemillero(); if (typeof renderCrece === 'function') renderCrece(); };
+  if (pendingPhoto) offloadPhotoFile(d, pendingPhoto, _refrescar);
+  if (pendingAudio) offloadAudio(d, pendingAudio, _refrescar);
 }
 
 $('#semNew').addEventListener('click', () => {
@@ -6692,14 +6724,15 @@ function bindBrand() {
   $('#brandIgOpen').addEventListener('click', () => { if (S.brand.social.instagram.url) window.open(S.brand.social.instagram.url, '_blank'); });
   $('#brandYtOpen').addEventListener('click', () => { if (S.brand.social.youtube.url) window.open(S.brand.social.youtube.url, '_blank'); });
   $('#brandLogoUpload').addEventListener('click', () => $('#brandLogoInput').click());
-  $('#brandLogoRemove').addEventListener('click', () => { if (!confirm('Quitar logo?')) return; S.brand.logoData = ''; save(); renderBrand(); });
+  $('#brandLogoRemove').addEventListener('click', () => { if (!confirm('Quitar logo?')) return; S.brand.logoData = ''; save(); renderBrand(); renderBrandHeader(); });
   $('#brandLogoDownload').addEventListener('click', () => {
     if (!S.brand.logoData) return;
     downloadFromUrl(S.brand.logoData, 'logo.png');
   });
   $('#brandLogoInput').addEventListener('change', async e => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-    try { S.brand.logoData = await fileToCompressedDataUrl(f, 800, 0.9); save(); renderBrand(); toast('Logo cargado','✦'); }
+    // v3.3.30: el logo se guarda como PNG (conserva transparencia — sin caja blanca en el encabezado)
+    try { S.brand.logoData = await fileToCompressedDataUrl(f, 400, 0.92, 'image/png'); save(); renderBrand(); renderBrandHeader(); toast('Logo cargado','✦'); }
     catch (err) { toast('Error con el logo'); }
   });
   const onPhoto = async (f) => {
@@ -7926,9 +7959,12 @@ function navigateToSearchResult(item) {
   $('#gsClear').style.display = 'none';
   const p = item.payload;
   if (p.type === 'semilla') {
+    // v3.3.30: el buscador abre la semilla en FOCO directo (una sola, con volver a Jardín)
+    const _s = (S.semillas||[]).find(x => x.id === p.id);
+    semCurrentParent = _s ? (_s.parentId ?? null) : null;
+    S.openSemillas = {}; S.openSemillas[p.id] = true; semDetailOpen = p.id; semFocusFrom = null;
+    save();
     switchTab('semillero');
-    S.openSemillas[p.id] = true; save();
-    renderSemillero();
     _pulseEl(`[data-sem-item="${p.id}"]`);
   } else if (p.type === 'planta') {
     if (p.projectId) S.activeProjectId = p.projectId;
@@ -8189,6 +8225,7 @@ function init() {
     init._bound = true;
   }
   // renderBrand() corre en el bloque diferido de arriba
+  renderBrandHeader();
   checkStorageUsage();
   applyMissionLock();
   renderNotifBanner();
