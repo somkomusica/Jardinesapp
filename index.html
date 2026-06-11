@@ -2540,6 +2540,7 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 // ===== Versión de la app (mostrada en Ajustes) =====
 // Cada cambio registra una nueva versión. La primera de arriba es la actual.
 const VERSION_LOG = [
+  {v:'3.3.30', d:'2026-06-11', t:'Sync sano: (1) arreglado el bug que dejaba la app SIN nube, bot ni reseteo diario si la última pestaña abierta era Ajustes; (2) eliminado el ping-pong infinito de sincronización entre teléfono y computadora (la app ya no re-sube el estado al aplicar cambios remotos ni cada 60 s sin cambios); (3) el merge de la nube ya no mezcla días en el Diario ni resucita cosas borradas en el otro dispositivo; (4) fin de las tareas repetidas en Hoy: si una planta tenía más de una tarea automática pendiente (huérfanas de merges viejos) sobreviven solo una, y las tareas manuales que repiten exactamente el título de una planta con paso automático pendiente se retiran solas.'},
   {v:'3.3.29', d:'2026-06-11', t:'La versión instalada ahora se ve ARRIBA de Ajustes (dorada, junto al título) — verificás de un vistazo que se subió la correcta. Y el Semillero en foco total de verdad: capturando una semilla nueva se ve SOLO el formulario, y con una abierta, SOLO esa — sin miniaturas debajo.'},
   {v:'3.3.28', d:'2026-06-11', t:'Blindaje del scroll: quitada una regla que en el teléfono podía seguir trabando el paneo de un dedo (segunda causa posible). Y el borde "Jardín" fantasma que se asomaba a la derecha en pantallas anchas, fuera. Probada COMPLETA en laboratorio: arranque, las 11 pestañas, captura, foco de semilla desde Crece, grupos y conteos — todo en verde antes de publicar.'},
   {v:'3.3.27', d:'2026-06-11', t:'El pase de tus reportes reales: (1) SCROLL arreglado — las tarjetas de Crece secuestraban el dedo; ahora un dedo scrollea siempre (se quitó el swipe-avanza y el swipe entre pestañas, que llevaba a pantallas viejas). (2) Fuera los popups del navegador: agrupar, renombrar, borrar y los del Muro usan hojas propias de la app; la barra de selección ya no es el parche oscuro. (3) Jerarquía de letras unificada: campos al volumen del contenido, secciones discretas, nada grita. (4) Desde Crece una semilla se abre DIRECTO (y volver te deja en Crece). (5) Grupos de Creciendo y Florecida como tiles de a 3 con su carácter (verde/índigo) y CONTEO REAL por etapa — se acabaron los "13" fantasma. (6) Muro limpio: las acciones aparecen solo al mantener presionada una pieza; los links muestran su ícono del sitio y se abren al tocarlos.'},
@@ -3031,6 +3032,10 @@ function hideUndoToast() {
 // ========================= DAILY CHECK =========================
 function dailyCheck() {
   const today = todayStr();
+  // FIX v3.3.30 (bucle de sync): solo hay cambios reales si alguna fecha rotó.
+  // Antes el save() final era incondicional → cada init() y cada tick de 60 s
+  // subía el estado completo a Firebase → ping-pong infinito entre dispositivos.
+  const _dayChanged = (S.habitDate !== today) || (S.quoteDate !== today) || (S.mantraDate !== today) || (S.bitaDate !== today);
   if (S.habitDate !== today) {
     // Skip archival if this day was already closed manually (cerrarJornada did it)
     if (S.habitDate && S.closedDate !== S.habitDate) {
@@ -3070,7 +3075,7 @@ function dailyCheck() {
     S.gratitud=['','','']; S.gratDate=today;
   }
   if (typeof refreshHoyInputs === 'function') refreshHoyInputs();
-  save();
+  if (_dayChanged) save(); // FIX v3.3.30: sin cambios de día no hay nada que guardar ni subir
 }
 
 // ========================= DATE DISPLAY =========================
@@ -7430,7 +7435,17 @@ function syncStepTasks() {
     const key = f.id + ':' + ns.id;
     if (S.stepSkips.includes(key)) return;
     const text = (f.title || 'planta') + ' · ' + ns.label;
-    const t = S.tasks.find(x => x.auto && String(x.florId) === String(f.id) && !x.done);
+    // FIX v3.3.30 (repetición de tareas): si hay MÁS de una auto pendiente para la
+    // misma planta (merges viejos / dos dispositivos creándola a la vez), sobran todas
+    // menos una — antes la extra quedaba huérfana para siempre con texto viejo.
+    const pendientes = S.tasks.filter(x => x.auto && String(x.florId) === String(f.id) && !x.done);
+    if (pendientes.length > 1) {
+      const buena = pendientes.find(x => x.text === text) || pendientes[0];
+      const sobran = new Set(pendientes.filter(x => x !== buena).map(x => x.id));
+      S.tasks = S.tasks.filter(x => !sobran.has(x.id));
+      changed = true;
+    }
+    const t = pendientes.length ? (pendientes.find(x => x.text === text) || pendientes[0]) : null;
     if (t) {
       // la planta avanzó por otro lado → la tarea se actualiza al paso vigente, sin perder su lugar
       if (String(t.stageId) !== String(ns.id) || t.text !== text) { t.stageId = ns.id; t.text = text; t.projectId = f.projectId; changed = true; }
@@ -7443,6 +7458,20 @@ function syncStepTasks() {
   const n0 = S.tasks.length;
   S.tasks = S.tasks.filter(t => !(t.auto && !t.done && !vivas.has(String(t.florId))));
   if (S.tasks.length !== n0) changed = true;
+  // FIX v3.3.30 (repetición de tareas): una tarea manual pendiente cuyo texto es
+  // EXACTAMENTE el título de una planta que ya tiene su paso automático pendiente
+  // es la misma cosa dos veces — fuera la manual (la auto lleva la etapa al día).
+  const _norm = s => (s || '').trim().toLowerCase();
+  const _titulosAuto = new Set();
+  S.tasks.forEach(x => {
+    if (x.auto && !x.done) {
+      const f = (S.flores || []).find(fl => String(fl.id) === String(x.florId));
+      if (f) _titulosAuto.add(_norm(f.title));
+    }
+  });
+  const n1 = S.tasks.length;
+  S.tasks = S.tasks.filter(x => !(!x.auto && !x.done && _titulosAuto.has(_norm(x.text))));
+  if (S.tasks.length !== n1) changed = true;
   if (changed) save();
 }
 function renderAgenda() {
@@ -8167,6 +8196,12 @@ function init() {
   // Rehydrate pending local blobs from IndexedDB & refresh cloud badge
   setTimeout(() => { rehydrateLocalBlobs(); updateCloudBadge(); }, 200);
 }
+// FIX v3.3.30 (bug TDZ): estas variables viven ANTES de init().
+// init() → switchTab('ajustes') → renderConfig → renderAuth lee `auth`;
+// si la declaración quedaba después, el ReferenceError detenía TODO el
+// script (sin Firebase, sin bot, sin reseteo diario) cuando la última
+// pestaña abierta era Ajustes.
+let firebaseReady = false, userId = null, db = null, auth = null, storage = null;
 init();
 setInterval(() => {
   const prev = S.habitDate; dailyCheck();
@@ -8185,7 +8220,7 @@ const firebaseConfig = {
   appId: "1:695678963767:web:ad40bd0c2b2052ecd06fb2"
 };
 
-let firebaseReady = false, userId = null, db = null, auth = null, storage = null;
+// (firebaseReady/userId/db/auth/storage se declaran arriba, antes de init() — fix TDZ v3.3.30)
 
 firebase.initializeApp(firebaseConfig);
 auth = firebase.auth();
@@ -8325,6 +8360,10 @@ async function authSignOut() {
   // onAuthStateChanged(null) → vuelve a iniciar sesión anónima
 }
 
+// FIX v3.3.30 (bucle de sync): mientras se aplica un estado remoto, los save()
+// que disparan los re-renders de init() NO deben re-subir a Firebase — eso
+// generaba un lastUpdate nuevo y el otro dispositivo lo aplicaba a su vez (eco infinito).
+let _applyingRemote = false;
 const originalSave = window.save;
 // Debounce: localStorage se escribe SIEMPRE al instante (originalSave);
 // la subida a Firebase (estado completo) espera 1.2 s de calma para no
@@ -8337,6 +8376,7 @@ function _flushFirebaseSave() {
 }
 window.save = function() {
   originalSave();
+  if (_applyingRemote) return; // FIX v3.3.30: aplicar remoto no re-publica
   if (!(firebaseReady && userId)) return;
   _fbDirty = true;
   clearTimeout(_fbSaveTimer);
@@ -8600,26 +8640,32 @@ function _stripBlobsForDB(obj) {
 }
 
 // Merge remote (may have __local__ markers) with local (has actual blobs)
+// FIX v3.3.30: el merge SOLO restaura blobs marcados '__local__' (su único
+// propósito). La versión anterior mezclaba arrays por índice y conservaba
+// claves que solo existían en local → entradas del Diario "Frankenstein"
+// (campos de días distintos mezclados) y resucitaba ítems borrados en el
+// otro dispositivo. Ahora el remoto manda; lo local solo aporta el valor
+// real donde el remoto dejó el marcador '__local__'.
 function _mergeWithLocal(remote, local) {
-  if (Array.isArray(remote) && Array.isArray(local)) {
+  if (remote === '__local__') {
+    return (local && local !== '__local__') ? local : remote;
+  }
+  if (Array.isArray(remote)) {
+    // Emparejar por id cuando exista (los arrays pueden venir reordenados);
+    // si no hay id, cae al índice solo como referencia para buscar '__local__'.
+    const byId = Array.isArray(local)
+      ? new Map(local.filter(x => x && typeof x === 'object' && 'id' in x).map(x => [x.id, x]))
+      : null;
     return remote.map((r, i) => {
-      if (r && typeof r === 'object' && local[i] && typeof local[i] === 'object') {
-        return _mergeWithLocal(r, local[i]);
-      }
-      return r;
+      let loc = Array.isArray(local) ? local[i] : undefined;
+      if (r && typeof r === 'object' && 'id' in r && byId && byId.has(r.id)) loc = byId.get(r.id);
+      return _mergeWithLocal(r, loc);
     });
   }
-  if (remote && typeof remote === 'object' && local && typeof local === 'object') {
+  if (remote && typeof remote === 'object') {
     const out = {};
-    const allKeys = new Set([...Object.keys(remote), ...Object.keys(local)]);
-    for (const k of allKeys) {
-      if (remote[k] === '__local__' && local[k] && local[k] !== '__local__') {
-        out[k] = local[k]; // preserve local blob / URL
-      } else if (k in remote) {
-        out[k] = _mergeWithLocal(remote[k], local[k]);
-      } else {
-        out[k] = local[k]; // key only in local
-      }
+    for (const k of Object.keys(remote)) {
+      out[k] = _mergeWithLocal(remote[k], (local && typeof local === 'object') ? local[k] : undefined);
     }
     return out;
   }
@@ -8642,7 +8688,8 @@ function loadFromFirebase() {
         localStorage.setItem('jardin-state', JSON.stringify(merged));
         S = migrate(Object.assign({}, defaults, merged));
         _lastSeenUpdate = Math.max(_lastSeenUpdate, remoteData.lastUpdate || 0);
-        init();
+        _applyingRemote = true;                       // FIX v3.3.30
+        try { init(); } finally { _applyingRemote = false; }
         if (_forceRemoteLoad) toast('Cuenta sincronizada en este dispositivo', '☁');
         else if (!_firstFirebaseLoad) toast('Datos actualizados desde otro dispositivo', '☁');
       } else {
@@ -8666,7 +8713,8 @@ function applyRemoteState(remoteData) {
   localStorage.setItem('jardin-state', JSON.stringify(merged));
   S = migrate(Object.assign({}, defaults, merged));
   _lastSeenUpdate = remoteData.lastUpdate || _lastSeenUpdate;
-  init();
+  _applyingRemote = true;                             // FIX v3.3.30
+  try { init(); } finally { _applyingRemote = false; }
   toast('Tu socio actualizó el Jardín', '🌿');
 }
 function listenRemoteState() {
