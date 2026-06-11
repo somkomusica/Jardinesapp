@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#D4A017">
 <meta name="description" content="Jardín — Tu sistema de organización artística">
 <link rel="manifest" href="manifest.json">
@@ -130,7 +130,7 @@ p.tab-hint { display: none; }
 /* Compact Frase + Voces */
 .frase-compact { padding: 14px 16px !important; }
 .frase-compact .label { font-size: 9px; margin-bottom: 4px; }
-.frase-compact .mantra-input { font-size: 16px; }
+.frase-compact .mantra-input { font-size: 15px; } /* la intención del día: focal, pero sin gritar */
 .voces-compact { padding: 12px 16px !important; display: flex; align-items: center; gap: 12px; }
 .voces-compact .v-text { flex: 1; min-width: 0; }
 .voces-compact .v-quote { font-size: 12px; line-height: 1.4; font-weight: 300; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
@@ -272,6 +272,12 @@ body { padding-bottom: 78px; }
 .cap-opt { flex: 1; background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 14px; cursor: pointer; padding: 18px 6px; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text); font-family: var(--font); font-size: 12px; letter-spacing: .02em; transition: transform .1s, border-color .15s; }
 .cap-opt .ti { font-size: 26px; color: var(--gold); }
 .cap-opt:active { transform: scale(.95); }
+/* Diálogos propios */
+.jd-msg { font-size: 13px; color: var(--text); padding: 2px 4px 12px; line-height: 1.5; }
+.jd-input { margin-bottom: 14px; }
+.jd-actions { display: flex; gap: 10px; justify-content: flex-end; padding-bottom: 4px; }
+.jd-actions .btn { padding: 10px 18px; }
+.btn.jd-danger { background: #b5462f; border-color: #b5462f; color: #fff; }
 /* Pasos editables en la captura de una idea */
 .nf-stage { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 .nf-stage input { flex: 1; }
@@ -338,11 +344,18 @@ body { padding-bottom: 78px; }
 .cr-backchip { background:none; border:.5px solid var(--border); border-radius:999px; padding:5px 12px; font-family:var(--font); font-size:11px; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:4px; margin-bottom:10px; }
 .cr-backchip:active { transform:scale(.95); }
 .cr-folder .cr-title .ti { margin-right:4px; }
-.select-bar button.danger { color:#ff8a7a; }
 /* Creciendo = jardín vivo (Fase 3): plantas SVG que crecen con el progreso */
 .cr-garden { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; align-items:end; padding:16px 8px 22px; background:linear-gradient(to bottom, transparent 28%, var(--cr-green-soft)); border-radius:18px; }
 .cr-gplant { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:6px 2px 4px; border-radius:12px; transition:transform .12s; }
 .cr-gplant:active { transform:scale(.93); }
+/* el dedo siempre puede scrollear: el navegador maneja el paneo vertical sobre tarjetas y plantas */
+.cr-card, .cr-gplant { touch-action: pan-y; }
+/* Grupos como tiles en la grilla (verde = plantas · índigo = flores) */
+.cr-gfolder .gf-ico { position: relative; width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 4px; }
+.cr-gfolder.gf-grow .gf-ico { background: var(--cr-green-soft); color: var(--cr-green); }
+.cr-gfolder.gf-flor .gf-ico { background: var(--indigo-soft); color: var(--cr-indigo); }
+.cr-gfolder .gf-badge { position: absolute; bottom: -4px; right: -4px; font-size: 13px; background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: var(--gold); }
+.cr-garden.gf-grid { background: linear-gradient(to bottom, transparent 30%, var(--indigo-soft)); align-items: start; margin-bottom: 10px; }
 .cr-gsvg svg { width:56px; height:76px; transform-origin:bottom center; animation:cr-sway 4.6s ease-in-out infinite; }
 @keyframes cr-sway { 0%,100%{transform:rotate(-1.6deg);} 50%{transform:rotate(1.6deg);} }
 .cr-gname { font-size:10px; text-align:center; line-height:1.2; max-width:98px; overflow:hidden; text-overflow:ellipsis; }
@@ -453,13 +466,13 @@ section.tab.active { display: block; animation: tabIn .2s ease; }
 }
 .card.dark { background: #1a1a1a; color: #F0EDE6; border-color: rgba(255,255,255,0.08); }
 .card.dark .label { color: rgba(240,237,230,0.55); }
-.label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; font-weight: 400; }
+.label { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; font-weight: 400; }
 .label .num { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #1a1a1a; color: var(--bg); text-align: center; line-height: 14px; font-size: 9px; margin-right: 6px; }
 .label.gold .num { background: var(--gold); color: #fff; }
 .label.gray .num { background: var(--text-secondary); color: var(--bg); }
-h2.section-title { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); font-weight: 400; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+h2.section-title { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); font-weight: 400; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 h2.section-title .ti { color: var(--gold); }
-h3.sub-title { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); font-weight: 400; margin: 18px 0 10px; display: flex; align-items: center; gap: 6px; }
+h3.sub-title { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); font-weight: 400; margin: 18px 0 10px; display: flex; align-items: center; gap: 6px; }
 h3.sub-title .ti { color: var(--gold); }
 
 .quote-card { padding: 24px 22px; }
@@ -470,7 +483,7 @@ h3.sub-title .ti { color: var(--gold); }
 .quote-actions button:hover { color: #fff; border-color: rgba(240,237,230,0.4); }
 
 .mantra-card { text-align: center; padding: 28px 20px; border: 0.5px dashed var(--gold); background: var(--gold-soft); }
-.mantra-input { background: transparent; border: none; outline: none; font-family: var(--font); font-size: 22px; font-weight: 300; text-align: center; width: 100%; margin-top: 4px; color: var(--text); letter-spacing: 0.02em; }
+.mantra-input { background: transparent; border: none; outline: none; font-family: var(--font); font-size: 17px; font-weight: 300; text-align: center; width: 100%; margin-top: 4px; color: var(--text); letter-spacing: 0.02em; }
 
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .stat-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
@@ -485,8 +498,9 @@ h3.sub-title .ti { color: var(--gold); }
 input[type="text"], input[type="number"], input[type="url"], textarea, select {
   width: 100%; background: transparent;
   border: 0.5px solid var(--border); border-radius: 6px;
-  padding: 9px 12px; font-family: var(--font); font-size: 16px;
-  /* 16px en campos: evita el zoom automático del navegador al enfocar */
+  padding: 9px 12px; font-family: var(--font); font-size: 13.5px;
+  /* jerarquía (v3.3.27): los campos hablan al volumen del contenido, no más fuerte que las secciones.
+     (Android Chrome no hace el zoom-al-enfocar de iOS, así que 13.5px es seguro acá.) */
   color: var(--text); outline: none; transition: border-color .15s;
   min-height: 44px; border-radius: 12px;
 }
@@ -651,20 +665,22 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .mtile.tile-m { grid-column: span 2; grid-row: span 2; }
 .mtile.tile-l { grid-column: span 4; grid-row: span 3; }
 .mtile .mosaic-img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; display: block; }
-.mtile .mtile-grip, .mtile .mtile-size { position: absolute; top: 4px; background: rgba(0,0,0,.5); color: #fff; border: none; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: .6; transition: opacity .15s; font-size: 13px; padding: 0; }
-.mtile:hover .mtile-grip, .mtile:hover .mtile-size { opacity: 1; }
+.mtile .mtile-grip, .mtile .mtile-size { position: absolute; top: 4px; background: rgba(0,0,0,.5); color: #fff; border: none; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .15s; font-size: 13px; padding: 0; }
+.mtile.show-actions .mtile-grip, .mtile.show-actions .mtile-size { opacity: 1; pointer-events: auto; }
 .mtile .mtile-grip { left: 4px; cursor: grab; touch-action: none; }
 .mtile .mtile-size { right: 4px; }
 @media (max-width: 480px) { .mosaic { grid-auto-rows: 60px; } }
 /* Referencias — muro visual (reusa .mosaic/.mtile) */
-.mtile .mtile-actions { position: absolute; top: 4px; right: 4px; display: flex; gap: 4px; opacity: .55; transition: opacity .15s; }
-.mtile:hover .mtile-actions { opacity: 1; }
+.mtile .mtile-actions { position: absolute; top: 4px; right: 4px; display: flex; gap: 4px; opacity: 0; pointer-events: none; transition: opacity .15s; }
+.mtile.show-actions .mtile-actions { opacity: 1; pointer-events: auto; }
 .mtile .mtile-act { background: rgba(0,0,0,.5); color: #fff; border: none; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; padding: 0; }
 .mtile .mtile-act.danger:hover { background: #b5402f; }
 .mtile.ref-link { background: linear-gradient(135deg, var(--gold-soft), var(--bg-soft)); }
-.mtile .ref-linkface { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px; text-align: center; color: var(--gold); }
+.mtile .ref-linkface { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 10px; text-align: center; color: var(--gold); cursor: pointer; }
 .mtile .ref-linkface i { font-size: 22px; }
-.mtile .ref-linkface span { font-size: 11px; color: var(--text-secondary); line-height: 1.3; max-height: 3.9em; overflow: hidden; }
+.mtile .ref-linkface .ref-favicon { width: 28px; height: 28px; border-radius: 7px; }
+.mtile .ref-linkface span { font-size: 11px; color: var(--text); line-height: 1.3; max-height: 2.7em; overflow: hidden; }
+.mtile .ref-linkface .ref-dom { font-size: 9px; color: var(--text-faint); max-height: 1.4em; }
 .mtile .ref-source { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 9.5px; letter-spacing: .04em; padding: 3px 6px; display: flex; align-items: center; gap: 4px; text-decoration: none; }
 .mtile .ref-source:hover { background: rgba(0,0,0,.75); }
 /* Anidación (páginas) + selección múltiple en Semillero */
@@ -678,20 +694,22 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .sem-check.on { color: var(--gold); }
 .collapsible.sem-sel { background: var(--gold-soft); border-radius: 8px; }
 /* Barra de selección (Seleccionar / Agrupar / Mover a) — colores sólidos, legibles en cualquier tema */
-.select-bar { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: #24242c; color: #f4f2ec; border: 1px solid var(--gold); border-radius: 12px; padding: 9px 14px; display: flex; align-items: center; gap: 8px; z-index: 9000; box-shadow: 0 8px 24px rgba(0,0,0,.45); flex-wrap: wrap; max-width: 94vw; justify-content: center; }
-.select-bar .sb-count { background: var(--gold); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-.select-bar .sb-hint { font-size: 11.5px; color: #c9c5bb; }
-.select-bar button { background: rgba(255,255,255,.07); border: 0.5px solid rgba(255,255,255,.18); color: #f4f2ec; cursor: pointer; font-size: 12.5px; display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 8px; }
-.select-bar button:hover { background: var(--gold); border-color: var(--gold); color: #fff; }
-.select-bar button[disabled] { opacity: .35; cursor: default; background: none; border-color: transparent; }
-.select-bar button[disabled]:hover { background: none; color: #f4f2ec; }
+/* Barra de selección al lenguaje del tema (antes era un parche oscuro sobre el claro) */
+.select-bar { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--bg-card); color: var(--text); border: 0.5px solid var(--border-strong); border-radius: 999px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; z-index: 9000; box-shadow: 0 8px 24px rgba(0,0,0,.14); flex-wrap: wrap; max-width: 94vw; justify-content: center; }
+.select-bar .sb-count { background: var(--gold); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+.select-bar .sb-hint { font-size: 11px; color: var(--text-secondary); }
+.select-bar button { background: none; border: 0.5px solid var(--border); color: var(--text); cursor: pointer; font-family: var(--font); font-size: 12px; display: inline-flex; align-items: center; gap: 5px; padding: 7px 11px; border-radius: 999px; transition: transform .1s; }
+.select-bar button:active { transform: scale(.93); }
+.select-bar button.danger { color: #b5462f; border-color: rgba(181,70,47,.35); }
+.select-bar button[disabled] { opacity: .35; cursor: default; }
 .plant.plant-folder .folder-ico { width: 46px; height: 46px; border-radius: 10px; background: var(--gold-soft); display: flex; align-items: center; justify-content: center; position: relative; color: var(--gold); font-size: 22px; }
 .plant.plant-folder .folder-ico .fk { position: absolute; bottom: -3px; right: -3px; background: var(--gold); color: #fff; border-radius: 50%; min-width: 15px; height: 15px; font-size: 9px; display: flex; align-items: center; justify-content: center; padding: 0 3px; }
 .plant.sel, .flor-row.sem-sel { outline: 2px solid var(--gold); outline-offset: 1px; border-radius: 8px; }
 .flor-folder .flor-head { cursor: pointer; }
 
 .sem-detail, .sem-form-wrap { background: var(--bg-card); border: 0.5px solid var(--border-strong); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; }
-.sem-detail input[type="text"].sem-title-input { font-size: 16px; font-weight: 500; padding: 6px 0; border: none; box-shadow: inset 0 -1px 0 var(--border); border-radius: 0; margin-bottom: 4px; }
+.sem-detail input[type="text"].sem-title-input { font-size: 15px; font-weight: 500; padding: 6px 0; border: none; box-shadow: inset 0 -1px 0 var(--border); border-radius: 0; margin-bottom: 4px; }
+.sem-title-input { font-size: 15px !important; font-weight: 500; } /* nombre de la obra: nivel título, parejo en captura y edición */
 .sem-detail input[type="text"].sem-title-input:focus { box-shadow: inset 0 -1px 0 var(--gold); }
 .sem-slot { margin-top: 14px; padding-top: 14px; border-top: 0.5px dashed var(--border); }
 .sem-slot:first-of-type { border-top: none; padding-top: 8px; }
@@ -2521,6 +2539,7 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 // ===== Versión de la app (mostrada en Ajustes) =====
 // Cada cambio registra una nueva versión. La primera de arriba es la actual.
 const VERSION_LOG = [
+  {v:'3.3.27', d:'2026-06-11', t:'El pase de tus reportes reales: (1) SCROLL arreglado — las tarjetas de Crece secuestraban el dedo; ahora un dedo scrollea siempre (se quitó el swipe-avanza y el swipe entre pestañas, que llevaba a pantallas viejas). (2) Fuera los popups del navegador: agrupar, renombrar, borrar y los del Muro usan hojas propias de la app; la barra de selección ya no es el parche oscuro. (3) Jerarquía de letras unificada: campos al volumen del contenido, secciones discretas, nada grita. (4) Desde Crece una semilla se abre DIRECTO (y volver te deja en Crece). (5) Grupos de Creciendo y Florecida como tiles de a 3 con su carácter (verde/índigo) y CONTEO REAL por etapa — se acabaron los "13" fantasma. (6) Muro limpio: las acciones aparecen solo al mantener presionada una pieza; los links muestran su ícono del sitio y se abren al tocarlos.'},
   {v:'3.3.26', d:'2026-06-10', t:'ADN único: semilla y planta llevan EXACTAMENTE lo mismo — Nombre · Etapas · Letra · Notas · Redes · Foto portada · Audio referencia · Links · Archivos. Descripción se fue de las dos. La captura nace con ese molde y el viejo "Texto" de tus semillas pasó a Notas (nada se pierde). Además: el tono CLARO es ahora el default real (auto/oscuro siguen en Ajustes) y la frase del día bajó a su lugar — línea propia DEBAJO de Jardín, chiquita, sin apretar la barra.'},
   {v:'3.3.25', d:'2026-06-10', t:'Frase del día bajo "Jardín·": cada día una distinta (Rick Rubin, James Clear y las tuyas), en itálica discreta. Se pliega sola al scrollear para no ocupar.'},
   {v:'3.3.24', d:'2026-06-10', t:'Abrir una semilla ahora es FOCO total: se ve solo esa semilla con un botón "‹ Semillero" para volver. Desaparecen el buscador, "Nueva semilla", los filtros y las demás tarjetas mientras está abierta (también durante la captura). Y se abre una a la vez — antes podían quedar varias desplegadas.'},
@@ -3227,8 +3246,14 @@ function crGrowing() { return (S.flores  || []).filter(f => !f.isPage && !isComp
 function crFlowers() { return (S.flores  || []).filter(f => !f.isPage &&  isComplete(f) && (f.parentId??null)===crParent); }
 function crFoldersOf(kind){ const arr = kind==='seed'?S.semillas:S.flores; return (arr||[]).filter(x=>x.isPage && (x.parentId??null)===crParent); }
 function crParentOf(id){ const arr=[...(S.flores||[]),...(S.semillas||[])]; const p=arr.find(x=>x.id===id); return p ? (p.parentId??null) : null; }
-function crFolderCard(kind, fp){
-  const cnt = (kind==='seed'?S.semillas:S.flores).filter(x=>(x.parentId??null)===fp.id).length;
+function crBucketCount(fp, bucket){
+  // Conteo REAL por etapa (antes contaba TODO lo de adentro → "13" en Florecida y vacío al entrar)
+  const kids = (S.flores||[]).filter(x=>(x.parentId??null)===fp.id && !x.isPage);
+  if (bucket==='flor') return kids.filter(x=>isComplete(x)).length;
+  return kids.filter(x=>!isComplete(x)).length;
+}
+function crFolderCard(kind, fp){ // bandeja de semillas: carpeta como tarjeta simple
+  const cnt = (kind==='seed'?S.semillas:S.flores).filter(x=>(x.parentId??null)===fp.id && !x.isPage).length;
   return `<div class="cr-card cr-folder" data-crfolder="${fp.id}">
     <span class="cr-dot" style="background:var(--text-faint)"></span>
     <div class="cr-body"><div class="cr-title"><i class="ti ti-folder" style="color:var(--gold)"></i>${escapeHTML(fp.title||'Carpeta')}</div>
@@ -3236,21 +3261,72 @@ function crFolderCard(kind, fp){
     <i class="ti ti-chevron-right" style="color:var(--text-faint);align-self:center;"></i>
   </div>`;
 }
+function crFolderTile(fp, bucket){
+  // Grupo como TILE en la grilla de 3 (como las plantas), con su propio carácter:
+  // verde = grupo de plantas creciendo · índigo = grupo de flores cosechadas
+  const cnt = crBucketCount(fp, bucket);
+  const flor = bucket==='flor';
+  return `<div class="cr-gplant cr-gfolder ${flor?'gf-flor':'gf-grow'}" data-crfolder="${fp.id}">
+    <div class="gf-ico"><i class="ti ${flor?'ti-flower':'ti-plant-2'}"></i><i class="ti ti-folder gf-badge"></i></div>
+    <div class="cr-gname">${escapeHTML(fp.title||'Grupo')}</div>
+    <div class="cr-gprog" style="${flor?'color:var(--cr-indigo);':''}">${cnt} ${flor?'cosechada'+(cnt===1?'':'s'):'creciendo'}</div>
+  </div>`;
+}
 // ---- Selección múltiple (mantener presionado): agrupar / borrar ----
+// ===== Diálogos propios (hoja inferior, lenguaje de la app) — fuera los popups del navegador =====
+function _jdSheet(innerHTML){
+  let bd=document.getElementById('jdBackdrop'), sh=document.getElementById('jdSheet');
+  if(!sh){ bd=document.createElement('div'); bd.id='jdBackdrop'; bd.className='more-backdrop';
+    sh=document.createElement('div'); sh.id='jdSheet'; sh.className='more-sheet';
+    document.body.appendChild(bd); document.body.appendChild(sh); }
+  sh.innerHTML='<div class="more-handle"></div>'+innerHTML;
+  requestAnimationFrame(()=>{ bd.classList.add('open'); sh.classList.add('open'); });
+  return {bd,sh,close(){ bd.classList.remove('open'); sh.classList.remove('open'); }};
+}
+function jdConfirm(msg, btnLabel='Confirmar', danger=false){
+  return new Promise(res=>{
+    const d=_jdSheet(`<div class="jd-msg">${escapeHTML(msg)}</div>
+      <div class="jd-actions">
+        <button class="btn ghost" id="jdNo">Cancelar</button>
+        <button class="btn ${danger?'jd-danger':'gold'}" id="jdYes">${escapeHTML(btnLabel)}</button>
+      </div>`);
+    const done=v=>{ d.close(); res(v); };
+    d.sh.querySelector('#jdYes').onclick=()=>done(true);
+    d.sh.querySelector('#jdNo').onclick=()=>done(false);
+    d.bd.onclick=()=>done(false);
+  });
+}
+function jdPrompt(msg, opts={}){
+  return new Promise(res=>{
+    const d=_jdSheet(`<div class="jd-msg">${escapeHTML(msg)}</div>
+      <input type="text" id="jdInput" class="jd-input" value="${escapeHTML(opts.value||'')}" placeholder="${escapeHTML(opts.placeholder||'')}" autocomplete="off">
+      <div class="jd-actions">
+        <button class="btn ghost" id="jdNo">Cancelar</button>
+        <button class="btn gold" id="jdYes">${escapeHTML(opts.btnLabel||'Guardar')}</button>
+      </div>`);
+    const inp=d.sh.querySelector('#jdInput');
+    const done=v=>{ d.close(); res(v); };
+    d.sh.querySelector('#jdYes').onclick=()=>done(inp.value);
+    d.sh.querySelector('#jdNo').onclick=()=>done(null);
+    d.bd.onclick=()=>done(null);
+    inp.addEventListener('keydown', e=>{ if(e.key==='Enter') done(inp.value); });
+    setTimeout(()=>inp.focus(), 120);
+  });
+}
 function crEnterSelect(kind,id){ crSelecting=true; crSelKind=kind; crSelected=new Set([id]); crVibe(15); renderCrece(); }
 function crExitSel(){ crSelecting=false; crSelected=new Set(); renderCrece(); }
 function crToggleSel(id){ if(crSelected.has(id)) crSelected.delete(id); else crSelected.add(id); if(crSelected.size===0){ crExitSel(); return; } renderCrece(); }
-function crDeleteSel(){
+async function crDeleteSel(){
   if(!crSelected.size) return;
-  if(!confirm(`Borrar ${crSelected.size} ${crSelKind==='seed'?'semilla(s)':'planta(s)'}? (también lo que tengan adentro)`)) return;
+  if(!await jdConfirm(`¿Borrar ${crSelected.size} ${crSelKind==='seed'?'semilla(s)':'planta(s)'}? También lo que tengan adentro.`, 'Borrar', true)) return;
   const ids=crSelected;
   if(crSelKind==='seed') S.semillas=S.semillas.filter(x=>!ids.has(x.id) && !ids.has(x.parentId));
   else S.flores=S.flores.filter(x=>!ids.has(x.id) && !ids.has(x.parentId));
   save(); crSelecting=false; crSelected=new Set(); renderCrece(); toast('Borrado','🗑');
 }
-function crGroupSel(){
+async function crGroupSel(){
   if(!crSelected.size) return;
-  const name=prompt('Nombre del grupo:'); if(name===null) return;
+  const name=await jdPrompt('Nombre del grupo', {placeholder:'ej: Sentir, ideas de voz...', btnLabel:'Agrupar'}); if(name===null) return;
   const pageId=uid(); const ids=crSelected;
   if(crSelKind==='seed'){
     S.semillas.unshift({ id:pageId, createdAt:Date.now(), date:todayStr(), title:(name.trim()||'Grupo'), text:'', link:'', photoData:null, audioData:null, audioSec:0, groupId:null, projectId:S.activeProjectId, parentId:crParent, isPage:true });
@@ -3326,7 +3402,14 @@ function crGardenPlant(f){
   </div>`;
 }
 function crVibe(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} }
-function crOpenSeed(id){ switchTab('semillero'); }
+let semFocusFrom = null; // de dónde se abrió la semilla (para volver coherente)
+function crOpenSeed(id){
+  // Directo a LA semilla (antes: te dejaba en la lista del semillero y había que tocar de nuevo)
+  const s=(S.semillas||[]).find(x=>x.id===id); if(!s){ switchTab('semillero'); return; }
+  semCurrentParent = (s.parentId ?? null);
+  S.openSemillas = {}; S.openSemillas[id] = true; semDetailOpen = id; semFocusFrom = 'crece';
+  switchTab('semillero');
+}
 function crAdvancePlant(id){
   const f=(S.flores||[]).find(x=>x.id===id); if(!f) return;
   const next=florNextStage(f); if(!next) return;
@@ -3336,7 +3419,7 @@ function crAdvancePlant(id){
   renderCrece();
 }
 function crSow(id){ const before=(S.semillas||[]).length; sembrarSemilla(id); if((S.semillas||[]).length<before){ crBucket='creciendo'; switchTab('crece'); } }
-function crRename(kind,id){ const arr=kind==='seed'?S.semillas:S.flores; const o=(arr||[]).find(x=>x.id===id); if(!o) return; const v=prompt('Nuevo nombre:', o.title||''); if(v!==null){ o.title=v.trim(); save(); renderCrece(); } }
+async function crRename(kind,id){ const arr=kind==='seed'?S.semillas:S.flores; const o=(arr||[]).find(x=>x.id===id); if(!o) return; const v=await jdPrompt('Nuevo nombre', {value:o.title||''}); if(v!==null){ o.title=v.trim(); save(); renderCrece(); } }
 function crDelete(kind,id){ const o=((kind==='seed'?S.semillas:S.flores)||[]).find(x=>x.id===id); if(!o) return; if(!confirm(`Borrar "${o.title||''}"?`)) return; if(kind==='seed') S.semillas=S.semillas.filter(x=>x.id!==id); else S.flores=S.flores.filter(x=>x.id!==id); save(); renderCrece(); }
 function crCloseSheet(){ document.getElementById('crSheetBackdrop')?.classList.remove('open'); document.getElementById('crSheet')?.classList.remove('open'); }
 function crActionSheet(kind,id){
@@ -3368,21 +3451,15 @@ function crActionSheet(kind,id){
 }
 // Gestos en una tarjeta/planta: tap=abrir · deslizar derecha=avanzar/sembrar · mantener=acciones
 function crWireGestures(el, kind, id){
-  let startX=0,startY=0,dx=0,dragging=false,moved=false,lpFired=false,lpTimer=null;
-  const onDown=(x,y,e)=>{ startX=x;startY=y;dragging=true;moved=false;lpFired=false;el.style.transition='none';
-    if(e&&e.pointerId!=null){ try{el.setPointerCapture(e.pointerId);}catch(_){} }
-    lpTimer=setTimeout(()=>{ if(!moved){ lpFired=true;dragging=false;el.style.transform='';crEnterSelect(kind,id); } },480); };
-  const onMove=(x,y)=>{ if(!dragging) return; dx=x-startX; const dy=y-startY;
-    if(Math.abs(dx)>6||Math.abs(dy)>6){ moved=true; clearTimeout(lpTimer); }
-    if(Math.abs(dy)>Math.abs(dx)) return;            // gesto vertical = scroll, no interferir
-    if(dx<0) dx=dx*0.25; el.style.transform=`translateX(${dx}px)`; };
-  const onUp=()=>{ clearTimeout(lpTimer); if(!dragging){ return; } dragging=false; el.style.transition='transform .2s';
-    if(dx>90){ el.style.transform='translateX(110%)'; setTimeout(()=>{ kind==='seed'?crSow(id):crAdvancePlant(id); },140); }
-    else { el.style.transform=''; if(!moved&&!lpFired){ kind==='seed'?crOpenSeed(id):openCreceDetail(id); } } dx=0; };
-  el.addEventListener('pointerdown', e=>onDown(e.clientX,e.clientY,e));
-  el.addEventListener('pointermove', e=>onMove(e.clientX,e.clientY));
-  el.addEventListener('pointerup', onUp);
-  el.addEventListener('pointercancel', ()=>{ clearTimeout(lpTimer); el.style.transition='transform .2s'; el.style.transform=''; dragging=false; });
+  // v3.3.27 (pedido Somko): SIN swipe — tap = abrir · mantener = selección múltiple.
+  // El bug del scroll a 2 dedos era el setPointerCapture de acá: secuestraba el dedo
+  // en cada tarjeta/planta sin touch-action, y Crece cubre casi toda la pantalla.
+  let moved=false, lpFired=false, lpTimer=null, sx=0, sy=0;
+  el.addEventListener('pointerdown', e=>{ moved=false; lpFired=false; sx=e.clientX; sy=e.clientY;
+    lpTimer=setTimeout(()=>{ if(!moved){ lpFired=true; crVibe(12); crEnterSelect(kind,id); } },480); });
+  el.addEventListener('pointermove', e=>{ if(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8){ moved=true; clearTimeout(lpTimer); } });
+  el.addEventListener('pointerup', ()=>{ clearTimeout(lpTimer); if(!moved&&!lpFired){ kind==='seed'?crOpenSeed(id):openCreceDetail(id); } });
+  el.addEventListener('pointercancel', ()=>clearTimeout(lpTimer));
 }
 function crSetChip(f){
   const chip=document.getElementById('crDetailChip'); if(!chip) return;
@@ -3453,12 +3530,17 @@ function renderCrece(){
   } else if (crBucket==='creciendo'){
     const arr = crSortPlants(crGrowing());
     hint = 'tu jardín vivo';
-    const garden = arr.length ? `<div class="cr-garden">${arr.map(crGardenPlant).join('')}</div>` : '';
-    listHtml = (folderCards + garden) || '<div class="cr-empty">nada creciendo todavía</div>';
+    // Grupos como tiles DENTRO de la grilla de 3, junto a las plantas (solo los que tienen algo creciendo)
+    const fTiles = crFoldersOf(kind).filter(fp => crBucketCount(fp,'creciendo') > 0).map(fp => crFolderTile(fp,'creciendo')).join('');
+    const garden = (fTiles || arr.length) ? `<div class="cr-garden">${fTiles}${arr.map(crGardenPlant).join('')}</div>` : '';
+    listHtml = garden || '<div class="cr-empty">nada creciendo todavía</div>';
   } else {
     const arr = crSortPlants(crFlowers());
     hint = 'tus flores cosechadas';
-    listHtml = (folderCards + arr.map(crPlantCard).join('')) || '<div class="cr-empty">todavía no floreció nada</div>';
+    // Grupos de flores: tiles de a 3, índigo, solo con cosechadas REALES adentro
+    const fTiles = crFoldersOf(kind).filter(fp => crBucketCount(fp,'flor') > 0).map(fp => crFolderTile(fp,'flor')).join('');
+    const fGrid = fTiles ? `<div class="cr-garden gf-grid">${fTiles}</div>` : '';
+    listHtml = (fGrid + arr.map(crPlantCard).join('')) || '<div class="cr-empty">todavía no floreció nada</div>';
   }
   const selNote = crSelecting ? ' · tocá para seleccionar' : ' · mantené presionado para seleccionar';
   sec.innerHTML = pills + lens + backChip + (hint?`<div class="cr-hint">${hint}${selNote}</div>`:'') + `<div class="cr-list">${listHtml}</div>`;
@@ -3626,28 +3708,8 @@ function renderHeatmapForElement(elId) {
   }
 }
 
-// Mobile swipe to switch tabs
-let touchStartX = null, touchStartY = null;
-document.body.addEventListener('touchstart', e => {
-  if (e.touches.length !== 1) return;
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-}, {passive: true});
-document.body.addEventListener('touchend', e => {
-  if (touchStartX === null) return;
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  const dy = e.changedTouches[0].clientY - touchStartY;
-  touchStartX = null;
-  if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6) return;
-  const target = e.target;
-  if (target.closest('textarea, input, audio, select, button')) return;
-  const visible = S.config.tabOrder.filter(t => S.config.tabVisible[t] && TABS_META[t]);
-  const curTab = document.querySelector('section.tab.active')?.id?.replace('tab-','');
-  const idx = visible.indexOf(curTab);
-  if (idx < 0) return;
-  if (dx > 0 && idx > 0) switchTab(visible[idx-1]);
-  else if (dx < 0 && idx < visible.length-1) switchTab(visible[idx+1]);
-}, {passive: true});
+// v3.3.27: swipe lateral entre pestañas ELIMINADO (pedido Somko) — navegaba al orden
+// viejo de tabs (semillero/jardín/flores ocultos) y era incoherente con la barra inferior.
 function applyHoyWidgets() {
   // Recorre los widgets que EXISTEN en HOY y oculta todo lo que no esté habilitado en config.
   // Así, aunque un cliente viejo re-agregue voces/stats/riego/dashboard a la config sincronizada,
@@ -5336,9 +5398,9 @@ function renderReferencias() {
   const bImg = $('#refAddImg'), bLink = $('#refAddLink'), bBoard = $('#refNewBoard'), search = $('#refSearch');
   if (bImg) bImg.onclick = () => { photoContext = {type:'ref-new'}; $('#photoInput').click(); };
   if (bLink) bLink.onclick = addRefLink;
-  if (bBoard) bBoard.onclick = () => {
-    const name = prompt('Nombre del tablero (ej: "paleta volcán", "estética video"):');
-    if (name && name.trim()) { refBoard = name.trim(); toast(`Tablero "${name.trim()}" · arrastrá referencias acá con el botón de carpeta`, '📂'); renderReferencias(); }
+  if (bBoard) bBoard.onclick = async () => {
+    const name = await jdPrompt('Nombre del tablero', {placeholder:'ej: paleta volcán, estética video', btnLabel:'Crear'});
+    if (name && name.trim()) { refBoard = name.trim(); toast(`Tablero "${name.trim()}" listo`, '📂'); renderReferencias(); }
   };
   if (search && !search._wired) { search._wired = true; search.addEventListener('input', e => { refSearchTerm = e.target.value; renderRefList(); }); }
   const bShuf = $('#refShuffle'); if (bShuf) bShuf.onclick = shuffleRefs;
@@ -5364,11 +5426,12 @@ function renderRefList() {
     return;
   }
   list.innerHTML = `<div class="mosaic" id="refsGrid">` + items.map(r => {
+    const dom = refDomain(r.sourceUrl);
     const inner = r.photoData
       ? `<img class="mosaic-img" src="${r.photoData}" alt="${escapeHTML(r.title||'')}" loading="lazy">`
-      : `<div class="ref-linkface"><i class="ti ti-link"></i><span>${escapeHTML(r.title || refDomain(r.sourceUrl) || 'link')}</span></div>`;
-    const caption = r.kind === 'link' && r.sourceUrl
-      ? `<a class="ref-source" href="${escapeHTML(r.sourceUrl)}" target="_blank" rel="noopener" title="${escapeHTML(r.sourceUrl)}"><i class="ti ti-external-link"></i> ${escapeHTML(refDomain(r.sourceUrl))}</a>`
+      : `<div class="ref-linkface">${dom?`<img class="ref-favicon" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(dom)}&sz=64" alt="" loading="lazy" onerror="this.style.display='none'">`:'<i class="ti ti-link"></i>'}<span>${escapeHTML(r.title || dom || 'link')}</span>${dom?`<span class="ref-dom">${escapeHTML(dom)}</span>`:''}</div>`;
+    const caption = r.kind === 'link' && r.sourceUrl && r.photoData
+      ? `<a class="ref-source" href="${escapeHTML(r.sourceUrl)}" target="_blank" rel="noopener" title="${escapeHTML(r.sourceUrl)}"><i class="ti ti-external-link"></i> ${escapeHTML(dom)}</a>`
       : '';
     return `<div class="mtile tile-${r.tile||'s'} ${r.kind==='link'?'ref-link':''}" data-rtile="${r.id}">
       <button class="dnd-grip mtile-grip" type="button" aria-label="mover" title="mantener para mover"><i class="ti ti-arrows-move"></i></button>
@@ -5382,23 +5445,32 @@ function renderRefList() {
     </div>`;
   }).join('') + `</div>`;
 
+  // Acciones ocultas: el muro se mira limpio; mantené presionada una pieza para editarla
+  list.querySelectorAll('.mtile').forEach(t => {
+    if (typeof attachLongPress === 'function') attachLongPress(t, () => { t.classList.toggle('show-actions'); crVibe(10); });
+  });
+  // Un link sin foto se abre tocándolo
+  list.querySelectorAll('.mtile.ref-link').forEach(t => {
+    const r = (S.refs||[]).find(x => x.id === +t.dataset.rtile);
+    if (r && !r.photoData && r.sourceUrl) t.querySelector('.ref-linkface')?.addEventListener('click', () => window.open(r.sourceUrl, '_blank'));
+  });
   list.querySelectorAll('[data-rsize]').forEach(b => b.addEventListener('click', (e) => {
     e.stopPropagation();
     const r = (S.refs||[]).find(x => x.id === +b.dataset.rsize); if (!r) return;
     r.tile = ({s:'m', m:'l', l:'s'})[r.tile||'s']; save(); renderRefList();
   }));
-  list.querySelectorAll('[data-rboard]').forEach(b => b.addEventListener('click', (e) => {
+  list.querySelectorAll('[data-rboard]').forEach(b => b.addEventListener('click', async (e) => {
     e.stopPropagation();
     const r = (S.refs||[]).find(x => x.id === +b.dataset.rboard); if (!r) return;
-    const name = prompt('Tablero para esta referencia (vacío = sin tablero):', r.board || (refBoard!=='all'&&refBoard!=='none'?refBoard:''));
+    const name = await jdPrompt('Tablero para esta referencia', {value: r.board || (refBoard!=='all'&&refBoard!=='none'?refBoard:''), placeholder:'vacío = sin tablero'});
     if (name === null) return;
     r.board = name.trim(); save(); renderReferencias();
   }));
-  list.querySelectorAll('[data-rdel]').forEach(b => b.addEventListener('click', (e) => {
+  list.querySelectorAll('[data-rdel]').forEach(b => b.addEventListener('click', async (e) => {
     e.stopPropagation();
     const id = +b.dataset.rdel;
     const r = (S.refs||[]).find(x => x.id === id); if (!r) return;
-    if (!confirm('¿Borrar esta referencia?')) return;
+    if (!await jdConfirm('¿Borrar esta referencia del muro?', 'Borrar', true)) return;
     S.refs = S.refs.filter(x => x.id !== id); save(); renderReferencias();
     toast('Referencia borrada', '🗑');
   }));
@@ -5416,10 +5488,10 @@ function refDomain(url) {
   try { return new URL(url).hostname.replace(/^www\./, ''); } catch(e) { return url.slice(0, 30); }
 }
 
-function addRefLink() {
-  const url = prompt('Pegá el link (Instagram, web, lo que te inspire):');
+async function addRefLink() {
+  const url = await jdPrompt('Pegá el link', {placeholder:'https:// — Instagram, web, lo que te inspire', btnLabel:'Seguir'});
   if (!url || !url.trim()) return;
-  const title = prompt('Título o nota (opcional):', '') || '';
+  const title = (await jdPrompt('Título o nota (opcional)', {btnLabel:'Al muro'})) || '';
   const ref = {id: uid(), kind:'link', title: title.trim(), photoData: null, sourceUrl: url.trim(), tile:'s', board: (refBoard!=='all'&&refBoard!=='none')?refBoard:'', createdAt: Date.now()};
   S.refs.unshift(ref);
   save(); renderReferencias();
@@ -5604,7 +5676,11 @@ function renderSemList() {
   }).join('');
   wireSemNav(list);
   const fb = list.querySelector('#semFocusBack');
-  if (fb) fb.addEventListener('click', () => { S.openSemillas = {}; semDetailOpen = null; save(); renderSemillero(); });
+  if (fb) fb.addEventListener('click', () => {
+    S.openSemillas = {}; semDetailOpen = null; save();
+    if (semFocusFrom === 'crece') { semFocusFrom = null; switchTab('crece'); return; } // volver a donde estabas
+    renderSemillero();
+  });
   list.querySelectorAll('[data-sementer]').forEach(b => b.addEventListener('click', (e) => {
     e.stopPropagation(); if (semSelecting) return;
     semCurrentParent = +b.dataset.sementer; renderSemList();
