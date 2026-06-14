@@ -1,5 +1,5 @@
 // Jardín Service Worker — Network First con auto-update
-const CACHE_NAME = 'jardin-v23-sync-sano';
+const CACHE_NAME = 'jardin-v25-grid-persist';
 const ESSENTIAL_FILES = [
   './',
   './index.html',

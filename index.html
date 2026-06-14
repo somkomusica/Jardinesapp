@@ -355,12 +355,26 @@ body { padding-bottom: 78px; }
 .cr-gplant:active { transform:scale(.93); }
 /* el dedo siempre puede scrollear: el navegador maneja el paneo vertical sobre tarjetas y plantas */
 .cr-card, .cr-gplant { touch-action: pan-y; }
+/* Drag & drop: arrastrar una entrada a un grupo existente */
+.cr-drag-src { opacity: .35; }
+.cr-drag-ghost { position: fixed; z-index: 9999; pointer-events: none; transform: translate(-50%,-50%) rotate(-1.2deg) scale(1.04); box-shadow: 0 14px 30px rgba(0,0,0,.30); border-radius: 14px; opacity: .97; background: var(--bg-card); }
+body.cr-dragging { -webkit-user-select: none; user-select: none; }
+[data-crfolder].cr-drop-target { outline: 1.5px dashed var(--gold); outline-offset: 2px; border-radius: 14px; transition: outline-color .15s ease, background .15s ease; }
+[data-crfolder].cr-drop-ok { outline: 2px solid var(--gold); background: var(--gold-soft); }
 /* Grupos como tiles en la grilla (verde = plantas · índigo = flores) */
 .cr-gfolder .gf-ico { position: relative; width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 4px; }
 .cr-gfolder.gf-grow .gf-ico { background: var(--cr-green-soft); color: var(--cr-green); }
 .cr-gfolder.gf-flor .gf-ico { background: var(--indigo-soft); color: var(--cr-indigo); }
 .cr-gfolder .gf-badge { position: absolute; bottom: -4px; right: -4px; font-size: 13px; background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: var(--gold); }
 .cr-garden.gf-grid { background: linear-gradient(to bottom, transparent 30%, var(--indigo-soft)); align-items: start; margin-bottom: 10px; }
+/* Semillero en grilla de 3 (igual que Creciendo/Florecida) */
+.cr-garden.cr-semgrid { background: linear-gradient(to bottom, transparent 28%, var(--gold-soft)); align-items: start; }
+.cr-gseed .gf-ico { position: relative; width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 4px; overflow: hidden; background: var(--gold-soft); color: var(--gold); }
+.cr-gseed .gf-ico img { width: 100%; height: 100%; object-fit: cover; }
+.cr-gfolder.gf-seed .gf-ico { background: var(--gold-soft); color: var(--gold); }
+.sem-tile { position: relative; }
+.sem-tile .sem-tile-check { position: absolute; top: 2px; right: 8px; font-size: 15px; color: var(--text-faint); z-index: 2; }
+.sem-tile .sem-tile-check.on { color: var(--gold); }
 .cr-gsvg svg { width:56px; height:76px; transform-origin:bottom center; animation:cr-sway 4.6s ease-in-out infinite; }
 @keyframes cr-sway { 0%,100%{transform:rotate(-1.6deg);} 50%{transform:rotate(1.6deg);} }
 .cr-gname { font-size:10px; text-align:center; line-height:1.2; max-width:98px; overflow:hidden; text-overflow:ellipsis; }
@@ -1708,7 +1722,7 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
 
 <header class="top">
   <div class="brand-row">
-    <div class="brand" id="brandHome">Jardín<span class="acc">.</span></div>
+    <div class="brand" id="brandHome">Somko<span class="acc">.</span></div>
     <div class="hdr-right">
       <div class="date-display" id="dateDisplay">—</div>
       <button id="searchToggle" class="hdr-icon" title="buscar" aria-label="buscar"><i class="ti ti-search"></i></button>
@@ -2544,6 +2558,8 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 // ===== Versión de la app (mostrada en Ajustes) =====
 // Cada cambio registra una nueva versión. La primera de arriba es la actual.
 const VERSION_LOG = [
+  {v:'3.3.32', d:'2026-06-14', t:'Correcciones del test: (1) Semilla AHORA SÍ en filas de a 3 — había un choque de nombres de clase (.sem-grid ya existía con columnas de 220px, que en el teléfono daba 1 sola columna); renombrada a .cr-semgrid. (2) Persistencia de imágenes reforzada: al volver de la nube se rehidratan al instante las imágenes locales (sin parpadeo ni "imagen rota") y se pide almacenamiento PERSISTENTE al navegador para que la caché local no se borre. NOTA: para que CUALQUIER archivo subido desde la app llegue a la nube (no solo al teléfono), hay que habilitar las reglas de Firebase Storage (te paso los pasos).'},
+  {v:'3.3.31', d:'2026-06-14', t:'Tu tanda de pedidos: (1) DRAG & DROP en Crece — mantené presionada una semilla/planta, se levanta y los grupos se iluminan; soltala sobre uno y entra ahí, SIN recrearlo (soltar fuera = selección múltiple, como antes). (2) Las fotos ya no se pierden: arreglado el bug por el que una imagen de Referencias subía a la nube pero el muro se quedaba con la miniatura y al recargar aparecía "faltante"; además el LOGO y las FOTOS de Marca ahora suben a la nube (antes solo vivían en el teléfono y se borraban). Todo lo que entregues —directo o por el bot— queda guardado. (3) El encabezado dice Somko (no Jardín) y al tocarlo te lleva a Marca; cuando subas tu logo en Marca queda fijo. (4) Semillero y Crece→Semilla ahora en grilla de a 3, igual que Creciendo y Florecida. (5) El socio (bot) ya NO te escribe en la mañana solo — lo pedís con "planifica el día"; de noche sí te recuerda cerrar la jornada. (6) El bot ahora ve también las tareas que cerraste hoy (antes preguntabas y no sabía).'},
   {v:'3.3.30', d:'2026-06-11', t:'Sync sano: (1) arreglado el bug que dejaba la app SIN nube, bot ni reseteo diario si la última pestaña abierta era Ajustes; (2) eliminado el ping-pong infinito de sincronización entre teléfono y computadora (la app ya no re-sube el estado al aplicar cambios remotos ni cada 60 s sin cambios); (3) el merge de la nube ya no mezcla días en el Diario ni resucita cosas borradas en el otro dispositivo; (4) fin de las tareas repetidas en Hoy: si una planta tenía más de una tarea automática pendiente (huérfanas de merges viejos) sobreviven solo una, y las tareas manuales que repiten exactamente el título de una planta con paso automático pendiente se retiran solas; (5) el Semillero viejo se retiró como pantalla: una semilla se abre DIRECTO a su información (sin fila de minimizar/maximizar encima) y guardar, descartar, borrar o volver te dejan siempre en Jardín.'},
   {v:'3.3.29', d:'2026-06-11', t:'La versión instalada ahora se ve ARRIBA de Ajustes (dorada, junto al título) — verificás de un vistazo que se subió la correcta. Y el Semillero en foco total de verdad: capturando una semilla nueva se ve SOLO el formulario, y con una abierta, SOLO esa — sin miniaturas debajo.'},
   {v:'3.3.28', d:'2026-06-11', t:'Blindaje del scroll: quitada una regla que en el teléfono podía seguir trabando el paneo de un dedo (segunda causa posible). Y el borde "Jardín" fantasma que se asomaba a la derecha en pantallas anchas, fuera. Probada COMPLETA en laboratorio: arranque, las 11 pestañas, captura, foco de semilla desde Crece, grupos y conteos — todo en verde antes de publicar.'},
@@ -3088,7 +3104,7 @@ function renderBrandHeader() {
   const el = document.getElementById('brandHome'); if (!el) return;
   const logo = S.brand && S.brand.logoData;
   if (logo) el.innerHTML = `<img class="brand-logo" src="${String(logo).replace(/"/g,'&quot;')}" alt="Somko">`;
-  else el.innerHTML = 'Jardín<span class="acc">.</span>';
+  else el.innerHTML = 'Somko<span class="acc">.</span>';
 }
 
 // ========================= DATE DISPLAY =========================
@@ -3424,6 +3440,26 @@ function crGardenPlant(f){
     <div class="cr-gprog">${next ? escapeHTML(next.label) : ''} · ${d}/${n}</div>
   </div>`;
 }
+// Semilla como TILE en la grilla de 3 (igual carácter que Creciendo/Florecida, en dorado)
+function crSeedTile(s){
+  const ico = s.photoData
+    ? `<img src="${String(s.photoData).replace(/"/g,'&quot;')}" alt="">`
+    : (s.audioData ? '<i class="ti ti-microphone"></i>' : s.link ? '<i class="ti ti-link"></i>' : '<i class="ti ti-seeding"></i>');
+  return `<div class="cr-gplant cr-gseed" data-crseed="${s.id}">
+    <div class="gf-ico">${ico}</div>
+    <div class="cr-gname">${escapeHTML(s.title || '(sin título)')}</div>
+    <div class="cr-gprog" style="color:var(--gold);">semilla</div>
+  </div>`;
+}
+function crSeedCount(fp){ return (S.semillas||[]).filter(x=>(x.parentId??null)===fp.id && !x.isPage).length; }
+function crSeedFolderTile(fp){
+  const cnt = crSeedCount(fp);
+  return `<div class="cr-gplant cr-gfolder gf-seed" data-crfolder="${fp.id}">
+    <div class="gf-ico"><i class="ti ti-seeding"></i><i class="ti ti-folder gf-badge"></i></div>
+    <div class="cr-gname">${escapeHTML(fp.title||'Grupo')}</div>
+    <div class="cr-gprog" style="color:var(--gold);">${cnt} ${cnt===1?'semilla':'semillas'}</div>
+  </div>`;
+}
 function crVibe(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} }
 let semFocusFrom = null; // de dónde se abrió la semilla (para volver coherente)
 function crOpenSeed(id){
@@ -3472,17 +3508,74 @@ function crActionSheet(kind,id){
   const bd=document.getElementById('crSheetBackdrop'); if(bd){ bd.onclick=crCloseSheet; bd.classList.add('open'); }
   sheet.classList.add('open');
 }
-// Gestos en una tarjeta/planta: tap=abrir · deslizar derecha=avanzar/sembrar · mantener=acciones
+// ---- Drag & drop: arrastrar una entrada a un grupo YA existente (sin recrearlo) ----
+let crGhost=null, crDropTarget=null, crDragActive=false;
+function crFolderUnder(x,y){ const el=document.elementFromPoint(x,y); return el? el.closest('[data-crfolder]') : null; }
+function crBeginDrag(srcEl, x, y){
+  const r=srcEl.getBoundingClientRect();
+  crGhost=srcEl.cloneNode(true);
+  crGhost.className=srcEl.className+' cr-drag-ghost';
+  crGhost.style.width=r.width+'px';
+  crGhost.style.left=x+'px'; crGhost.style.top=y+'px';
+  document.body.appendChild(crGhost);
+  srcEl.classList.add('cr-drag-src');
+  document.body.classList.add('cr-dragging');
+  crDragActive=true;
+  document.querySelectorAll('[data-crfolder]').forEach(f=>f.classList.add('cr-drop-target'));
+}
+function crMoveDrag(x,y){
+  if(crGhost){ crGhost.style.left=x+'px'; crGhost.style.top=y+'px'; }
+  const f=crFolderUnder(x,y);
+  if(f!==crDropTarget){
+    if(crDropTarget) crDropTarget.classList.remove('cr-drop-ok');
+    crDropTarget=f;
+    if(crDropTarget) crDropTarget.classList.add('cr-drop-ok');
+  }
+}
+function crCleanupDrag(){
+  if(crGhost){ crGhost.remove(); crGhost=null; }
+  document.querySelectorAll('.cr-drag-src').forEach(e=>e.classList.remove('cr-drag-src'));
+  document.querySelectorAll('[data-crfolder]').forEach(f=>f.classList.remove('cr-drop-target','cr-drop-ok'));
+  document.body.classList.remove('cr-dragging');
+  crDropTarget=null; crDragActive=false;
+}
+function crMoveIntoFolder(kind,id,fid){
+  if(id===fid) return;
+  const arr = kind==='seed'?S.semillas:S.flores;
+  const item=arr.find(x=>x.id===id), folder=arr.find(x=>x.id===fid);
+  if(!item||!folder||!folder.isPage){ renderCrece(); return; }
+  if((item.parentId??null)===fid){ renderCrece(); return; }
+  item.parentId=fid; save(); crVibe([20,30,20]);
+  toast(`Movida a "${folder.title||'Grupo'}"`,'📁'); renderCrece();
+}
+function crEndDrag(kind,id){
+  const target=crDropTarget; crCleanupDrag();
+  if(target){ crMoveIntoFolder(kind,id,+target.dataset.crfolder); return true; }
+  return false;
+}
+// Evita que el navegador haga scroll mientras se arrastra (solo durante un drag activo)
+document.addEventListener('touchmove', e=>{ if(crDragActive) e.preventDefault(); }, {passive:false});
+
+// Gestos en una tarjeta/planta: tap=abrir · mantener=levantar para arrastrar
 function crWireGestures(el, kind, id){
-  // v3.3.27 (pedido Somko): SIN swipe — tap = abrir · mantener = selección múltiple.
-  // El bug del scroll a 2 dedos era el setPointerCapture de acá: secuestraba el dedo
-  // en cada tarjeta/planta sin touch-action, y Crece cubre casi toda la pantalla.
-  let moved=false, lpFired=false, lpTimer=null, sx=0, sy=0;
-  el.addEventListener('pointerdown', e=>{ moved=false; lpFired=false; sx=e.clientX; sy=e.clientY;
-    lpTimer=setTimeout(()=>{ if(!moved){ lpFired=true; crVibe(12); crEnterSelect(kind,id); } },480); });
-  el.addEventListener('pointermove', e=>{ if(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8){ moved=true; clearTimeout(lpTimer); } });
-  el.addEventListener('pointerup', ()=>{ clearTimeout(lpTimer); if(!moved&&!lpFired){ kind==='seed'?crOpenSeed(id):openCreceDetail(id); } });
-  el.addEventListener('pointercancel', ()=>clearTimeout(lpTimer));
+  // v3.3.27 (pedido Somko): SIN swipe — tap = abrir · mantener = levantar.
+  // Mantener presionado LEVANTA la tarjeta: si la soltás sobre un grupo la mueve adentro;
+  // si la soltás fuera de un grupo, entra en selección múltiple (flujo Agrupar, intacto).
+  let moved=false, lpFired=false, lpTimer=null, sx=0, sy=0, dragging=false, pid=null;
+  el.addEventListener('pointerdown', e=>{ moved=false; lpFired=false; dragging=false; sx=e.clientX; sy=e.clientY; pid=e.pointerId;
+    lpTimer=setTimeout(()=>{ if(!moved){ lpFired=true; dragging=true; crVibe(14);
+      try{ el.setPointerCapture(pid); }catch(_){}
+      crBeginDrag(el, sx, sy); } },420); });
+  el.addEventListener('pointermove', e=>{
+    if(dragging){ crMoveDrag(e.clientX, e.clientY); return; }
+    if(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8){ moved=true; clearTimeout(lpTimer); } });
+  el.addEventListener('pointerup', ()=>{ clearTimeout(lpTimer);
+    if(dragging){ dragging=false;
+      const handled=crEndDrag(kind,id);
+      if(!handled) crEnterSelect(kind,id);   // soltó fuera de un grupo → selección múltiple
+      return; }
+    if(!moved&&!lpFired){ kind==='seed'?crOpenSeed(id):openCreceDetail(id); } });
+  el.addEventListener('pointercancel', ()=>{ clearTimeout(lpTimer); if(dragging){ dragging=false; crCleanupDrag(); } });
 }
 function crSetChip(f){
   const chip=document.getElementById('crDetailChip'); if(!chip) return;
@@ -3549,7 +3642,10 @@ function renderCrece(){
   if (crBucket==='semilla'){
     const arr = crSeeds();
     hint = 'tu bandeja';
-    listHtml = (folderCards + arr.map(crSeedCard).join('')) || '<div class="cr-empty">sin semillas · capturá con el ＋</div>';
+    // Grilla de 3 (igual que Creciendo/Florecida): grupos como tiles + semillas como tiles
+    const fTiles = crFoldersOf('seed').map(fp => crSeedFolderTile(fp)).join('');
+    const grid = (fTiles || arr.length) ? `<div class="cr-garden cr-semgrid">${fTiles}${arr.map(crSeedTile).join('')}</div>` : '';
+    listHtml = grid || '<div class="cr-empty">sin semillas · capturá con el ＋</div>';
   } else if (crBucket==='creciendo'){
     const arr = crSortPlants(crGrowing());
     hint = 'tu jardín vivo';
@@ -3593,7 +3689,7 @@ document.getElementById('searchToggle')?.addEventListener('click', () => {
   else { const i = document.getElementById('globalSearchInput'); if (i) { i.value=''; } if (typeof closeSearchResults==='function') closeSearchResults(); }
 });
 // volver a Crece desde el título (es la pantalla principal)
-(function(){ const b = document.querySelector('header.top .brand'); if (b){ b.style.cursor='pointer'; b.title='Ir a Crece'; b.addEventListener('click', () => switchTab('crece')); } })();
+(function(){ const b = document.querySelector('header.top .brand'); if (b){ b.style.cursor='pointer'; b.title='Ir a Marca'; b.addEventListener('click', () => switchTab('marca')); } })();
 // Frase del día bajo la marca — una distinta cada día, estable durante el día
 const FRASES_DIA = [
   'Vives mejor en estado de asombro constante. — Rick Rubin',
@@ -5645,6 +5741,24 @@ function wireSemNav(list) {
   }));
 }
 
+// Tile de semilla para el Semillero en grilla de 3 (mismo look que Creciendo/Florecida)
+function semTile(i){
+  const kids = semChildCount(i.id);
+  const sel = semSelected.has(i.id);
+  const ico = i.photoData
+    ? `<img src="${i.photoData}" alt="">`
+    : kids ? '<i class="ti ti-folder"></i>'
+    : i.audioData ? '<i class="ti ti-microphone"></i>'
+    : i.link ? '<i class="ti ti-link"></i>'
+    : (i.lyrics||i.notes) ? '<i class="ti ti-align-left"></i>'
+    : '<i class="ti ti-seeding"></i>';
+  return `<div class="cr-gplant cr-gseed sem-tile ${sel?'cr-sel':''}" data-semtile="${i.id}" data-haskids="${kids?1:0}">
+    ${semSelecting?`<span class="sem-tile-check ${sel?'on':''}"><i class="ti ti-${sel?'circle-check-filled':'circle'}"></i></span>`:''}
+    <div class="gf-ico">${ico}${kids?'<i class="ti ti-folder gf-badge"></i>':''}</div>
+    <div class="cr-gname">${escapeHTML(i.title||'sin título')}</div>
+    <div class="cr-gprog" style="color:var(--gold);">${kids?kids+' dentro':'semilla'}</div>
+  </div>`;
+}
 function renderSemList() {
   const list = $('#semList');
   if (semFormOpen) { list.innerHTML = ''; return; } // capturando = SOLO el formulario, nada de miniaturas debajo
@@ -5670,6 +5784,24 @@ function renderSemList() {
   if (!items.length) {
     list.innerHTML = crumb + '<div class="empty">' + (semCurrentParent!==null ? 'esta página está vacía · agrega una semilla aquí' : 'sin semillas') + '</div>';
     wireSemNav(list); renderSemSelectBar(); return;
+  }
+  // BROWSE (sin buscar ni foco): grilla de 3 como Creciendo/Florecida
+  if (!searching && !focusId) {
+    list.innerHTML = crumb + `<div class="cr-garden cr-semgrid">${items.map(semTile).join('')}</div>`;
+    wireSemNav(list);
+    list.querySelectorAll('[data-semtile]').forEach(el => {
+      const id = +el.dataset.semtile;
+      let lpFired = false;
+      attachLongPress(el, () => { lpFired = true; if (!semSelecting) { semSelecting = true; semSelected = new Set(); } toggleSemSelect(id); }, 500);
+      el.addEventListener('click', () => {
+        if (lpFired) { lpFired = false; return; }
+        if (semSelecting) { toggleSemSelect(id); return; }
+        if (el.dataset.haskids === '1') { semCurrentParent = id; renderSemList(); return; }
+        S.openSemillas = {}; S.openSemillas[id] = true; semDetailOpen = id; save(); renderSemillero();
+      });
+    });
+    renderSemSelectBar();
+    return;
   }
   list.innerHTML = crumb + items.map(i => {
     const isOpen = !!S.openSemillas[i.id];
@@ -6732,7 +6864,13 @@ function bindBrand() {
   $('#brandLogoInput').addEventListener('change', async e => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     // v3.3.30: el logo se guarda como PNG (conserva transparencia — sin caja blanca en el encabezado)
-    try { S.brand.logoData = await fileToCompressedDataUrl(f, 400, 0.92, 'image/png'); save(); renderBrand(); renderBrandHeader(); toast('Logo cargado','✦'); }
+    try {
+      S.brand.logoData = await fileToCompressedDataUrl(f, 400, 0.92, 'image/png'); // thumb inmediato
+      save(); renderBrand(); renderBrandHeader(); toast('Logo cargado','✦');
+      // Persistencia segura: sube el original a Storage y reemplaza por URL estable (no se pierde al recargar)
+      queueUpload({collection:'brand', objId:'logo', kind:'photo', field:'logoData', blob:f, ext:(f.name.split('.').pop()||'png').toLowerCase(), contentType:f.type||'image/png'})
+        .then(()=>{ renderBrand(); renderBrandHeader(); });
+    }
     catch (err) { toast('Error con el logo'); }
   });
   const onPhoto = async (f) => {
@@ -6740,8 +6878,12 @@ function bindBrand() {
     try {
       const dataUrl = await fileToCompressedDataUrl(f, 1280, 0.78);
       const cap = prompt('Caption (opcional):', '') || '';
-      S.brand.photos.push({id: uid(), dataUrl, caption: cap, date: todayStr()});
+      const ph = {id: uid(), dataUrl, caption: cap, date: todayStr()};
+      S.brand.photos.push(ph);
       save(); renderBrand(); toast('Foto agregada','✦');
+      // Persistencia segura: sube el original a Storage y reemplaza el thumb por URL estable
+      queueUpload({collection:'brand-photo', objId:ph.id, kind:'photo', field:'dataUrl', blob:f, ext:(f.name.split('.').pop()||'jpg').toLowerCase(), contentType:f.type||'image/jpeg'})
+        .then(()=>renderBrand());
     } catch (err) { toast('Error con la foto'); }
   };
   $('#brandPhotoInput').addEventListener('change', e => { const f = e.target.files[0]; e.target.value=''; onPhoto(f); });
@@ -8264,6 +8406,12 @@ auth = firebase.auth();
 db = firebase.database();
 storage = firebase.storage();
 
+// Pide almacenamiento PERSISTENTE: el navegador no desaloja la caché local de imágenes
+// (IndexedDB) bajo presión de espacio → lo que subís no se pierde mientras sube/queda en la nube.
+(function requestPersistentStorage(){
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
+})();
+
 let isAnon = true;
 // Mantener la sesión iniciada entre recargas (clave para sync persistente)
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
@@ -8475,16 +8623,18 @@ async function _idbCount() {
 
 // Find an object inside S by collection + id; supports flores, semillas, brand
 function _findObjInState(collection, objId) {
-  if (collection === 'flores') return S.flores.find(x => x.id === objId);
-  if (collection === 'semillas') return S.semillas.find(x => x.id === objId);
+  if (collection === 'flores') return (S.flores||[]).find(x => x.id === objId);
+  if (collection === 'semillas') return (S.semillas||[]).find(x => x.id === objId);
+  if (collection === 'refs') return (S.refs||[]).find(x => x.id === objId);
   if (collection === 'brand') return S.brand;
+  if (collection === 'brand-photo') return (S.brand && Array.isArray(S.brand.photos) ? S.brand.photos : []).find(x => x.id === objId);
   return null;
 }
 
 // Queue a blob/file for upload. If Firebase is ready, also try immediately.
-async function queueUpload({collection, objId, kind, blob, ext, contentType}) {
+async function queueUpload({collection, objId, kind, blob, ext, contentType, field}) {
   const key = `${kind}_${collection}_${objId}_${Date.now()}`;
-  const entry = {key, collection, objId, kind, blob, ext: ext || 'bin', contentType: contentType || 'application/octet-stream', createdAt: Date.now()};
+  const entry = {key, collection, objId, kind, field: field || null, blob, ext: ext || 'bin', contentType: contentType || 'application/octet-stream', createdAt: Date.now()};
   try { await _idbPut(entry); } catch(e) { console.error('idb put failed:', e); }
   updateCloudBadge();
   // Try immediate upload
@@ -8509,7 +8659,7 @@ async function processUploadQueue() {
         const url = await snap.ref.getDownloadURL();
         const obj = _findObjInState(item.collection, item.objId);
         if (obj) {
-          const field = item.kind === 'photo' ? 'photoData' : item.kind === 'audio' ? 'audioData' : 'logoData';
+          const field = item.field || (item.kind === 'photo' ? 'photoData' : item.kind === 'audio' ? 'audioData' : 'logoData');
           obj[field] = url;
         }
         await _idbDelete(item.key);
@@ -8552,7 +8702,7 @@ async function rehydrateLocalBlobs() {
     for (const item of items) {
       const obj = _findObjInState(item.collection, item.objId);
       if (!obj) continue;
-      const field = item.kind === 'photo' ? 'photoData' : item.kind === 'audio' ? 'audioData' : 'logoData';
+      const field = item.field || (item.kind === 'photo' ? 'photoData' : item.kind === 'audio' ? 'audioData' : 'logoData');
       // Only rehydrate if the field is missing or is a __local__ marker
       if (!obj[field] || obj[field] === '__local__' || (typeof obj[field] === 'string' && !obj[field].startsWith('http') && !obj[field].startsWith('data:'))) {
         try {
@@ -8727,6 +8877,7 @@ function loadFromFirebase() {
         _lastSeenUpdate = Math.max(_lastSeenUpdate, remoteData.lastUpdate || 0);
         _applyingRemote = true;                       // FIX v3.3.30
         try { init(); } finally { _applyingRemote = false; }
+        rehydrateLocalBlobs();   // restaura YA las imágenes locales (IDB) si el remoto trajo '__local__' — evita el parpadeo/imagen rota
         if (_forceRemoteLoad) toast('Cuenta sincronizada en este dispositivo', '☁');
         else if (!_firstFirebaseLoad) toast('Datos actualizados desde otro dispositivo', '☁');
       } else {
@@ -8752,6 +8903,7 @@ function applyRemoteState(remoteData) {
   _lastSeenUpdate = remoteData.lastUpdate || _lastSeenUpdate;
   _applyingRemote = true;                             // FIX v3.3.30
   try { init(); } finally { _applyingRemote = false; }
+  rehydrateLocalBlobs();   // restaura YA las imágenes locales (IDB) tras aplicar estado remoto
   toast('Tu socio actualizó el Jardín', '🌿');
 }
 function listenRemoteState() {
@@ -8799,6 +8951,8 @@ function listenBotData() {
 function _hasLocalBlobs() {
   const items = [...(S.flores||[]), ...(S.semillas||[])];
   if (items.some(o => (o.photoData && o.photoData.startsWith('data:')) || (o.audioData && o.audioData.startsWith('data:')))) return true;
+  if ((S.refs||[]).some(r => r.photoData && r.photoData.startsWith('data:'))) return true;
+  if (S.brand && Array.isArray(S.brand.photos) && S.brand.photos.some(p => p.dataUrl && p.dataUrl.startsWith('data:'))) return true;
   return !!(S.brand && S.brand.logoData && S.brand.logoData.startsWith('data:'));
 }
 
@@ -8834,8 +8988,26 @@ async function migrateMediaToStorage() {
   // Brand logo
   if (S.brand && S.brand.logoData && S.brand.logoData.startsWith('data:')) {
     const blob = _dataUrlToBlob(S.brand.logoData);
-    await queueUpload({collection: 'brand', objId: 'logo', kind: 'photo', blob, ext: 'png', contentType: blob.type || 'image/png'});
+    await queueUpload({collection: 'brand', objId: 'logo', kind: 'photo', field: 'logoData', blob, ext: 'png', contentType: blob.type || 'image/png'});
     queued++;
+  }
+  // Brand photos (galería de Marca)
+  if (S.brand && Array.isArray(S.brand.photos)) {
+    for (const p of S.brand.photos) {
+      if (p.dataUrl && p.dataUrl.startsWith('data:')) {
+        const blob = _dataUrlToBlob(p.dataUrl);
+        await queueUpload({collection: 'brand-photo', objId: p.id, kind: 'photo', field: 'dataUrl', blob, ext: 'jpg', contentType: blob.type || 'image/jpeg'});
+        queued++;
+      }
+    }
+  }
+  // Referencias (muro)
+  for (const r of (S.refs || [])) {
+    if (r.photoData && r.photoData.startsWith('data:')) {
+      const blob = _dataUrlToBlob(r.photoData);
+      await queueUpload({collection: 'refs', objId: r.id, kind: 'photo', blob, ext: 'jpg', contentType: blob.type || 'image/jpeg'});
+      queued++;
+    }
   }
   if (queued > 0) {
     toast(`${queued} archivo${queued > 1 ? 's' : ''} en cola · subiendo cuando haya internet`, '☁');
