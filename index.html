@@ -74,7 +74,7 @@ body {
 
 .shell { position: relative; z-index: 1; max-width: 460px; margin: 0 auto; padding: 0 16px 96px; min-height: 100dvh; }
 header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; position: sticky; top: 0; z-index: 100; background: var(--bg); padding-top: 16px; }
-.brand-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand { font-weight: 600; font-size: 16px; letter-spacing: 0.02em; transition: font-size .25s; }
 header.top.shrunk .brand { font-size: 14px; }
 header.top { transition: padding .25s; }
@@ -84,8 +84,8 @@ header.top.shrunk { padding-top: 8px; }
 header.top.shrunk .brand-sub { max-height: 0; opacity: 0; margin-top: 0; }
 .brand .acc { color: var(--gold); }
 /* v3.3.30: logo Somko en el encabezado (usa el logo subido en Marca) */
-.brand img.brand-logo { height: 22px; display: block; transition: height .25s; }
-header.top.shrunk .brand img.brand-logo { height: 17px; }
+.brand img.brand-logo { height: 60px; max-width: 64vw; width: auto; object-fit: contain; display: block; transition: height .25s; }
+header.top.shrunk .brand img.brand-logo { height: 40px; }
 [data-theme="dark"] .brand img.brand-logo { filter: invert(1); } /* logo negro → blanco en oscuro */
 .date-display { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); text-align: right; }
 
@@ -652,6 +652,9 @@ input.flat:focus, textarea.flat:focus { border: none; box-shadow: inset 0 -1px 0
 .sem-filter .group-pill.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 
 .sem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+/* Muro: filtro de tipo (Todo · Fotos · Links) al inicio de la barra de tableros */
+.ref-kindfilter { display: inline-flex; gap: 4px; }
+.ref-filtersep { display: inline-block; width: 1px; align-self: center; height: 18px; background: var(--border); margin: 0 4px; vertical-align: middle; }
 .sem-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px; cursor: pointer; transition: border-color .15s; display: flex; flex-direction: column; gap: 8px; }
 .sem-card:hover { border-color: var(--gold); }
 .sem-card .sem-title { font-size: 12px; font-weight: 500; letter-spacing: 0.02em; }
@@ -2106,7 +2109,7 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
         <h3 class="sub-title"><i class="ti ti-photo"></i> Galería de fotos</h3>
         <p class="tab-hint">fotos de prensa, portadas, momentos · click para ver / poner caption</p>
         <div class="brand-photo-gallery" id="brandGallery"></div>
-        <input type="file" id="brandPhotoInput" accept="image/*" hidden>
+        <input type="file" id="brandPhotoInput" accept="image/*" multiple hidden>
         <input type="file" id="brandPhotoCamera" accept="image/*" capture="environment" hidden>
       </div>
 
@@ -2327,7 +2330,7 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
     <button class="btn ghost tiny" id="importBtn"><i class="ti ti-upload"></i> Importar</button>
     <button class="btn ghost tiny" id="migrateMediaBtn" title="Forzar subida de pendientes"><i class="ti ti-cloud-upload"></i><span id="cloudBadge" style="display:none;margin-left:6px;font-size:8px;color:var(--gold);font-weight:600;">—</span></button>
     <input type="file" id="importFile" accept=".json" hidden>
-    <input type="file" id="photoInput" accept="image/*" hidden>
+    <input type="file" id="photoInput" accept="image/*" multiple hidden>
     <input type="file" id="photoCamera" accept="image/*" capture="environment" hidden>
   </div>
 </footer>
@@ -2558,6 +2561,8 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 // ===== Versión de la app (mostrada en Ajustes) =====
 // Cada cambio registra una nueva versión. La primera de arriba es la actual.
 const VERSION_LOG = [
+  {v:'3.3.34', d:'2026-06-14', t:'Más de tu lista: (1) Subida de VARIAS fotos a la vez — en la Galería de Marca y en el Muro el selector ya deja elegir varias (las portadas de planta/semilla siguen siendo una). (2) Muro: botón para filtrar por Todo · Fotos · Links; y al tocar Mezclar ahora los tamaños cambian al azar entre los 3 (s/m/l), no solo el orden. (3) "Compartir con… Jardín": desde el teléfono podés compartir una imagen, audio o link a la app — entra solo al Muro (o como semilla). Requiere tener la app instalada en la pantalla de inicio.'},
+  {v:'3.3.33', d:'2026-06-14', t:'Logo Somko más grande en el encabezado: pasó de 22px a 60px de alto (≈8x el tamaño visible que tenía), centrado y con tope de ancho para que nunca se desborde. Si lo querés más grande o más chico, es un solo número (height de .brand-logo).'},
   {v:'3.3.32', d:'2026-06-14', t:'Correcciones del test: (1) Semilla AHORA SÍ en filas de a 3 — había un choque de nombres de clase (.sem-grid ya existía con columnas de 220px, que en el teléfono daba 1 sola columna); renombrada a .cr-semgrid. (2) Persistencia de imágenes reforzada: al volver de la nube se rehidratan al instante las imágenes locales (sin parpadeo ni "imagen rota") y se pide almacenamiento PERSISTENTE al navegador para que la caché local no se borre. NOTA: para que CUALQUIER archivo subido desde la app llegue a la nube (no solo al teléfono), hay que habilitar las reglas de Firebase Storage (te paso los pasos).'},
   {v:'3.3.31', d:'2026-06-14', t:'Tu tanda de pedidos: (1) DRAG & DROP en Crece — mantené presionada una semilla/planta, se levanta y los grupos se iluminan; soltala sobre uno y entra ahí, SIN recrearlo (soltar fuera = selección múltiple, como antes). (2) Las fotos ya no se pierden: arreglado el bug por el que una imagen de Referencias subía a la nube pero el muro se quedaba con la miniatura y al recargar aparecía "faltante"; además el LOGO y las FOTOS de Marca ahora suben a la nube (antes solo vivían en el teléfono y se borraban). Todo lo que entregues —directo o por el bot— queda guardado. (3) El encabezado dice Somko (no Jardín) y al tocarlo te lleva a Marca; cuando subas tu logo en Marca queda fijo. (4) Semillero y Crece→Semilla ahora en grilla de a 3, igual que Creciendo y Florecida. (5) El socio (bot) ya NO te escribe en la mañana solo — lo pedís con "planifica el día"; de noche sí te recuerda cerrar la jornada. (6) El bot ahora ve también las tareas que cerraste hoy (antes preguntabas y no sabía).'},
   {v:'3.3.30', d:'2026-06-11', t:'Sync sano: (1) arreglado el bug que dejaba la app SIN nube, bot ni reseteo diario si la última pestaña abierta era Ajustes; (2) eliminado el ping-pong infinito de sincronización entre teléfono y computadora (la app ya no re-sube el estado al aplicar cambios remotos ni cada 60 s sin cambios); (3) el merge de la nube ya no mezcla días en el Diario ni resucita cosas borradas en el otro dispositivo; (4) fin de las tareas repetidas en Hoy: si una planta tenía más de una tarea automática pendiente (huérfanas de merges viejos) sobreviven solo una, y las tareas manuales que repiten exactamente el título de una planta con paso automático pendiente se retiran solas; (5) el Semillero viejo se retiró como pantalla: una semilla se abre DIRECTO a su información (sin fila de minimizar/maximizar encima) y guardar, descartar, borrar o volver te dejan siempre en Jardín.'},
@@ -5481,6 +5486,7 @@ function renderSemMosaic(list) {
 // Una referencia ALIMENTA pero nunca es planta. Vive en su propio muro, libre de orden.
 //   {id, kind:'image'|'link', title, photoData, sourceUrl, tile:'s'|'m'|'l', board:'', createdAt}
 let refBoard = 'all';      // tablero (categoría) activo
+let refKind = 'all';       // filtro de tipo: 'all' | 'image' (fotos) | 'link' (links)
 let refSearchTerm = '';
 
 function refMatchesBoard(r) {
@@ -5488,17 +5494,30 @@ function refMatchesBoard(r) {
   if (refBoard === 'none') return !r.board;
   return r.board === refBoard;
 }
+function refMatchesKind(r) {
+  if (refKind === 'all') return true;
+  if (refKind === 'link') return r.kind === 'link';
+  return r.kind !== 'link'; // fotos (image)
+}
 
 function renderRefBoards() {
   const el = $('#refBoards'); if (!el) return;
   const boards = [...new Set((S.refs||[]).map(r => r.board).filter(Boolean))].sort();
-  let html = `<button data-rb="all" class="${refBoard==='all'?'active':''}">Todas</button>`;
+  // Filtro de TIPO: Todo · Fotos · Links
+  let html = `<span class="ref-kindfilter">`
+    + `<button data-rk="all" class="${refKind==='all'?'active':''}"><i class="ti ti-layout-grid"></i> Todo</button>`
+    + `<button data-rk="image" class="${refKind==='image'?'active':''}"><i class="ti ti-photo"></i> Fotos</button>`
+    + `<button data-rk="link" class="${refKind==='link'?'active':''}"><i class="ti ti-link"></i> Links</button>`
+    + `</span><span class="ref-filtersep"></span>`;
+  html += `<button data-rb="all" class="${refBoard==='all'?'active':''}">Todas</button>`;
   html += `<button data-rb="none" class="${refBoard==='none'?'active':''}">Sin tablero</button>`;
   boards.forEach(b => {
     html += `<button data-rb="${escapeHTML(b)}" class="group-pill ${refBoard===b?'active':''}"><i class="ti ti-folder"></i> ${escapeHTML(b)} <span class="muted" style="margin-left:2px;">×</span></button>`;
   });
   el.innerHTML = html;
-  el.querySelectorAll('button').forEach(b => b.addEventListener('click', (e) => {
+  // Botones de tipo (Fotos/Links/Todo)
+  el.querySelectorAll('[data-rk]').forEach(b => b.addEventListener('click', () => { refKind = b.dataset.rk; renderReferencias(); }));
+  el.querySelectorAll('[data-rb]').forEach(b => b.addEventListener('click', (e) => {
     const key = b.dataset.rb;
     if (key !== 'all' && key !== 'none' && e.target.textContent === '×') {
       if (confirm(`Eliminar el tablero "${key}"? (las referencias no se borran, quedan sin tablero)`)) {
@@ -5530,12 +5549,15 @@ function renderReferencias() {
 function shuffleRefs(){
   const a = S.refs || [];
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  // Tamaños al azar entre los 3 (s · m · l) — el collage cambia de ritmo en cada mezcla
+  const sizes = ['s','m','l'];
+  a.forEach(r => { r.tile = sizes[Math.floor(Math.random()*sizes.length)]; });
   save(); renderReferencias();
   toast('Muro mezclado', '🔀'); if (navigator.vibrate) navigator.vibrate(12);
 }
 function renderRefList() {
   const list = $('#refsList'); if (!list) return;
-  let items = (S.refs||[]).filter(refMatchesBoard);
+  let items = (S.refs||[]).filter(refMatchesBoard).filter(refMatchesKind);
   if (refSearchTerm) {
     const t = refSearchTerm.toLowerCase();
     items = items.filter(r => (r.title||'').toLowerCase().includes(t) || (r.sourceUrl||'').toLowerCase().includes(t) || (r.board||'').toLowerCase().includes(t));
@@ -6366,10 +6388,11 @@ async function handlePhotoFile(file) {
         offloadPhotoFile(f, file, () => { renderFlores(); renderGarden(); });
       }
     } else if (photoContext?.type === 'ref-new') {
-      const title = prompt('Título o nota (opcional):', '') || '';
+      const bulk = !!photoContext._bulk;
+      const title = bulk ? '' : (prompt('Título o nota (opcional):', '') || '');
       const ref = {id: uid(), kind:'image', title: title.trim(), photoData: thumbDataUrl, sourceUrl:'', tile:'s', board:(refBoard!=='all'&&refBoard!=='none')?refBoard:'', createdAt: Date.now()};
       S.refs.unshift(ref);
-      save(); toast('Imagen al muro','✦'); renderReferencias();
+      save(); if(!bulk) toast('Imagen al muro','✦'); renderReferencias();
       offloadPhotoFile(ref, file, renderReferencias); // reemplaza el thumb por la URL full-res
     } else {
       // Direct add — create new semilla with thumbnail, then upload original
@@ -6382,8 +6405,84 @@ async function handlePhotoFile(file) {
   } catch (e) { console.error(e); toast('Error con la foto'); }
   photoContext = null;
 }
-$('#photoInput').addEventListener('change', e => { const f = e.target.files[0]; e.target.value=''; handlePhotoFile(f); });
+$('#photoInput').addEventListener('change', async e => {
+  const files = Array.from(e.target.files || []); e.target.value='';
+  if (!files.length) return;
+  const ctx = photoContext;
+  // Referencias (muro): permite VARIAS imágenes de una. Las portadas (planta/semilla/flor) son una sola.
+  if (ctx && ctx.type === 'ref-new' && files.length > 1) {
+    for (const f of files) { photoContext = {type:'ref-new', _bulk:true}; await handlePhotoFile(f); }
+    toast(`${files.length} imágenes al muro`, '✦');
+  } else {
+    handlePhotoFile(files[0]);
+  }
+});
 $('#photoCamera').addEventListener('change', e => { const f = e.target.files[0]; e.target.value=''; handlePhotoFile(f); });
+
+// ===== "Compartir con… Jardín" (Web Share Target) =====
+// Cuando compartís algo desde el teléfono, el SW lo deja en el cache 'jardin-share'
+// y abre la app con ?shared=1. Acá lo recogemos: imágenes/audio → Muro, link/texto → Muro/Semilla.
+let _sharedHandled = false;
+async function handleSharedContent() {
+  if (_sharedHandled) return;
+  if (!/[?&]shared=1\b/.test(location.search)) return;
+  _sharedHandled = true;
+  try {
+    if (!('caches' in window)) return;
+    const cache = await caches.open('jardin-share');
+    const metaRes = await cache.match('./shared-meta');
+    if (!metaRes) return;
+    const meta = await metaRes.json();
+    S.refs = S.refs || [];
+    let added = 0;
+    // Link explícito o el primer http(s) que venga en el texto → tarjeta-link
+    const urlInText = (/(https?:\/\/[^\s]+)/.exec(meta.text || meta.url || '') || [])[0] || '';
+    const sharedUrl = (meta.url || '').trim() || urlInText;
+    const fileKeys = Array.isArray(meta.files) ? meta.files : [];
+    if (sharedUrl) {
+      S.refs.unshift({ id: uid(), kind:'link', title:(meta.title||meta.text||'').replace(sharedUrl,'').slice(0,120).trim(), photoData:null, sourceUrl: sharedUrl, tile:'s', board:'', createdAt: Date.now() });
+      added++;
+    } else if ((meta.text || meta.title) && !fileKeys.length) {
+      // texto puro sin link → semilla
+      S.semillas = S.semillas || [];
+      S.semillas.unshift({ id: uid(), createdAt: Date.now(), date: todayStr(), title:(meta.title||'').slice(0,80) || 'compartido', notes: meta.text||'', lyrics:'', socialContent:'', stages:[], links:[], files:[], photoData:null, audioData:null, audioSec:0, groupId:null, projectId: S.activeProjectId||1 });
+      added++;
+    }
+    // Archivos compartidos
+    for (const key of fileKeys) {
+      try {
+        const fr = await cache.match(key);
+        if (!fr) continue;
+        const blob = await fr.blob();
+        const name = decodeURIComponent(fr.headers.get('x-filename') || 'compartido');
+        const type = blob.type || '';
+        const file = new File([blob], name, { type: type || 'application/octet-stream' });
+        if (/^image\//.test(type)) {
+          const thumb = await fileToCompressedDataUrl(file);
+          const ref = { id: uid(), kind:'image', title:'', photoData: thumb, sourceUrl:'', tile:'s', board:'', createdAt: Date.now() };
+          S.refs.unshift(ref);
+          offloadPhotoFile(ref, file, () => renderReferencias());
+          added++;
+        } else if (/^audio\//.test(type)) {
+          // audio → semilla con audio
+          S.semillas = S.semillas || [];
+          const sem = { id: uid(), createdAt: Date.now(), date: todayStr(), title: name.replace(/\.[a-z0-9]+$/i,'')||'audio', notes:'', lyrics:'', socialContent:'', stages:[], links:[], files:[], photoData:null, audioData:null, audioSec:0, groupId:null, projectId: S.activeProjectId||1 };
+          S.semillas.unshift(sem);
+          offloadAudio(sem, file, () => renderSemillero());
+          added++;
+        }
+      } catch (e) { console.warn('shared file', e); }
+      await cache.delete(key);
+    }
+    await cache.delete('./shared-meta');
+    save();
+    if (added) { toast(added>1?`${added} elementos recibidos`:'Recibido en Jardín','📥'); }
+    if (typeof switchTab === 'function') switchTab('referencias');
+  } catch (e) { console.error('share import', e); }
+  finally { try { history.replaceState(null, '', location.pathname); } catch(e){} }
+}
+// Respaldo: si Firebase no llegó a iniciar, igual recogemos lo compartido (el guard evita duplicar).
+window.addEventListener('load', () => setTimeout(() => { try { handleSharedContent(); } catch(e){} }, 4500));
 
 // ========================= AUDIO RECORDING (context-aware) =========================
 let mediaRecorder = null, audioChunks = [], recordingStream = null;
@@ -6873,21 +6972,28 @@ function bindBrand() {
     }
     catch (err) { toast('Error con el logo'); }
   });
-  const onPhoto = async (f) => {
+  const onPhoto = async (f, askCaption=true) => {
     if (!f) return;
     try {
       const dataUrl = await fileToCompressedDataUrl(f, 1280, 0.78);
-      const cap = prompt('Caption (opcional):', '') || '';
+      const cap = askCaption ? (prompt('Caption (opcional):', '') || '') : '';
       const ph = {id: uid(), dataUrl, caption: cap, date: todayStr()};
       S.brand.photos.push(ph);
-      save(); renderBrand(); toast('Foto agregada','✦');
+      save(); renderBrand();
       // Persistencia segura: sube el original a Storage y reemplaza el thumb por URL estable
       queueUpload({collection:'brand-photo', objId:ph.id, kind:'photo', field:'dataUrl', blob:f, ext:(f.name.split('.').pop()||'jpg').toLowerCase(), contentType:f.type||'image/jpeg'})
         .then(()=>renderBrand());
     } catch (err) { toast('Error con la foto'); }
   };
-  $('#brandPhotoInput').addEventListener('change', e => { const f = e.target.files[0]; e.target.value=''; onPhoto(f); });
-  $('#brandPhotoCamera').addEventListener('change', e => { const f = e.target.files[0]; e.target.value=''; onPhoto(f); });
+  // Soporta VARIAS fotos a la vez (selección múltiple en el selector). Con 1 sola pregunta el caption; con varias, las agrega de una.
+  const onPhotos = async (fileList) => {
+    const files = Array.from(fileList || []);
+    if (!files.length) return;
+    for (const f of files) await onPhoto(f, files.length === 1);
+    toast(files.length > 1 ? `${files.length} fotos agregadas` : 'Foto agregada', '✦');
+  };
+  $('#brandPhotoInput').addEventListener('change', e => { const files = e.target.files; e.target.value=''; onPhotos(files); });
+  $('#brandPhotoCamera').addEventListener('change', e => { const files = e.target.files; e.target.value=''; onPhotos(files); });
 }
 
 // ========================= MARCA (legacy fields kept) =========================
@@ -8434,6 +8540,7 @@ auth.onAuthStateChanged(user => {
       if (_hasLocalBlobs()) migrateMediaToStorage();
       // Always try draining the queue in case of leftover pending uploads from prior sessions
       processUploadQueue();
+      handleSharedContent(); // recoge lo que llegó por "Compartir con… Jardín" (tras cargar la nube)
     }, 3000);
     // Retry queue periodically (every 30s) — light operation
     setInterval(() => processUploadQueue(), 30000);
