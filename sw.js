@@ -1,5 +1,5 @@
 // Jardín Service Worker — Network First con auto-update
-const CACHE_NAME = 'jardin-v36-drive';
+const CACHE_NAME = 'jardin-v38-wavglass';
 const ESSENTIAL_FILES = [
   './',
   './index.html',
