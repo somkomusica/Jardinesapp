@@ -1,12 +1,12 @@
 // Jardín Service Worker — Network First con auto-update
-const CACHE_NAME = 'jardin-v27-share-multi';
+const CACHE_NAME = 'jardin-v29-deseos';
 const ESSENTIAL_FILES = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  './apple-touch-icon.png'
+  './icon-512-maskable.png'
 ];
 
 self.addEventListener('install', (event) => {
