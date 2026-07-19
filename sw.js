@@ -1,12 +1,12 @@
 // Jardín Service Worker — Network First con auto-update
-const CACHE_NAME = 'jardin-v29-deseos';
+const CACHE_NAME = 'jardin-v33-heroplayer';
 const ESSENTIAL_FILES = [
   './',
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
-  './icon-512-maskable.png'
+  './icon-192-v2.png',
+  './icon-512-v2.png',
+  './icon-512-maskable-v2.png'
 ];
 
 self.addEventListener('install', (event) => {

@@ -84,8 +84,8 @@ header.top.shrunk { padding-top: 8px; }
 header.top.shrunk .brand-sub { max-height: 0; opacity: 0; margin-top: 0; }
 .brand .acc { color: var(--gold); }
 /* v3.3.30: logo Somko en el encabezado (usa el logo subido en Marca) */
-.brand img.brand-logo { height: 60px; max-width: 64vw; width: auto; object-fit: contain; display: block; transition: height .25s; }
-header.top.shrunk .brand img.brand-logo { height: 40px; }
+.brand img.brand-logo { height: 26px; max-width: 52vw; width: auto; object-fit: contain; display: block; transition: height .25s; }
+header.top.shrunk .brand img.brand-logo { height: 18px; }
 [data-theme="dark"] .brand img.brand-logo { filter: invert(1); } /* logo negro → blanco en oscuro */
 .date-display { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); text-align: right; }
 
@@ -1719,11 +1719,113 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
 #refBoards { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
 #refBoards::-webkit-scrollbar { display: none; }
 #refBoards button { white-space: nowrap; flex-shrink: 0; }
+/* v3.3.38: Semillero sin toolbar ni filtros (la captura vive en el ＋; ganchos JS intactos) */
+#tab-semillero .sem-toolbar, #tab-semillero #semFilter { display: none !important; }
 .nf-stage .dnd-grip { background: none; border: none; color: var(--text-faint); cursor: grab; padding: 6px 4px; touch-action: none; font-size: 14px; flex-shrink: 0; }
 #nfMoreBtn { margin-top: 12px; }
 #agendaDateBtn.has-date { color: var(--gold); border-color: var(--gold); }
 .cr-empty .btn, .empty .btn { margin-top: 10px; }
 .config-hint { font-size: 10.5px; color: var(--text-faint); font-style: italic; margin: -4px 0 10px; }
+/* Estadísticas — curvas de efectividad (v3.3.37) */
+.est-insight { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; margin-top: 8px; }
+.est-insight b { color: var(--gold); font-weight: 600; }
+.estw-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.estw-lab { font-size: 10px; color: var(--text-faint); width: 76px; flex-shrink: 0; text-align: right; }
+.estw-track { flex: 1; height: 10px; border-radius: 5px; background: var(--bg-soft); overflow: hidden; }
+.estw-fill { height: 100%; border-radius: 5px; background: var(--gold); opacity: .5; transition: width .3s; }
+.estw-fill.now { opacity: 1; }
+.estw-fill.ritual { background: var(--green); }
+.estw-val { font-size: 11px; color: var(--text-secondary); width: 36px; flex-shrink: 0; font-variant-numeric: tabular-nums; text-align: right; }
+/* v3.3.38 — Estudio: ficha plegable, editor de letras, reproductor con comentarios */
+.pd-hero { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.pd-hero-img { width: 74px; height: 74px; object-fit: cover; border-radius: 12px; border: .5px solid var(--border); flex-shrink: 0; cursor: zoom-in; }
+.pd-hero-ph { display: flex; align-items: center; justify-content: center; background: var(--gold-soft); color: var(--gold); font-size: 26px; cursor: default; }
+.pd-hero-main { flex: 1; min-width: 0; }
+.pd-hero-main .title, .pd-hero-main .sem-title-input { border: none; font-weight: 500; font-size: 16px; color: var(--gold); background: transparent; padding: 0; width: 100%; min-height: 0; }
+.pd-hero-main .pct { font-size: 10px; letter-spacing: .1em; color: var(--text-secondary); margin-top: 3px; text-transform: uppercase; }
+.pd-sec { border: .5px solid var(--border); border-radius: 12px; margin-bottom: 8px; overflow: hidden; background: var(--bg-card); }
+.pd-sec-head { width: 100%; display: flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; font-family: var(--font); color: var(--text); padding: 11px 12px; font-size: 12.5px; text-align: left; }
+.pd-sec-head > .ti:first-child { color: var(--gold); font-size: 15px; }
+.pd-sec-name { flex: 1; letter-spacing: .02em; }
+.pd-sec-badge { font-size: 10px; color: var(--gold); white-space: nowrap; }
+.pd-copy { color: var(--text-faint); padding: 4px 6px; display: inline-flex; border-radius: 6px; cursor: pointer; }
+.pd-copy:active { color: var(--gold); transform: scale(.9); }
+.pd-sec-ch { color: var(--text-faint); font-size: 14px; transition: transform .2s; }
+.pd-sec.open .pd-sec-ch { transform: rotate(180deg); }
+.pd-sec-body { display: none; padding: 2px 12px 12px; }
+.pd-sec.open .pd-sec-body { display: block; }
+#lyxOverlay { position: fixed; inset: 0; margin: 0 auto; max-width: 460px; z-index: 2000; background: var(--bg); display: flex; flex-direction: column; transform: translateY(102%); transition: transform .3s cubic-bezier(.16,1,.3,1); }
+#lyxOverlay.on { transform: translateY(0); }
+body.lyx-open { overflow: hidden; }
+.lyx-top { display: flex; align-items: center; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 12px 6px; border-bottom: .5px solid var(--border); flex-shrink: 0; }
+.lyx-title { font-size: 12px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-left: auto; }
+.lyx-tools { display: flex; align-items: center; gap: 2px; padding: 6px 10px; border-bottom: .5px solid var(--border); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+.lyx-tools::-webkit-scrollbar { display: none; }
+.lyx-tools button { background: none; border: .5px solid var(--border); border-radius: 8px; min-width: 34px; height: 32px; display: inline-flex; align-items: center; justify-content: center; color: var(--text); font-family: var(--font); font-size: 12px; cursor: pointer; flex-shrink: 0; }
+.lyx-tools button:active { background: var(--gold-soft); border-color: var(--gold); }
+.lyx-sep { width: 1px; height: 18px; background: var(--border); margin: 0 5px; flex-shrink: 0; }
+.lyx-page { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.lyx-editor { min-height: 100%; padding: 18px 16px calc(40px + env(safe-area-inset-bottom)); font-family: var(--font); font-size: 15px; line-height: 1.85; outline: none; -webkit-user-select: text; user-select: text; }
+.lyx-mark { display: inline-block; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); border: .5px solid var(--gold); border-radius: 999px; padding: 1px 10px; margin: 6px 0 2px; }
+.lyx-preview { min-height: 44px; border: .5px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13.5px; line-height: 1.7; cursor: pointer; max-height: 300px; overflow-y: auto; }
+.lyx-preview:active { border-color: var(--gold); }
+.lyx-ph { color: var(--text-faint); font-style: italic; }
+.jp { margin: 2px 0 6px; }
+.jp-row { display: flex; align-items: center; gap: 10px; }
+.jp-play { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--gold); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 16px; }
+.jp-play:active { transform: scale(.92); }
+.jp-bar { position: relative; flex: 1; height: 26px; cursor: pointer; }
+.jp-bar::before { content: ''; position: absolute; left: 0; right: 0; top: 11px; height: 4px; border-radius: 2px; background: var(--bg-soft); }
+.jp-fill { position: absolute; left: 0; top: 11px; height: 4px; border-radius: 2px; background: var(--gold); width: 0; pointer-events: none; }
+.jp-pins { position: absolute; inset: 0; pointer-events: none; }
+.jp-pin { position: absolute; top: 4px; width: 9px; height: 9px; border-radius: 50%; background: var(--indigo); border: 1.5px solid var(--bg-card); padding: 0; cursor: pointer; pointer-events: auto; }
+.jp-time { font-size: 10px; color: var(--text-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.jp-acts { margin-top: 2px; }
+.jp-notes { margin-top: 6px; }
+.jp-note { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: .5px dashed var(--border); }
+.jp-note:last-child { border-bottom: none; }
+.jp-note-t { background: var(--indigo-soft); color: var(--indigo); border: none; border-radius: 6px; font-family: var(--font); font-size: 10.5px; padding: 2px 7px; cursor: pointer; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.jp-note-text { flex: 1; font-size: 12.5px; line-height: 1.45; }
+.jp-note-del { background: none; border: none; color: var(--text-faint); cursor: pointer; padding: 2px 4px; flex-shrink: 0; }
+.jp-empty { font-size: 11px; color: var(--text-faint); font-style: italic; padding: 6px 0; }
+.jp-file { margin-top: 10px; border-top: .5px dashed var(--border); padding-top: 8px; }
+.jp-file-name { font-size: 11.5px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.jp-file-name .ti { color: var(--gold); }
+/* v3.3.39 — waveform + playlist */
+.jp-bar { overflow: hidden; border-radius: 4px; }
+.jp-wave { position: absolute; inset: 0; width: 100%; height: 100%; }
+.jp-wave.approx { opacity: .8; }
+.jp-track { border: .5px solid var(--border); border-radius: 10px; margin-bottom: 6px; overflow: hidden; }
+.jp-track-head { width: 100%; display: flex; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; font-family: var(--font); color: var(--text); padding: 10px 12px; font-size: 12.5px; text-align: left; }
+.jp-track-num { font-size: 10px; color: var(--text-faint); width: 16px; text-align: center; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.jp-track-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jp-track-meta { font-size: 10px; color: var(--indigo); flex-shrink: 0; }
+.jp-track-go { color: var(--gold); font-size: 14px; flex-shrink: 0; }
+.jp-track.open { border-color: var(--gold); }
+.jp-track.open .jp-track-go { transform: rotate(0deg); }
+.jp-track-body { display: none; padding: 0 12px 10px; }
+.jp-track.open .jp-track-body { display: block; }
+/* v3.3.40 — reproductor hero + playlist editable */
+.pd-cover { position: relative; flex-shrink: 0; }
+.pd-cover-play { position: absolute; right: 4px; bottom: 4px; width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(26,26,26,.72); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; }
+.pd-cover-play:active { transform: scale(.9); }
+.hp { margin: 8px 0 4px; }
+.hp-wave { display: block; width: 100%; height: 30px; cursor: pointer; }
+.hp-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.hp-play { width: 30px; height: 30px; border-radius: 50%; border: none; background: var(--gold); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 12px; }
+.hp-play:active { transform: scale(.9); }
+.hp-name { flex: 1; font-size: 11.5px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hp-time { font-size: 10px; color: var(--text-faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hp-note { background: none; border: .5px solid var(--border); border-radius: 8px; color: var(--text-secondary); width: 32px; height: 26px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.hp-note:active { color: var(--gold); border-color: var(--gold); }
+.hp-empty { font-size: 11px; color: var(--text-faint); font-style: italic; padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+.hp-notes { margin-top: 2px; }
+.jp-row-cover { width: 26px; height: 26px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+.jp-row-cover.ph { display: inline-flex; align-items: center; justify-content: center; background: var(--gold-soft); color: var(--gold); font-size: 13px; }
+.jp-track-edit { color: var(--text-faint); padding: 3px 4px; cursor: pointer; flex-shrink: 0; display: inline-flex; }
+.jp-track-edit:active { color: var(--gold); }
+.jp-track-edit.danger:active { color: #b5462f; }
+.jp-track.open { background: var(--gold-soft); border-color: var(--gold); }
 /* ¿Qué Quiero? — metas y sueños (v3.3.36) */
 .deseo-add { display: flex; gap: 6px; margin-bottom: 10px; }
 .deseo-add input { flex: 1; }
@@ -1882,12 +1984,9 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
   </div>
 
   <!-- UTILIDADES (al fondo de HOY) -->
-  <div data-widget="utilidades" class="card" id="utilCard" style="padding:14px 18px;">
-    <div class="dash-toggle" id="utilToggle">
-      <h2 class="section-title" style="margin-bottom:0;"><i class="ti ti-tool"></i> Utilidades</h2>
-      <i class="ti ti-chevron-down dash-arrow" id="utilArrow"></i>
-    </div>
-    <div id="utilBody" style="display:none;">
+  <div data-widget="utilidades" class="card" id="utilCard">
+    <h2 class="section-title"><i class="ti ti-tool"></i> Utilidades</h2>
+    <div id="utilBody">
       <div class="tuner-card" style="text-align:center;">
         <h3 style="margin:14px 0 2px;font-size:13px;letter-spacing:.04em;"><i class="ti ti-music" style="margin-right:6px;"></i>Afinador</h3>
         <p class="tab-hint">cromático · cualquier nota · tocá una nota a la vez · verde = afinada</p>
@@ -2043,16 +2142,23 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
       <div class="sbc-value" id="estFloresDone">0</div>
       <div class="sbc-unit">de <span id="estFloresTotal">0</span> totales</div>
     </div>
-    <div class="stat-bigcard">
-      <div class="sbc-label"><i class="ti ti-seedling"></i> Semillas</div>
-      <div class="sbc-value" id="estSemillas">0</div>
-      <div class="sbc-unit">en el semillero</div>
-    </div>
-    <div class="stat-bigcard">
-      <div class="sbc-label"><i class="ti ti-droplet"></i> Riego</div>
-      <div class="sbc-value" id="estRiegoMin">0</div>
-      <div class="sbc-unit">min este mes</div>
-    </div>
+  </div>
+
+  <!-- CURVA DE EFECTIVIDAD -->
+  <div class="card">
+    <h2 class="section-title"><i class="ti ti-activity"></i> Curva de efectividad — 28 días</h2>
+    <p class="tab-hint">barras = tareas terminadas por día · línea = tu media de 7 días · tocá un día para el detalle</p>
+    <div id="estCurve"></div>
+    <div class="est-insight" id="estInsight"></div>
+  </div>
+
+  <!-- SEMANA A SEMANA -->
+  <div class="card">
+    <h2 class="section-title"><i class="ti ti-calendar-stats"></i> Semana a semana</h2>
+    <h3 class="sub-title"><i class="ti ti-checks"></i> Tareas terminadas</h3>
+    <div class="est-weeks" id="estWeeks"></div>
+    <h3 class="sub-title"><i class="ti ti-plant"></i> Rituales cumplidos</h3>
+    <div class="est-weeks" id="estRitualCurve"></div>
   </div>
 
   <!-- HEATMAP -->
@@ -2070,13 +2176,6 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
     </div>
   </div>
 
-  <!-- PROGRESS BY STAGE -->
-  <div class="card">
-    <h2 class="section-title"><i class="ti ti-progress"></i> Progreso por etapa</h2>
-    <p class="tab-hint">cuántas plantas tienen cada etapa completada</p>
-    <div id="estStageBars" class="stage-bars"></div>
-  </div>
-
   <!-- HABITS -->
   <div class="card">
     <h2 class="section-title"><i class="ti ti-checks"></i> Hábitos</h2>
@@ -2084,12 +2183,6 @@ body.on-crece .project-bar { display: none; }   /* Crece no filtra por cantero -
     <div id="estHabitsList" class="habits-stats-list"></div>
   </div>
 
-  <!-- PROJECTS BREAKDOWN -->
-  <div class="card">
-    <h2 class="section-title"><i class="ti ti-folder"></i> Proyectos</h2>
-    <p class="tab-hint">flores y plantas por proyecto</p>
-    <div id="estProjects" class="projects-stats"></div>
-  </div>
 </section>
 
 <!-- FLORES -->
@@ -2613,6 +2706,10 @@ const PROJECT_TYPES = ['Single', 'EP', 'Álbum', 'Otro'];
 // v3.3.35 — wordmark oficial incrustado: el encabezado no depende de subidas ni de la nube.
 const BRAND_WORDMARK = 'data:image/png;base64,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';
 const VERSION_LOG = [
+  {v:'3.3.40', d:'2026-07-19', t:'REPRODUCTOR EN LA CABECERA (pedido con captura). Cada canción — semilla, planta o florecida — trae ahora su reproductor FIJO arriba, bajo las etapas: la línea de onda marca el PROGRESO DE REPRODUCCIÓN (donde marcaste en verde), con play, nombre de la pista, tiempo y botón de comentar; los comentarios quedan como puntos índigo sobre la onda y la lista aparece debajo. El botón ▶ sobre la portada también reproduce. La PLAYLIST (sección propia) junta TODO el audio de la canción: archivos directos, links de Drive/Dropbox y la idea de voz grabada — cada pista con miniatura de la portada, nombre, contador de comentarios y funciones de edición (renombrar ✎ y quitar ✕); tocás una pista y suena en el reproductor de arriba; al terminar una pista sigue la siguiente. El % de etapas quedó como texto junto al nombre (la barra vieja de avance se retiró: esa línea ahora es del audio). Logo del encabezado otro 28% más chico (26px). '},
+  {v:'3.3.39', d:'2026-07-19', t:'AUDIO DOBLE + WAVEFORM + Utilidades corregida. (1) La ficha de cada canción ahora separa DEMO/MASTER de IDEAS DE VOZ: pegás el link de Drive o Dropbox (o un wav/mp3 directo) en Links o Archivos y aparece como PISTA en la playlist de esa canción — tocás la pista y se abre su reproductor con FORMA DE ONDA, comentarios al minuto y pines; una pista a la vez, como plataforma musical. La grabación con el micrófono queda aparte en "Ideas de voz" con el mismo reproductor. La forma de onda es REAL cuando el archivo se deja leer (subidas de la app, Dropbox); si el link no lo permite (Drive a veces no), se muestra una onda decorativa y la reproducción funciona igual — así de honesto. (2) Utilidades ahora es una sección normal de Hoy: una sola fila con título, punto de arrastre y flecha a la derecha, igual que ¿Qué Quiero? (antes tenía los controles apilados en vertical). El logo del encabezado 40% más chico ya venía de la versión anterior — se ve al publicar.'},
+  {v:'3.3.38', d:'2026-07-19', t:'ESTUDIO — la ficha de tus canciones, pensada para trabajar. (1) EDITOR DE LETRAS a pantalla completa: tocás la zona de la letra (en semilla, planta o captura) y se abre un espacio de escritura con negrita, cursiva, subrayado, 4 colores de tinta, marcadores de VERSO/CORO/PUENTE, inserción de acordes y copiar-todo. El texto plano sigue siendo la verdad para el bot y el buscador; el formato viaja aparte. (2) FICHA REORGANIZADA (semilla, planta y florecida): portada + nombre + progreso arriba como plataforma musical, y todo lo demás en secciones PLEGADAS con indicador de contenido y botón de COPIAR en letra, notas y redes. Nada se perdió: son los mismos campos, mejor ordenados. (3) REPRODUCTOR CON COMENTARIOS AL MINUTO (tipo SoundCloud): el demo grabado y cualquier archivo de audio (wav, mp3…) en Archivos se reproducen dentro de la ficha, con barra, pines índigo en los momentos comentados, "Comentar en 1:23", y lista de comentarios que saltan al momento exacto al tocarlos. (4) SEMILLERO limpio: fuera el botón "Nueva semilla" (vive en el ＋), el buscador y los filtros de arriba.'},
+  {v:'3.3.37', d:'2026-07-19', t:'Correcciones de Somko. (1) Logo del encabezado 40% más chico. (2) Puntos de arrastre SIEMPRE a la derecha: barra de secciones de Hoy (antes al plegar saltaban a la izquierda), pasos de la captura y editor de etapas. (3) Estadísticas rediseñada: fuera Semillas, Riego, Proyectos y el viejo "progreso por etapa" (usaba el molde fijo de 4 etapas). Entra la CURVA DE EFECTIVIDAD de 28 días — barras de tareas terminadas por día + tu media de 7 días + lectura en palabras (tendencia semanal y tu mejor día) — con detalle al tocar cualquier día (qué terminaste y tus rituales); y "Semana a semana": tareas terminadas y % de rituales de las últimas 4 semanas. Quedan también Racha, Flores, Constancia 60 días y Hábitos 30 días. (4) Íconos de Android renombrados para obligar al teléfono a soltar el ícono viejo guardado — con esto el ícono miniatura y la animación de apertura pasan a ser la estrella dorada limpia (la misma del refresh). Reinstalá la app para verlo al instante.'},
   {v:'3.3.36', d:'2026-07-19', t:'Nueva sección en Hoy, debajo de Utilidades: ¿QUÉ QUIERO? — tus metas, sueños y deseos de corto y largo plazo. Agregás con la casilla (o Enter); tocás el círculo para marcarla CUMPLIDA (celebra y baja al grupo "cumplidos" con su fecha — tocás de nuevo para revivirla); tocás el texto para editarlo; la etiqueta cicla ¿plazo? → corto → largo; arrastrás con el manubrio ≡ (o manteniendo presionado) para priorizar; la ✕ borra con confirmación. Se pliega, se oculta y se reordena desde Ajustes como cualquier sección de Hoy. Tus deseos viven en tu cuenta y se sincronizan entre dispositivos como todo lo demás.'},
   {v:'3.3.35', d:'2026-07-18', t:'Pulido total de interfaz (pedido de Somko, julio). LETRA pareja y legible: cuerpo y campos a 14, títulos de tarjeta/ficha más presentes, nada ilegible. ESPACIOS compactos: tarjetas, secciones y hojas con menos aire muerto — entra más por pantalla y los botones conservan su zona táctil. ARRASTRAR consistente: el manubrio ≡ mueve AL TOQUE (sin espera); mantener presionado el cuerpo ~medio segundo levanta y arrastra; se acabó el tiempo largo disparejo; los pasos de una idea se reordenan arrastrando en la captura (los de una planta ya se podían en su editor); en el Muro las acciones de cada pieza aparecen con presión sostenida real. CAPTURA liviana: nombre·notas·foto·audio a la vista y el resto (letra·redes·link·pasos) plegado en "más detalles". TAREAS: la fecha vive detrás del botón de calendario. El ＋ ahora también crea Tarea. Ajustes sin texto repetido. La barra de abajo ilumina Jardín al capturar (antes marcaba Más). Pantallas vacías con botón directo. ARRANQUE: portada propia con el isotipo dorado y logo del encabezado nítido de fábrica. Íconos de Android rehechos desde el isotipo 2025 — limpios, sin doble marco (reinstalá la PWA para verlos).'},
   {v:'3.3.34', d:'2026-06-14', t:'Más de tu lista: (1) Subida de VARIAS fotos a la vez — en la Galería de Marca y en el Muro el selector ya deja elegir varias (las portadas de planta/semilla siguen siendo una). (2) Muro: botón para filtrar por Todo · Fotos · Links; y al tocar Mezclar ahora los tamaños cambian al azar entre los 3 (s/m/l), no solo el orden. (3) "Compartir con… Jardín": desde el teléfono podés compartir una imagen, audio o link a la app — entra solo al Muro (o como semilla). Requiere tener la app instalada en la pantalla de inicio.'},
@@ -2658,7 +2755,7 @@ const DEFAULT_CONFIG = {
   bottomNav: ['hoy','crece','referencias'],  // las 3 principales de la barra (editable). El resto va en "Más".
   hoyWidgets: {agenda:true, bitacora:true, utilidades:true, deseos:true},
   hoyOrder: ['agenda','bitacora','utilidades','deseos'],
-  hoyCollapsed: {agenda:false, bitacora:false, deseos:false},
+  hoyCollapsed: {agenda:false, bitacora:false, deseos:false, utilidades:true},
   theme: 'light', // default: tono claro (decisión Somko); auto/oscuro siguen en Ajustes
 };
 
@@ -3808,35 +3905,17 @@ renderBrandQuote();
 })();
 
 function renderEstadisticas() {
-  // Top metrics
+  // Arriba: solo lo que se usa (Semillas y Riego fuera — pedido Somko v3.3.37)
   const $set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   $set('estStreak', S.streak || 0);
   const total = (S.flores || []).length;
-  const done = (S.flores || []).filter(f => isComplete(f)).length;
-  $set('estFloresDone', done);
+  $set('estFloresDone', (S.flores || []).filter(f => isComplete(f)).length);
   $set('estFloresTotal', total);
-  $set('estSemillas', (S.semillas || []).length);
   const today = todayStr();
-  const ym = today.slice(0, 7);
-  const riegoMes = (S.riegoSessions || []).filter(r => (r.date || '').startsWith(ym)).reduce((a, r) => a + (r.minutes || 0), 0);
-  $set('estRiegoMin', riegoMes);
 
-  // Heatmap (same as before)
   renderHeatmapForElement('heatmap');
-
-  // Stage bars
-  const sbEl = document.getElementById('estStageBars');
-  if (sbEl) {
-    sbEl.innerHTML = STAGES.map(stage => {
-      const cnt = (S.flores || []).filter(f => f[stage]).length;
-      const pct = total ? Math.round((cnt / total) * 100) : 0;
-      return `<div class="stage-bar">
-        <div class="sb-name">${STAGE_LABELS[stage]}</div>
-        <div class="sb-track"><div class="sb-fill" style="width:${pct}%"></div></div>
-        <div class="sb-count">${cnt}/${total}</div>
-      </div>`;
-    }).join('');
-  }
+  renderEstCurva();
+  renderEstSemanas();
 
   // Habits (last 30 days)
   const hbEl = document.getElementById('estHabitsList');
@@ -3860,28 +3939,117 @@ function renderEstadisticas() {
       </div>`;
     }).join('');
   }
+}
 
-  // Projects
-  const pjEl = document.getElementById('estProjects');
-  if (pjEl) {
-    pjEl.innerHTML = (S.projects || []).map(p => {
-      const projFlores = (S.flores || []).filter(f => f.projectId === p.id);
-      const projDone = projFlores.filter(f => isComplete(f)).length;
-      const pct = projFlores.length ? Math.round((projDone / projFlores.length) * 100) : 0;
-      return `<div class="proj-stat-card">
-        <div class="psc-head">
-          <div class="psc-name">${escapeHTML(p.name)}</div>
-          <div class="psc-type">${escapeHTML(p.type)}</div>
-        </div>
-        <div class="psc-counts">
-          <div><strong>${projFlores.length}</strong> plantas</div>
-          <div><strong>${projDone}</strong> cosechadas</div>
-          <div><strong>${pct}%</strong> avance</div>
-        </div>
-        <div class="psc-progress"><div class="psc-progress-fill" style="width:${pct}%"></div></div>
-      </div>`;
-    }).join('') || '<div class="empty">sin proyectos</div>';
+// ===== Curvas de efectividad (v3.3.37) — leer el rendimiento, no solo números =====
+// Fuente de verdad por día: el archivo del día (dailyLog, se guarda al cerrar la jornada) y,
+// para hoy o días sin cierre, las tareas vivas con fecha de completado.
+const _estPad = n => String(n).padStart(2, '0');
+const _estIso = d => d.getFullYear() + '-' + _estPad(d.getMonth() + 1) + '-' + _estPad(d.getDate());
+function estLastDates(n) {
+  const out = []; const hoy = new Date();
+  for (let i = n - 1; i >= 0; i--) { const x = new Date(hoy); x.setDate(hoy.getDate() - i); out.push(_estIso(x)); }
+  return out;
+}
+function estDayData(date) {
+  const live = (S.tasks || []).filter(t => t.done && t.doneDate === date).map(t => t.text);
+  const snap = (S.dailyLog || []).find(x => x.date === date);
+  const tareas = (snap && Array.isArray(snap.tareasHechas) && snap.tareasHechas.length >= live.length) ? snap.tareasHechas : live;
+  let reqDone = null, reqTotal = null;
+  if (snap && typeof snap.reqDone === 'number') { reqDone = snap.reqDone; reqTotal = snap.reqTotal || null; }
+  else if (date === todayStr()) {
+    const reqIds = HABITS_CONFIG.filter(h => h.required).map(h => h.id);
+    reqDone = (S.habitDate === date) ? reqIds.filter(id => S.habits[id]).length : 0;
+    reqTotal = reqIds.length;
   }
+  return { date, tareas, reqDone, reqTotal };
+}
+function renderEstCurva() {
+  const host = document.getElementById('estCurve'); if (!host) return;
+  const dates = estLastDates(28);
+  const datos = dates.map(estDayData);
+  const counts = datos.map(d => d.tareas.length);
+  const max = Math.max(4, ...counts);
+  const W = 336, H = 112, BASE = 92, BW = 9, GAP = 3;
+  const media = counts.map((_, i) => {
+    const seg = counts.slice(Math.max(0, i - 6), i + 1);
+    return seg.reduce((a, b) => a + b, 0) / seg.length;
+  });
+  const y = v => BASE - (v / max) * 72;
+  const x = i => i * (BW + GAP) + BW / 2;
+  const linea = media.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1)).join(' ');
+  const hoy = todayStr();
+  const bars = datos.map((d, i) => {
+    const h = counts[i] ? Math.max(3, (counts[i] / max) * 72) : 2;
+    const fill = counts[i] ? (d.date === hoy ? 'var(--gold-light)' : 'var(--gold)') : 'var(--border)';
+    return `<g data-estdia="${d.date}" style="cursor:pointer">
+      <rect x="${(i * (BW + GAP)).toFixed(1)}" y="0" width="${BW + GAP}" height="${BASE}" fill="transparent"></rect>
+      <rect x="${(i * (BW + GAP)).toFixed(1)}" y="${(BASE - h).toFixed(1)}" width="${BW}" height="${h.toFixed(1)}" rx="2" fill="${fill}" opacity="${counts[i] ? '.9' : '.6'}"></rect>
+    </g>`;
+  }).join('');
+  const labs = [0, 7, 14, 21, 27].map(i => {
+    const d = new Date(dates[i] + 'T12:00:00');
+    return `<text x="${x(i).toFixed(1)}" y="${H - 2}" text-anchor="middle" font-size="8" fill="var(--text-faint)" font-family="inherit">${d.getDate()}/${d.getMonth() + 1}</text>`;
+  }).join('');
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+    ${bars}
+    <path d="${linea}" fill="none" stroke="var(--indigo)" stroke-width="1.8" stroke-linecap="round" opacity=".85"></path>
+    ${labs}
+  </svg>`;
+  host.querySelectorAll('[data-estdia]').forEach(g => g.addEventListener('click', () => estDayDetail(g.dataset.estdia)));
+  // Lectura en palabras: tendencia semanal + tu mejor día
+  const ult7 = counts.slice(-7).reduce((a, b) => a + b, 0);
+  const prev7 = counts.slice(-14, -7).reduce((a, b) => a + b, 0);
+  const dif = ult7 - prev7;
+  const porDow = [0, 0, 0, 0, 0, 0, 0], vecesDow = [0, 0, 0, 0, 0, 0, 0];
+  datos.forEach((d, i) => { const dow = new Date(d.date + 'T12:00:00').getDay(); porDow[dow] += counts[i]; vecesDow[dow]++; });
+  const DOW = ['domingos', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados'];
+  let best = 0, bestAvg = -1;
+  porDow.forEach((v, i) => { const avg = vecesDow[i] ? v / vecesDow[i] : 0; if (avg > bestAvg) { bestAvg = avg; best = i; } });
+  const tend = dif > 0 ? `▲ ${dif} más que la semana anterior — la curva sube` : dif < 0 ? `▼ ${-dif} menos que la semana anterior` : 'igual que la semana anterior';
+  const ie = document.getElementById('estInsight');
+  if (ie) ie.innerHTML = bestAvg > 0
+    ? `<b>${ult7}</b> terminadas en los últimos 7 días · ${tend}.<br>Tu mejor día suele ser <b>${DOW[best]}</b>. Tocá una barra y te muestro qué hiciste ese día.`
+    : 'Todavía no hay días con tareas terminadas en estas 4 semanas — la curva se dibuja sola a medida que completás.';
+}
+function renderEstSemanas() {
+  const host = document.getElementById('estWeeks'); if (!host) return;
+  const dates = estLastDates(28);
+  const porDia = dates.map(d => estDayData(d));
+  const counts = porDia.map(d => d.tareas.length);
+  const sem = [0, 1, 2, 3].map(i => counts.slice(i * 7, i * 7 + 7).reduce((a, b) => a + b, 0));
+  const labels = ['hace 3 sem', 'hace 2 sem', 'sem pasada', 'esta sem'];
+  const mx = Math.max(1, ...sem);
+  host.innerHTML = sem.map((v, i) => `<div class="estw-row">
+    <div class="estw-lab">${labels[i]}</div>
+    <div class="estw-track"><div class="estw-fill${i === 3 ? ' now' : ''}" style="width:${Math.round((v / mx) * 100)}%"></div></div>
+    <div class="estw-val">${v}</div>
+  </div>`).join('');
+  const hb = document.getElementById('estRitualCurve');
+  if (hb) {
+    const ratios = [0, 1, 2, 3].map(i => {
+      const seg = porDia.slice(i * 7, i * 7 + 7).filter(d => d.reqTotal);
+      if (!seg.length) return null;
+      return Math.round(seg.reduce((a, d) => a + d.reqDone / d.reqTotal, 0) / seg.length * 100);
+    });
+    hb.innerHTML = ratios.map((r, i) => `<div class="estw-row">
+      <div class="estw-lab">${labels[i]}</div>
+      <div class="estw-track"><div class="estw-fill ritual${i === 3 ? ' now' : ''}" style="width:${r === null ? 0 : r}%"></div></div>
+      <div class="estw-val">${r === null ? '—' : r + '%'}</div>
+    </div>`).join('');
+  }
+}
+function estDayDetail(date) {
+  const d = estDayData(date);
+  const bonita = new Date(date + 'T12:00:00').toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const sh = _jdSheet(`<div class="jd-msg">
+      <b style="text-transform:capitalize">${escapeHTML(bonita)}</b><br><br>
+      ${d.tareas.length ? `✔ <b>${d.tareas.length}</b> terminada(s):<br>· ${d.tareas.map(escapeHTML).join('<br>· ')}` : 'Sin tareas registradas ese día.'}
+      ${d.reqDone !== null && d.reqTotal ? `<br><br>🌿 Rituales: <b>${d.reqDone}/${d.reqTotal}</b>` : ''}
+    </div>
+    <div class="jd-actions"><button class="btn gold" id="jdOk">Listo</button></div>`);
+  sh.sh.querySelector('#jdOk').onclick = () => sh.close();
+  sh.bd.onclick = () => sh.close();
 }
 
 // Helper to render heatmap into specified element (reusable)
@@ -4499,6 +4667,452 @@ document.getElementById('gardenSelectBtn')?.addEventListener('click', () => {
   renderGarden();
 });
 
+// ===== v3.3.38 · ESTUDIO: portapapeles, editor de letras, reproductor con comentarios, ficha plegable =====
+async function jdCopy(text, label) {
+  const t = String(text || '');
+  if (!t.trim()) { toast('Nada que copiar', '📋'); return; }
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e2) {} ta.remove();
+  }
+  toast((label || 'Texto') + ' copiado', '📋');
+}
+
+// Letra con formato: el texto PLANO (lyrics) sigue siendo la verdad para el bot y el buscador;
+// el formato (lyricsRich) solo se usa si coincide con el plano (si el bot editó, gana el plano).
+function _lyxHtml(ent) {
+  if (ent.lyricsRich) {
+    const t = document.createElement('div'); t.innerHTML = ent.lyricsRich;
+    if ((t.innerText || '').replace(/\s+/g, ' ').trim() === (ent.lyrics || '').replace(/\s+/g, ' ').trim()) return ent.lyricsRich;
+  }
+  return escapeHTML(ent.lyrics || '').replace(/\n/g, '<br>');
+}
+
+let _lyxTarget = null;
+function openLyricEditor(opts) {
+  _lyxTarget = opts;
+  let ov = document.getElementById('lyxOverlay');
+  if (!ov) {
+    ov = document.createElement('div'); ov.id = 'lyxOverlay';
+    ov.innerHTML = `
+      <div class="lyx-top">
+        <button class="cr-back" id="lyxClose" type="button"><i class="ti ti-chevron-left"></i> Guardar y volver</button>
+        <span class="lyx-title" id="lyxTitle"></span>
+      </div>
+      <div class="lyx-tools">
+        <button type="button" data-lyx="bold" title="negrita"><i class="ti ti-bold"></i></button>
+        <button type="button" data-lyx="italic" title="cursiva"><i class="ti ti-italic"></i></button>
+        <button type="button" data-lyx="underline" title="subrayado"><i class="ti ti-underline"></i></button>
+        <span class="lyx-sep"></span>
+        <button type="button" data-lyxcolor="#B8860B" style="color:#B8860B" title="dorado"><i class="ti ti-circle-filled"></i></button>
+        <button type="button" data-lyxcolor="#5b7d4f" style="color:#5b7d4f" title="verde"><i class="ti ti-circle-filled"></i></button>
+        <button type="button" data-lyxcolor="#44688C" style="color:#44688C" title="índigo"><i class="ti ti-circle-filled"></i></button>
+        <button type="button" data-lyxcolor="#b5462f" style="color:#b5462f" title="rojo"><i class="ti ti-circle-filled"></i></button>
+        <button type="button" data-lyxcolor="" title="quitar formato"><i class="ti ti-circle-off"></i></button>
+        <span class="lyx-sep"></span>
+        <button type="button" data-lyxins="verso" title="marcar VERSO">V</button>
+        <button type="button" data-lyxins="coro" title="marcar CORO">C</button>
+        <button type="button" data-lyxins="puente" title="marcar PUENTE">P</button>
+        <button type="button" data-lyxins="acorde" title="insertar acorde">[A]</button>
+        <span class="lyx-sep"></span>
+        <button type="button" id="lyxCopy" title="copiar todo"><i class="ti ti-copy"></i></button>
+      </div>
+      <div class="lyx-page"><div class="lyx-editor" id="lyxEditor" contenteditable="true" spellcheck="false"></div></div>`;
+    document.body.appendChild(ov);
+    const ed = ov.querySelector('#lyxEditor');
+    ov.querySelector('#lyxClose').addEventListener('click', closeLyricEditor);
+    ov.querySelectorAll('[data-lyx]').forEach(b => b.addEventListener('mousedown', e => { e.preventDefault(); document.execCommand(b.dataset.lyx); ed.focus(); }));
+    ov.querySelectorAll('[data-lyxcolor]').forEach(b => b.addEventListener('mousedown', e => {
+      e.preventDefault(); const c = b.dataset.lyxcolor;
+      if (c) document.execCommand('foreColor', false, c); else document.execCommand('removeFormat');
+      ed.focus();
+    }));
+    ov.querySelectorAll('[data-lyxins]').forEach(b => b.addEventListener('mousedown', e => {
+      e.preventDefault(); const k = b.dataset.lyxins;
+      if (k === 'acorde') document.execCommand('insertText', false, '[Am] ');
+      else document.execCommand('insertHTML', false, '<div><span class="lyx-mark">— ' + k.toUpperCase() + ' —</span></div><div><br></div>');
+      ed.focus();
+    }));
+    ov.querySelector('#lyxCopy').addEventListener('click', () => jdCopy(ed.innerText, 'Letra'));
+  }
+  const ed = ov.querySelector('#lyxEditor');
+  const rich = opts.getRich && opts.getRich();
+  ed.innerHTML = rich && rich.trim() ? rich : (escapeHTML(opts.get() || '').replace(/\n/g, '<br>'));
+  ov.querySelector('#lyxTitle').textContent = opts.title || '';
+  ov.classList.add('on'); document.body.classList.add('lyx-open');
+  setTimeout(() => ed.focus(), 150);
+}
+function closeLyricEditor() {
+  const ov = document.getElementById('lyxOverlay'); if (!ov || !_lyxTarget) return;
+  const ed = ov.querySelector('#lyxEditor');
+  _lyxTarget.set((ed.innerText || '').replace(/\n{3,}/g, '\n\n').replace(/\s+$/, ''));
+  if (_lyxTarget.setRich) _lyxTarget.setRich(ed.innerHTML);
+  ov.classList.remove('on'); document.body.classList.remove('lyx-open');
+  const t = _lyxTarget; _lyxTarget = null;
+  if (t.persist !== false) save();
+  if (t.after) t.after();
+}
+
+// Reproductor con comentarios en el tiempo (la esencia SoundCloud: marcar EL momento).
+function fmtT(sec) { sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+function esAudioUrl(url) { return /\.(wav|mp3|m4a|aac|ogg|flac|webm)$/i.test(String(url || '').split('?')[0].split('#')[0]); }
+// Links de Drive/Dropbox → dirección reproducible. Devuelve null si no parece audio streameable.
+function normalizeAudioLink(url) {
+  const u = String(url || '').trim(); if (!u) return null;
+  try {
+    const p = new URL(u);
+    if (/(^|\.)dropbox\.com$/i.test(p.hostname)) {
+      p.hostname = 'dl.dropboxusercontent.com';
+      p.searchParams.delete('dl');
+      return p.toString();
+    }
+    if (/^drive\.google\.com$/i.test(p.hostname)) {
+      const m = p.pathname.match(/\/file\/d\/([^/]+)/);
+      const id = m ? m[1] : (p.searchParams.get('id') || '');
+      return id ? ('https://drive.google.com/uc?export=download&id=' + id) : null;
+    }
+    if (esAudioUrl(u)) return u;
+  } catch (e) { if (esAudioUrl(u)) return u; }
+  return null;
+}
+// Todas las pistas de una canción: archivos y links que sean (o parezcan) audio.
+function songTracks(ent) {
+  const out = []; const vistos = new Set();
+  const add = (kv) => {
+    const src = normalizeAudioLink(kv.url);
+    if (src && !vistos.has(src)) { vistos.add(src); out.push({ name: kv.name || 'audio', src, kv }); }
+  };
+  (ent.files || []).forEach(add);
+  (ent.links || []).forEach(add);
+  return out;
+}
+// Cola completa de la canción: pistas de links/archivos + la idea de voz grabada (si hay).
+function songQueue(ent) {
+  const q = songTracks(ent).slice();
+  if (ent.audioData) q.push({ name: 'Idea de voz' + (ent.audioSec ? ' · ' + fmtT(ent.audioSec) : ''), src: ent.audioData, idea: true });
+  return q;
+}
+// Reproductor HERO: uno por ficha, arriba, bajo las etapas. La línea = progreso de reproducción.
+function mountHeroPlayer(host, ent, coverBtn) {
+  const cola = songQueue(ent);
+  host.classList.add('hp');
+  if (!cola.length) {
+    host.innerHTML = '<div class="hp-empty"><i class="ti ti-music"></i> sin audio aún — pegá un link en Links/Archivos o grabá una idea de voz</div>';
+    if (coverBtn) coverBtn.style.display = 'none';
+    return { load() {} };
+  }
+  host.innerHTML = `
+    <canvas class="hp-wave"></canvas>
+    <div class="hp-row">
+      <button type="button" class="hp-play" aria-label="reproducir"><i class="ti ti-player-play-filled"></i></button>
+      <span class="hp-name"></span>
+      <span class="hp-time">0:00</span>
+      <button type="button" class="hp-note" title="comentar en este momento"><i class="ti ti-message-plus"></i></button>
+    </div>
+    <div class="jp-notes hp-notes"></div>
+    <audio preload="metadata"></audio>`;
+  const au = host.querySelector('audio'), wave = host.querySelector('.hp-wave'),
+        play = host.querySelector('.hp-play'), nameEl = host.querySelector('.hp-name'),
+        time = host.querySelector('.hp-time'), noteBtn = host.querySelector('.hp-note'),
+        list = host.querySelector('.hp-notes');
+  let idx = 0, _wf = null;
+  const cur = () => cola[idx];
+  const dur = () => (au.duration && isFinite(au.duration)) ? au.duration : (cur().idea ? (ent.audioSec || 0) : (_wf && _wf.dur) || 0);
+  const notas = () => (ent.audioNotes || []).filter(n => n.src === cur().src).sort((a, b) => a.t - b.t);
+  const drawWave = () => {
+    if (!wave || !_wf) return;
+    const r = wave.getBoundingClientRect(); if (!r.width) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = Math.round(r.width * dpr), H = Math.round(30 * dpr);
+    if (wave.width !== W) { wave.width = W; wave.height = H; }
+    const ctx = wave.getContext('2d'); if (!ctx) return;
+    ctx.clearRect(0, 0, W, H);
+    const N = _wf.peaks.length, bw = W / N, mid = H * 0.58;
+    const played = (dur() ? (au.currentTime / dur()) : 0) * W;
+    for (let i = 0; i < N; i++) {
+      const h = Math.max(2 * dpr, _wf.peaks[i] * H * 0.7);
+      const x = i * bw;
+      ctx.fillStyle = x <= played ? '#B8860B' : 'rgba(140,134,120,.38)';
+      ctx.fillRect(x, mid - h / 2, Math.max(1, bw * 0.62), h);
+    }
+    const d = dur();
+    if (d) notas().forEach(n => {
+      ctx.fillStyle = '#44688C';
+      ctx.beginPath(); ctx.arc((n.t / d) * W, 3.5 * dpr, 2.6 * dpr, 0, Math.PI * 2); ctx.fill();
+    });
+  };
+  const drawNotes = () => {
+    const ns = notas();
+    list.innerHTML = ns.map(n => `
+      <div class="jp-note">
+        <button type="button" class="jp-note-t" data-hpseek="${n.t}">${fmtT(n.t)}</button>
+        <div class="jp-note-text">${escapeHTML(n.text)}</div>
+        <button type="button" class="jp-note-del" data-hpdel="${n.id}" aria-label="borrar"><i class="ti ti-x"></i></button>
+      </div>`).join('');
+    list.querySelectorAll('[data-hpseek]').forEach(p => p.addEventListener('click', () => { au.currentTime = +p.dataset.hpseek; au.play().catch(() => {}); }));
+    list.querySelectorAll('[data-hpdel]').forEach(b => b.addEventListener('click', async () => {
+      if (!(await jdConfirm('¿Borrar este comentario?', 'Borrar', true))) return;
+      ent.audioNotes = (ent.audioNotes || []).filter(n => n.id !== +b.dataset.hpdel);
+      save(); drawNotes(); drawWave();
+    }));
+  };
+  const load = (i, auto) => {
+    idx = Math.max(0, Math.min(cola.length - 1, i));
+    _wf = null;
+    au.src = cur().src;
+    nameEl.textContent = (idx + 1) + ' · ' + cur().name;
+    const mySrc = cur().src;
+    waveformData(mySrc).then(d => { if (cur().src === mySrc) { _wf = d; drawWave(); } });
+    drawNotes(); drawWave();
+    if (auto) au.play().catch(() => {});
+  };
+  const toggle = () => { if (au.paused) au.play().catch(() => {}); else au.pause(); };
+  play.addEventListener('click', toggle);
+  if (coverBtn) coverBtn.addEventListener('click', toggle);
+  au.addEventListener('play', () => {
+    play.innerHTML = '<i class="ti ti-player-pause-filled"></i>';
+    if (coverBtn) coverBtn.innerHTML = '<i class="ti ti-player-pause-filled"></i>';
+  });
+  au.addEventListener('pause', () => {
+    play.innerHTML = '<i class="ti ti-player-play-filled"></i>';
+    if (coverBtn) coverBtn.innerHTML = '<i class="ti ti-player-play-filled"></i>';
+  });
+  au.addEventListener('ended', () => { if (idx < cola.length - 1) load(idx + 1, true); });
+  au.addEventListener('timeupdate', () => {
+    time.textContent = fmtT(au.currentTime) + (dur() ? ' / ' + fmtT(dur()) : '');
+    drawWave();
+  });
+  au.addEventListener('loadedmetadata', () => { time.textContent = '0:00' + (dur() ? ' / ' + fmtT(dur()) : ''); drawWave(); });
+  wave.addEventListener('click', e => {
+    const d = dur(); if (!d) return;
+    const r = wave.getBoundingClientRect();
+    au.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * d;
+  });
+  noteBtn.addEventListener('click', async () => {
+    const t = Math.floor(au.currentTime || 0);
+    if (!au.paused) au.pause();
+    const txt = await jdPrompt('Comentario en ' + fmtT(t) + ' · ' + cur().name, { placeholder: 'ej: acá entra la quena · subir el bajo…', btnLabel: 'Comentar' });
+    if (txt === null || !txt.trim()) return;
+    ent.audioNotes = Array.isArray(ent.audioNotes) ? ent.audioNotes : [];
+    ent.audioNotes.push({ id: Date.now(), src: cur().src, t, text: txt.trim(), date: todayStr() });
+    save(); drawNotes(); drawWave();
+    toast('Comentario en ' + fmtT(t), '💬');
+  });
+  load(0, false);
+  return { load, audio: au };
+}
+// Forma de onda: real si el archivo se deja leer (Storage/Dropbox suelen dejar; Drive no siempre).
+// Si no se puede, barras suaves decorativas (la reproducción funciona igual).
+const _wfCache = {};
+function waveformData(src) {
+  if (_wfCache[src]) return Promise.resolve(_wfCache[src]);
+  return (async () => {
+    try {
+      const resp = await fetch(src, { mode: 'cors' });
+      if (!resp.ok) throw 0;
+      const len = +resp.headers.get('content-length') || 0;
+      if (len > 15 * 1024 * 1024) throw 0; // masters muy pesados: no decodificar en el teléfono
+      const buf = await resp.arrayBuffer();
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ac = new AC();
+      const audio = await ac.decodeAudioData(buf);
+      if (ac.close) ac.close();
+      const ch = audio.getChannelData(0);
+      const N = 72, block = Math.max(1, Math.floor(ch.length / N)), peaks = [];
+      for (let i = 0; i < N; i++) {
+        let mx = 0; const st = i * block;
+        for (let j = st; j < st + block; j += 16) { const v = Math.abs(ch[j] || 0); if (v > mx) mx = v; }
+        peaks.push(mx);
+      }
+      const top = Math.max(0.01, ...peaks);
+      _wfCache[src] = { peaks: peaks.map(v => v / top), real: true, dur: audio.duration };
+    } catch (e) {
+      let h = 0; for (const c of String(src)) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+      const peaks = [];
+      for (let i = 0; i < 72; i++) { h = (h * 1103515245 + 12345) >>> 0; peaks.push(0.3 + 0.4 * ((h >> 16) % 1000) / 1000); }
+      _wfCache[src] = { peaks, real: false };
+    }
+    return _wfCache[src];
+  })();
+}
+function mountPlayer(host, src, ent) {
+  if (!host || !src || host._jp) return; host._jp = true;
+  ent.audioNotes = Array.isArray(ent.audioNotes) ? ent.audioNotes : [];
+  const notes = () => ent.audioNotes.filter(n => n.src === src).sort((a, b) => a.t - b.t);
+  host.classList.add('jp');
+  host.innerHTML = `
+    <audio preload="metadata"></audio>
+    <div class="jp-row">
+      <button type="button" class="jp-play" aria-label="reproducir"><i class="ti ti-player-play-filled"></i></button>
+      <div class="jp-bar"><canvas class="jp-wave"></canvas><div class="jp-fill"></div><div class="jp-pins"></div></div>
+      <div class="jp-time">0:00</div>
+    </div>
+    <div class="jp-acts">
+      <button type="button" class="btn ghost tiny jp-addnote"><i class="ti ti-message-plus"></i> Comentar en <span class="jp-at">0:00</span></button>
+    </div>
+    <div class="jp-notes"></div>`;
+  const au = host.querySelector('audio'); au.src = src;
+  const play = host.querySelector('.jp-play'), bar = host.querySelector('.jp-bar'),
+        fill = host.querySelector('.jp-fill'), pins = host.querySelector('.jp-pins'),
+        time = host.querySelector('.jp-time'), at = host.querySelector('.jp-at'),
+        list = host.querySelector('.jp-notes');
+  const dur = () => au.duration && isFinite(au.duration) ? au.duration : (ent.audioSec || 0);
+  const wave = host.querySelector('.jp-wave'); let _wf = null;
+  const drawWave = () => {
+    if (!wave || !_wf) return;
+    const r = bar.getBoundingClientRect(); if (!r.width) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = Math.round(r.width * dpr), H = Math.round(26 * dpr);
+    if (wave.width !== W) { wave.width = W; wave.height = H; }
+    const ctx = wave.getContext('2d'); if (!ctx) return;
+    ctx.clearRect(0, 0, W, H);
+    const N = _wf.peaks.length, bw = W / N, mid = H / 2;
+    const played = (dur() ? (au.currentTime / dur()) : 0) * W;
+    for (let i = 0; i < N; i++) {
+      const h = Math.max(2 * dpr, _wf.peaks[i] * H * 0.86);
+      const x = i * bw;
+      ctx.fillStyle = x <= played ? '#B8860B' : 'rgba(140,134,120,.38)';
+      ctx.fillRect(x, mid - h / 2, Math.max(1, bw * 0.62), h);
+    }
+  };
+  waveformData(src).then(d => { _wf = d; fill.style.display = 'none'; if (!d.real && wave) wave.classList.add('approx'); drawWave(); });
+  const drawPins = () => {
+    const d = dur();
+    pins.innerHTML = d ? notes().map(n => `<button type="button" class="jp-pin" data-jpseek="${n.t}" style="left:${Math.min(98.5, (n.t / d) * 100)}%" title="${fmtT(n.t)} · ${escapeHTML(n.text)}"></button>`).join('') : '';
+    pins.querySelectorAll('[data-jpseek]').forEach(p => p.addEventListener('click', e => { e.stopPropagation(); au.currentTime = +p.dataset.jpseek; au.play(); }));
+  };
+  const drawNotes = () => {
+    const ns = notes();
+    list.innerHTML = ns.length ? ns.map(n => `
+      <div class="jp-note">
+        <button type="button" class="jp-note-t" data-jpseek="${n.t}">${fmtT(n.t)}</button>
+        <div class="jp-note-text">${escapeHTML(n.text)}</div>
+        <button type="button" class="jp-note-del" data-jpdel="${n.id}" aria-label="borrar"><i class="ti ti-x"></i></button>
+      </div>`).join('') : '<div class="jp-empty">sin comentarios — pausá donde quieras marcar algo y comentá ese momento</div>';
+    list.querySelectorAll('[data-jpseek]').forEach(p => p.addEventListener('click', () => { au.currentTime = +p.dataset.jpseek; au.play(); }));
+    list.querySelectorAll('[data-jpdel]').forEach(b => b.addEventListener('click', async () => {
+      if (!(await jdConfirm('¿Borrar este comentario?', 'Borrar', true))) return;
+      ent.audioNotes = ent.audioNotes.filter(n => n.id !== +b.dataset.jpdel);
+      save(); drawNotes(); drawPins();
+    }));
+  };
+  play.addEventListener('click', () => { if (au.paused) au.play(); else au.pause(); });
+  au.addEventListener('play', () => { play.innerHTML = '<i class="ti ti-player-pause-filled"></i>'; });
+  au.addEventListener('pause', () => { play.innerHTML = '<i class="ti ti-player-play-filled"></i>'; });
+  au.addEventListener('timeupdate', () => {
+    const d = dur() || 1;
+    fill.style.width = ((au.currentTime / d) * 100) + '%';
+    time.textContent = fmtT(au.currentTime) + ' / ' + fmtT(d);
+    at.textContent = fmtT(au.currentTime);
+    drawWave();
+  });
+  au.addEventListener('loadedmetadata', () => { time.textContent = '0:00 / ' + fmtT(dur()); drawPins(); drawWave(); });
+  bar.addEventListener('click', e => {
+    const d = dur(); if (!d) return;
+    const r = bar.getBoundingClientRect();
+    au.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * d;
+  });
+  host.querySelector('.jp-addnote').addEventListener('click', async () => {
+    const t = Math.floor(au.currentTime || 0);
+    if (!au.paused) au.pause();
+    const txt = await jdPrompt('Comentario en ' + fmtT(t), { placeholder: 'ej: acá entra la quena · subir el bajo…', btnLabel: 'Comentar' });
+    if (txt === null || !txt.trim()) return;
+    ent.audioNotes.push({ id: Date.now(), src, t, text: txt.trim(), date: todayStr() });
+    save(); drawNotes(); drawPins();
+    toast('Comentario en ' + fmtT(t), '💬');
+  });
+  drawPins(); drawNotes();
+}
+
+// Ficha plegable: recordamos qué secciones abriste mientras la app está abierta.
+const _fichaOpen = {};
+function fichaSec(ns, sec, icon, nombre, badge, copyField, bodyHtml) {
+  return `<div class="pd-sec${_fichaOpen[ns + ':' + sec] ? ' open' : ''}" data-sec="${sec}">
+    <button type="button" class="pd-sec-head" data-sechead="${sec}">
+      <i class="ti ${icon}"></i><span class="pd-sec-name">${nombre}</span>
+      <span class="pd-sec-badge">${badge || ''}</span>
+      ${copyField ? `<span class="pd-copy" data-copy="${copyField}" title="copiar"><i class="ti ti-copy"></i></span>` : ''}
+      <i class="ti ti-chevron-down pd-sec-ch"></i>
+    </button>
+    <div class="pd-sec-body">${bodyHtml}</div>
+  </div>`;
+}
+function wireFicha(root, ent, ns, after) {
+  root.querySelectorAll('[data-sechead]').forEach(h => h.addEventListener('click', e => {
+    if (e.target.closest('.pd-copy')) return;
+    const box = h.closest('.pd-sec'); const k = ns + ':' + h.dataset.sechead;
+    _fichaOpen[k] = !box.classList.contains('open');
+    box.classList.toggle('open', _fichaOpen[k]);
+  }));
+  root.querySelectorAll('[data-copy]').forEach(c => c.addEventListener('click', e => {
+    e.stopPropagation();
+    const f = c.dataset.copy;
+    jdCopy(ent[f] || '', ({ lyrics: 'Letra', notes: 'Notas', socialContent: 'Contenido' })[f] || 'Texto');
+  }));
+  root.querySelectorAll('[data-lyxzone]').forEach(z => z.addEventListener('click', () => {
+    openLyricEditor({
+      title: ent.title || 'Letra',
+      get: () => ent.lyrics || '', set: v => { ent.lyrics = v; },
+      getRich: () => ent.lyricsRich || '', setRich: v => { ent.lyricsRich = v; },
+      after,
+    });
+  }));
+  // v3.3.40: reproductor HERO fijo arriba + playlist con portada, nombres y edición
+  const hero = root.querySelector('[data-heroplayer]');
+  if (hero) root._hero = mountHeroPlayer(hero, ent, root.querySelector('.pd-cover-play'));
+  const pl = root.querySelector('[data-jplist]');
+  if (pl) {
+    const cola = songQueue(ent);
+    const thumb = ent.photoData
+      ? `<img class="jp-row-cover" src="${ent.photoData}" alt="">`
+      : '<span class="jp-row-cover ph"><i class="ti ti-disc"></i></span>';
+    pl.innerHTML = cola.length ? cola.map((t, i) => {
+      const nc = (ent.audioNotes || []).filter(n => n.src === t.src).length;
+      return `
+      <div class="jp-track" data-jptrack="${i}">
+        <button type="button" class="jp-track-head">${thumb}<span class="jp-track-name">${escapeHTML(t.name)}</span><span class="jp-track-meta">${nc ? '💬' + nc : ''}</span>
+          <span class="jp-track-edit" data-jped="${i}" title="renombrar"><i class="ti ti-pencil"></i></span>
+          <span class="jp-track-edit danger" data-jpdel2="${i}" title="quitar"><i class="ti ti-x"></i></span>
+          <i class="ti ti-player-play-filled jp-track-go"></i></button>
+      </div>`;
+    }).join('') : '<div class="jp-empty">pegá un link de Drive/Dropbox (o un wav/mp3) en Links o Archivos, o grabá una idea de voz — y acá se arma la playlist</div>';
+    pl.querySelectorAll('.jp-track').forEach((box, i) => {
+      box.querySelector('.jp-track-head').addEventListener('click', e => {
+        if (e.target.closest('.jp-track-edit')) return;
+        pl.querySelectorAll('.jp-track').forEach(x => x.classList.remove('open'));
+        box.classList.add('open');
+        if (root._hero) root._hero.load(i, true);
+      });
+    });
+    pl.querySelectorAll('[data-jped]').forEach(b => b.addEventListener('click', async e => {
+      e.stopPropagation();
+      const t = cola[+b.dataset.jped]; if (!t) return;
+      if (t.idea) { toast('La idea de voz se regraba en su sección', '🎙'); return; }
+      const v = await jdPrompt('Nombre de la pista', { value: t.name, btnLabel: 'Guardar' });
+      if (v === null || !v.trim() || !t.kv) return;
+      t.kv.name = v.trim();
+      save(); if (after) after();
+    }));
+    pl.querySelectorAll('[data-jpdel2]').forEach(b => b.addEventListener('click', async e => {
+      e.stopPropagation();
+      const t = cola[+b.dataset.jpdel2]; if (!t) return;
+      if (!(await jdConfirm(`¿Quitar "${t.name}" de la canción?`, 'Quitar', true))) return;
+      if (t.idea) { ent.audioData = null; ent.audioSec = 0; }
+      else if (t.kv) {
+        ent.files = (ent.files || []).filter(x => x !== t.kv);
+        ent.links = (ent.links || []).filter(x => x !== t.kv);
+      }
+      save(); if (after) after();
+    }));
+  }
+}
+function fichaAudioFiles(ent) {
+  return (ent.files || []).map((kv, i) => esAudioUrl(kv.url)
+    ? `<div class="jp-file"><div class="jp-file-name"><i class="ti ti-file-music"></i> ${escapeHTML(kv.name || 'audio')}</div><div class="jp-host" data-jpfile="${i}"></div></div>`
+    : '').join('');
+}
+
 function renderPlantDetail() {
   const el = $('#plantDetail');
   if (!selectedPlantId) { el.innerHTML = ''; return; }
@@ -4507,38 +5121,64 @@ function renderPlantDetail() {
   const ds = stagesDone(f);
   const n = stagesOf(f).length || 1;   // nº REAL de etapas del cantero (arregla el bug ÷4)
   const pct = Math.round((ds/n)*100);
+  const tracksP = songTracks(f);
+  const nAudios = tracksP.length + (f.audioData ? 1 : 0);
+  const nNotas = (f.audioNotes||[]).length;
   el.innerHTML = `
     <div class="plant-detail">
-      <div class="head">
-        <input type="text" class="title" data-pf="title" value="${escapeHTML(f.title||'')}" style="border:none;font-weight:500;font-size:14px;color:var(--gold);background:transparent;padding:0;flex:1;">
-        <div class="pct">${ds}/${n} · ${pct}%</div>
+      <div class="pd-hero">
+        <div class="pd-cover">
+          ${f.photoData ? `<img class="pd-img pd-hero-img" src="${f.photoData}" alt="">` : `<div class="pd-hero-img pd-hero-ph"><i class="ti ti-disc"></i></div>`}
+          <button type="button" class="pd-cover-play" aria-label="reproducir"><i class="ti ti-player-play-filled"></i></button>
+        </div>
+        <div class="pd-hero-main">
+          <input type="text" class="title" data-pf="title" value="${escapeHTML(f.title||'')}">
+          <div class="pct">${ds}/${n} etapas · ${pct}%</div>
+        </div>
       </div>
       <div class="stages">
         ${stagesOf(f).map(s => `<div class="stage ${f[s.id]?'done':''}" data-pstage="${s.id}">${s.label}</div>`).join('')}
       </div>
+      <div class="pd-heroplayer" data-heroplayer="1"></div>
       <button class="pd-edit-stages" id="pdEditStages"><i class="ti ti-list-check"></i> Editar etapas de esta planta</button>
-      <div class="flor-progress-bar" style="margin:8px 0;"><div style="width:${pct}%"></div></div>
 
-      <div class="pd-section">
-        <label>Letra con acordes</label>
-        <textarea data-pf="lyrics" rows="6" placeholder="la letra... [Am] [F] sobre las sílabas">${escapeHTML(f.lyrics||'')}</textarea>
-      </div>
+      ${fichaSec('plant', 'lyrics', 'ti-music', 'Letra con acordes', f.lyrics ? '●' : '', 'lyrics', `
+        <div class="lyx-preview" data-lyxzone="1">${_lyxHtml(f) || '<span class="lyx-ph">tocá para abrir el editor de letras…</span>'}</div>
+      `)}
 
-      <div class="pd-section">
-        <label>Notas de producción</label>
-        <textarea data-pf="notes" rows="2" placeholder="falta grabar quenas, fix hi hats...">${escapeHTML(f.notes||'')}</textarea>
-      </div>
+      ${fichaSec('plant', 'playlist', 'ti-playlist', 'Playlist', nAudios || '', '', `
+        <div class="jp-playlist" data-jplist="1"></div>
+      `)}
 
-      <div class="pd-section">
-        <label>Contenido redes sociales</label>
-        <textarea data-pf="socialContent" rows="2" placeholder="copy para teaser, caption para reel...">${escapeHTML(f.socialContent||'')}</textarea>
-      </div>
+      ${fichaSec('plant', 'ideas', 'ti-microphone', 'Ideas de voz', f.audioData ? fmtT(f.audioSec||0) + (nNotas ? ' · 💬' + nNotas : '') : '', '', `
+        ${f.audioData ? `
+          <div class="slot-actions">
+            <button class="btn ghost tiny" data-pact="audioRec" id="pdRec-${f.id}"><i class="ti ti-refresh"></i> Re-grabar</button>
+            <button class="btn ghost tiny" data-pact="audioDl"><i class="ti ti-download"></i></button>
+            <button class="btn ghost tiny danger" data-pact="audioRm"><i class="ti ti-x"></i> Quitar</button>
+            <span class="voice-status" id="pdStatus-${f.id}"></span>
+            <span class="voice-time" id="pdTime-${f.id}"></span>
+          </div>
+        ` : `
+          <div class="pd-empty">
+            <button class="btn ghost tiny" data-pact="audioRec" id="pdRec-${f.id}"><i class="ti ti-microphone"></i> Grabar idea de voz</button>
+            <span class="voice-status" id="pdStatus-${f.id}"></span>
+            <span class="voice-time" id="pdTime-${f.id}"></span>
+          </div>
+        `}
+      `)}
 
-      <div class="pd-section">
-        <label><i class="ti ti-photo"></i> Foto / portada</label>
+      ${fichaSec('plant', 'notes', 'ti-tool', 'Notas de producción', f.notes ? '●' : '', 'notes', `
+        <textarea data-pf="notes" rows="3" placeholder="falta grabar quenas, fix hi hats...">${escapeHTML(f.notes||'')}</textarea>
+      `)}
+
+      ${fichaSec('plant', 'social', 'ti-speakerphone', 'Contenido redes', f.socialContent ? '●' : '', 'socialContent', `
+        <textarea data-pf="socialContent" rows="3" placeholder="copy para teaser, caption para reel...">${escapeHTML(f.socialContent||'')}</textarea>
+      `)}
+
+      ${fichaSec('plant', 'photo', 'ti-photo', 'Portada', f.photoData ? '●' : '', '', `
         ${f.photoData ? `
-          <img class="pd-img" src="${f.photoData}" alt="">
-          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+          <div class="slot-actions" style="margin-top:0;">
             <button class="btn ghost tiny" data-pact="photoUp"><i class="ti ti-refresh"></i> Cambiar</button>
             <button class="btn ghost tiny" data-pact="photoCam"><i class="ti ti-camera"></i> Capturar</button>
             <button class="btn ghost tiny danger" data-pact="photoRm"><i class="ti ti-x"></i> Quitar</button>
@@ -4549,40 +5189,17 @@ function renderPlantDetail() {
             <button class="btn ghost tiny" data-pact="photoCam"><i class="ti ti-camera"></i> Capturar</button>
           </div>
         `}
-      </div>
+      `)}
 
-      <div class="pd-section">
-        <label><i class="ti ti-microphone"></i> Audio de referencia</label>
-        ${f.audioData ? `
-          <audio controls src="${f.audioData}"></audio>
-          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
-            <span class="muted small">${f.audioSec||0}s</span>
-            <button class="btn ghost tiny" data-pact="audioRec" id="pdRec-${f.id}"><i class="ti ti-refresh"></i> Re-grabar</button>
-            <button class="btn ghost tiny" data-pact="audioDl"><i class="ti ti-download"></i></button>
-            <button class="btn ghost tiny danger" data-pact="audioRm"><i class="ti ti-x"></i> Quitar</button>
-            <span class="voice-status" id="pdStatus-${f.id}"></span>
-            <span class="voice-time" id="pdTime-${f.id}"></span>
-          </div>
-        ` : `
-          <div class="pd-empty">
-            <button class="btn ghost tiny" data-pact="audioRec" id="pdRec-${f.id}"><i class="ti ti-microphone"></i> Grabar audio</button>
-            <span class="voice-status" id="pdStatus-${f.id}"></span>
-            <span class="voice-time" id="pdTime-${f.id}"></span>
-          </div>
-        `}
-      </div>
-
-      <div class="pd-section">
-        <label>Links</label>
+      ${fichaSec('plant', 'links', 'ti-link', 'Links', (f.links||[]).length || '', '', `
         <div class="kvlist" data-list="pdLinks-${f.id}">${renderKvList(f.links||[])}</div>
         <button class="btn ghost tiny" data-additem="pdLinks-${f.id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar link</button>
-      </div>
+      `)}
 
-      <div class="pd-section">
-        <label>Archivos</label>
+      ${fichaSec('plant', 'files', 'ti-paperclip', 'Archivos', (f.files||[]).length || '', '', `
         <div class="kvlist" data-list="pdFiles-${f.id}">${renderKvList(f.files||[])}</div>
         <button class="btn ghost tiny" data-additem="pdFiles-${f.id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar archivo</button>
-      </div>
+      `)}
 
       <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:14px;padding-top:12px;border-top:0.5px solid var(--border);flex-wrap:wrap;">
         <button class="btn ghost tiny danger" id="plantDel"><i class="ti ti-trash"></i> Eliminar</button>
@@ -4590,6 +5207,7 @@ function renderPlantDetail() {
       </div>
     </div>
   `;
+  wireFicha(el, f, 'plant', () => renderPlantDetail());
   // Stage clicks
   el.querySelectorAll('[data-pstage]').forEach(b => b.addEventListener('click', () => {
     const stage = b.dataset.pstage;
@@ -4769,9 +5387,9 @@ function renderStageEditorList(){
   if (!stageDraft.length) { host.innerHTML = '<div class="empty">sin etapas · agregá una o elegí una plantilla</div>'; return; }
   host.innerHTML = stageDraft.map((s,i) => `
     <div class="stage-row" data-k="${s._k}">
-      <button class="dnd-grip" type="button" aria-label="reordenar"><i class="ti ti-grip-vertical"></i></button>
       <span class="st-num">${i+1}</span>
       <input type="text" class="st-input" value="${escapeHTML(s.label)}" placeholder="nombre de la etapa...">
+      <button class="dnd-grip" type="button" aria-label="reordenar"><i class="ti ti-grip-vertical"></i></button>
       <button class="st-del" type="button" title="quitar"><i class="ti ti-x"></i></button>
     </div>`).join('');
   host.querySelectorAll('.stage-row').forEach(row => {
@@ -5966,56 +6584,33 @@ function renderSemBodyInline(id, container) {
   if (!Array.isArray(s.stages)) s.stages = [];
   if (!Array.isArray(s.links)) s.links = s.link ? [{name:'link', url:s.link}] : [];
   if (!Array.isArray(s.files)) s.files = [];
+  const tracksS = songTracks(s);
+  const nAudiosS = tracksS.length + (s.audioData ? 1 : 0);
+  const nNotasS = (s.audioNotes||[]).length;
   container.innerHTML = `
-    <input type="text" class="sem-title-input" data-sf="title" value="${escapeHTML(s.title||'')}" placeholder="nombre...">
-
-    <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-route"></i> Etapas</label>
-      <div id="semStg-${id}">
-        ${s.stages.map((st,i)=>`<div class="nf-stage"><input type="text" value="${escapeHTML(st)}" data-semstg="${i}" placeholder="paso..."><button class="nf-stage-rm" data-semstgrm="${i}" aria-label="quitar"><i class="ti ti-x"></i></button></div>`).join('')}
+    <div class="pd-hero">
+      <div class="pd-cover">
+        ${s.photoData ? `<img class="preview-img pd-hero-img" src="${s.photoData}" alt="">` : `<div class="pd-hero-img pd-hero-ph"><i class="ti ti-seeding"></i></div>`}
+        <button type="button" class="pd-cover-play" aria-label="reproducir"><i class="ti ti-player-play-filled"></i></button>
       </div>
-      <button class="btn ghost tiny" data-act="stgAdd"><i class="ti ti-plus"></i> Etapa</button>
+      <div class="pd-hero-main">
+        <input type="text" class="sem-title-input" data-sf="title" value="${escapeHTML(s.title||'')}" placeholder="nombre...">
+        <div class="pct">semilla · ${s.stages.length} pasos</div>
+      </div>
     </div>
+    <div class="pd-heroplayer" data-heroplayer="1"></div>
 
-    <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-music"></i> Letra con acordes</label>
-      <textarea data-sf="lyrics" rows="4" placeholder="la letra... [Am] [F] sobre las sílabas">${escapeHTML(s.lyrics||'')}</textarea>
-    </div>
+    ${fichaSec('seed', 'lyrics', 'ti-music', 'Letra con acordes', s.lyrics ? '●' : '', 'lyrics', `
+      <div class="lyx-preview" data-lyxzone="1">${_lyxHtml(s) || '<span class="lyx-ph">tocá para abrir el editor de letras…</span>'}</div>
+    `)}
 
-    <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-tool"></i> Notas</label>
-      <textarea data-sf="notes" rows="3" placeholder="ideas, pendientes, producción...">${escapeHTML(s.notes||'')}</textarea>
-    </div>
+    ${fichaSec('seed', 'playlist', 'ti-playlist', 'Playlist', nAudiosS || '', '', `
+      <div class="jp-playlist" data-jplist="1"></div>
+    `)}
 
-    <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-speakerphone"></i> Contenido redes sociales</label>
-      <textarea data-sf="socialContent" rows="2" placeholder="copy para teaser, caption para reel...">${escapeHTML(s.socialContent||'')}</textarea>
-    </div>
-
-    <div class="sem-slot ${s.photoData?'':'empty'}">
-      <label class="slot-label"><i class="ti ti-photo"></i> Foto portada</label>
-      ${s.photoData ? `
-        <img class="preview-img" src="${s.photoData}" alt="">
-        <div class="slot-actions">
-          <button class="btn ghost tiny" data-act="photoUp"><i class="ti ti-refresh"></i> Cambiar</button>
-          <button class="btn ghost tiny" data-act="photoCam"><i class="ti ti-camera"></i> Capturar</button>
-          <button class="btn ghost tiny danger" data-act="photoRm"><i class="ti ti-x"></i> Quitar</button>
-        </div>
-      ` : `
-        <div class="slot-empty">
-          <div class="hint">aún sin foto</div>
-          <button class="btn ghost" data-act="photoUp"><i class="ti ti-photo-plus"></i> Subir foto</button>
-          <button class="btn ghost" data-act="photoCam"><i class="ti ti-camera"></i> Capturar</button>
-        </div>
-      `}
-    </div>
-
-    <div class="sem-slot ${s.audioData?'':'empty'}">
-      <label class="slot-label"><i class="ti ti-microphone"></i> Audio referencia</label>
+    ${fichaSec('seed', 'ideas', 'ti-microphone', 'Ideas de voz', s.audioData ? fmtT(s.audioSec||0) + (nNotasS ? ' · 💬' + nNotasS : '') : '', '', `
       ${s.audioData ? `
-        <audio controls src="${s.audioData}"></audio>
         <div class="slot-actions">
-          <span class="muted small">${s.audioSec||0}s</span>
           <button class="btn ghost tiny" data-act="audioRec" id="semRec-${id}"><i class="ti ti-refresh"></i> Re-grabar</button>
           <button class="btn ghost tiny" data-act="audioDl"><i class="ti ti-download"></i></button>
           <button class="btn ghost tiny danger" data-act="audioRm"><i class="ti ti-x"></i> Quitar</button>
@@ -6024,31 +6619,59 @@ function renderSemBodyInline(id, container) {
         </div>
       ` : `
         <div class="slot-empty">
-          <div class="hint">aún sin audio</div>
-          <button class="btn ghost" data-act="audioRec" id="semRec-${id}"><i class="ti ti-microphone"></i> Grabar audio</button>
+          <button class="btn ghost" data-act="audioRec" id="semRec-${id}"><i class="ti ti-microphone"></i> Grabar idea de voz</button>
           <span class="voice-status" id="semStatus-${id}"></span>
           <span class="voice-time" id="semTime-${id}"></span>
         </div>
       `}
-    </div>
+    `)}
 
-    <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-link"></i> Links</label>
+    ${fichaSec('seed', 'stages', 'ti-route', 'Etapas', s.stages.length || '', '', `
+      <div id="semStg-${id}">
+        ${s.stages.map((st,i)=>`<div class="nf-stage"><input type="text" value="${escapeHTML(st)}" data-semstg="${i}" placeholder="paso..."><button class="nf-stage-rm" data-semstgrm="${i}" aria-label="quitar"><i class="ti ti-x"></i></button></div>`).join('')}
+      </div>
+      <button class="btn ghost tiny" data-act="stgAdd"><i class="ti ti-plus"></i> Etapa</button>
+    `)}
+
+    ${fichaSec('seed', 'notes', 'ti-tool', 'Notas', s.notes ? '●' : '', 'notes', `
+      <textarea data-sf="notes" rows="3" placeholder="ideas, pendientes, producción...">${escapeHTML(s.notes||'')}</textarea>
+    `)}
+
+    ${fichaSec('seed', 'social', 'ti-speakerphone', 'Contenido redes', s.socialContent ? '●' : '', 'socialContent', `
+      <textarea data-sf="socialContent" rows="2" placeholder="copy para teaser, caption para reel...">${escapeHTML(s.socialContent||'')}</textarea>
+    `)}
+
+    ${fichaSec('seed', 'photo', 'ti-photo', 'Portada', s.photoData ? '●' : '', '', `
+      ${s.photoData ? `
+        <div class="slot-actions" style="margin-top:0;">
+          <button class="btn ghost tiny" data-act="photoUp"><i class="ti ti-refresh"></i> Cambiar</button>
+          <button class="btn ghost tiny" data-act="photoCam"><i class="ti ti-camera"></i> Capturar</button>
+          <button class="btn ghost tiny danger" data-act="photoRm"><i class="ti ti-x"></i> Quitar</button>
+        </div>
+      ` : `
+        <div class="slot-empty">
+          <button class="btn ghost" data-act="photoUp"><i class="ti ti-photo-plus"></i> Subir foto</button>
+          <button class="btn ghost" data-act="photoCam"><i class="ti ti-camera"></i> Capturar</button>
+        </div>
+      `}
+    `)}
+
+    ${fichaSec('seed', 'links', 'ti-link', 'Links', (s.links||[]).length || '', '', `
       <div class="kvlist" data-list="semLinks-${id}">${renderKvList(s.links)}</div>
       <button class="btn ghost tiny" data-additem="semLinks-${id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar link</button>
-    </div>
+    `)}
 
-    <div class="sem-slot">
-      <label class="slot-label"><i class="ti ti-paperclip"></i> Archivos</label>
+    ${fichaSec('seed', 'files', 'ti-paperclip', 'Archivos', (s.files||[]).length || '', '', `
       <div class="kvlist" data-list="semFiles-${id}">${renderKvList(s.files)}</div>
       <button class="btn ghost tiny" data-additem="semFiles-${id}" style="margin-top:6px;"><i class="ti ti-plus"></i> Agregar archivo</button>
-    </div>
+    `)}
 
     <div class="actions" style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap;">
       <button class="btn ghost tiny danger" data-act="del"><i class="ti ti-trash"></i> Eliminar</button>
       <button class="btn gold tiny" data-act="sembrar"><i class="ti ti-plant"></i> Sembrar como planta</button>
     </div>
   `;
+  wireFicha(container, s, 'seed', () => renderSemillero());
   // Bind campos de texto (guarda al tipear; re-render solo al salir del título)
   container.querySelectorAll('[data-sf]').forEach(inp => {
     inp.addEventListener('input', e => { s[inp.dataset.sf] = e.target.value; save(); });
@@ -6323,7 +6946,7 @@ function renderSemForm() {
       <div id="nfMore" style="display:${_more?'block':'none'}">
         <div class="sem-slot">
           <label class="slot-label"><i class="ti ti-music"></i> Letra con acordes</label>
-          <textarea id="nfLyrics" rows="3" placeholder="la letra... [Am] [F] sobre las sílabas">${escapeHTML(d.lyrics||'')}</textarea>
+          <div class="lyx-preview" id="nfLyxZone">${d.lyricsRich || escapeHTML(d.lyrics||'').replace(/\n/g,'<br>') || '<span class="lyx-ph">tocá para abrir el editor de letras…</span>'}</div>
         </div>
         <div class="sem-slot">
           <label class="slot-label"><i class="ti ti-speakerphone"></i> Contenido redes sociales</label>
@@ -6336,7 +6959,7 @@ function renderSemForm() {
         <div class="sem-slot">
           <label class="slot-label"><i class="ti ti-route"></i> Pasos para terminarla</label>
           <div id="nfStages">
-            ${d.stages.map((st,i)=>`<div class="nf-stage" data-k="${i}"><button class="dnd-grip" tabindex="-1" aria-label="mover paso"><i class="ti ti-grip-vertical"></i></button><input type="text" value="${escapeHTML(st)}" data-stg="${i}" placeholder="paso..."><button class="nf-stage-rm" data-stgrm="${i}" aria-label="quitar paso"><i class="ti ti-x"></i></button></div>`).join('')}
+            ${d.stages.map((st,i)=>`<div class="nf-stage" data-k="${i}"><input type="text" value="${escapeHTML(st)}" data-stg="${i}" placeholder="paso..."><button class="dnd-grip" tabindex="-1" aria-label="mover paso"><i class="ti ti-grip-vertical"></i></button><button class="nf-stage-rm" data-stgrm="${i}" aria-label="quitar paso"><i class="ti ti-x"></i></button></div>`).join('')}
           </div>
           <button class="btn ghost tiny" id="nfStageAdd"><i class="ti ti-plus"></i> Paso</button>
         </div>
@@ -6349,7 +6972,12 @@ function renderSemForm() {
     </div>
   `;
   $('#nfTitle').addEventListener('input', e => { d.title = e.target.value; });
-  $('#nfLyrics').addEventListener('input', e => { d.lyrics = e.target.value; });
+  $('#nfLyxZone')?.addEventListener('click', () => openLyricEditor({
+    title: d.title || 'Nueva semilla', persist: false,
+    get: () => d.lyrics || '', set: v => { d.lyrics = v; },
+    getRich: () => d.lyricsRich || '', setRich: v => { d.lyricsRich = v; },
+    after: () => renderSemForm(),
+  }));
   $('#nfNotes').addEventListener('input', e => { d.notes = e.target.value; });
   $('#nfSocial').addEventListener('input', e => { d.socialContent = e.target.value; });
   $('#nfLink').addEventListener('input', e => { d.link = e.target.value; });
@@ -6948,16 +7576,8 @@ function renderAfinador() {
   const dbCal = $('#dbmCalib');
   if (dbCal && !dbCal._wired) { dbCal._wired = true; dbCal.addEventListener('click', calibrarDb); }
   renderDbZone();
-  const toggle = $('#utilToggle'), body = $('#utilBody');
-  if (toggle && body && !toggle._wired) {
-    toggle._wired = true;
-    toggle.addEventListener('click', () => {
-      utilOpen = !utilOpen;
-      body.style.display = utilOpen ? 'block' : 'none';
-      toggle.classList.toggle('open', utilOpen);
-      if (!utilOpen) stopUtilAudio(); // cerrar la sección apaga el mic
-    });
-  }
+  // v3.3.39: Utilidades usa el plegado ESTÁNDAR de los widgets de Hoy (misma fila que ¿Qué Quiero?);
+  // el apagado del mic al plegar vive en el manejador estándar de injectHoyControls.
 }
 
 // ========================= BRAND PROFILE =========================
@@ -8094,7 +8714,7 @@ function renderPlantSteps() {
 
 // ========================= HOY · WIDGETS MODULARES =========================
 const HOY_NAMES = { agenda:'Tareas', bitacora:'Bitácora', voces:'Voces', stats:'Progreso', riego:'Riego', dashboard:'Estadísticas', utilidades:'Utilidades', deseos:'¿Qué Quiero?' };
-const HOY_COLLAPSIBLE = { agenda:1, bitacora:1, voces:1, stats:1, riego:1, deseos:1 }; // dashboard y utilidades usan su propio toggle interno
+const HOY_COLLAPSIBLE = { agenda:1, bitacora:1, voces:1, stats:1, riego:1, deseos:1, utilidades:1 }; // dashboard usa su propio toggle interno
 
 // Envuelve el contenido de cada widget en .widget-body y le antepone una barra
 // con grip (mover) + nombre (visible al colapsar) + chevron (minimizar). Idempotente.
@@ -8112,8 +8732,8 @@ function injectHoyControls() {
     const collapseBtn = HOY_COLLAPSIBLE[key]
       ? '<button class="widget-collapse" type="button" aria-label="minimizar"><i class="ti ti-chevron-down"></i></button>'
       : '';
-    bar.innerHTML = '<button class="widget-grip" type="button" aria-label="mover"><i class="ti ti-grip-vertical"></i></button>'
-      + '<span class="widget-name">' + (HOY_NAMES[key] || key) + '</span>'
+    bar.innerHTML = '<span class="widget-name">' + (HOY_NAMES[key] || key) + '</span>'
+      + '<button class="widget-grip" type="button" aria-label="mover"><i class="ti ti-grip-vertical"></i></button>'
       + collapseBtn;
     w.appendChild(bar);
     w.appendChild(body);
@@ -8123,6 +8743,7 @@ function injectHoyControls() {
       e.stopPropagation();
       S.config.hoyCollapsed[key] = !S.config.hoyCollapsed[key];
       save(); applyHoyCollapsed();
+      if (key === 'utilidades' && S.config.hoyCollapsed[key] && typeof stopUtilAudio === 'function') stopUtilAudio();
     });
   });
 }
